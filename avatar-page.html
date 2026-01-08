@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DFWy</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Helvetica", monospace;
+        }
+        
+        body {
+            background-color: transparent;
+            overflow: hidden;
+            color: #000;
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: 100vw;
+            margin: 0;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .top-section {
+            position: absolute;
+            top: 55px; /* Center vertically */
+            left: 50%; /* Center horizontally */
+            transform: translate(-50%, -50%); /* Adjust for element dimensions */
+            width: 500px; /* Match the width of the content (top-controls and collections-row) */
+            display: flex;
+            flex-direction: column;
+            padding: 10px 15px 15px 15px;
+            background-color: rgba(255, 255, 255, 0); /* Transparent background */
+            z-index: 10; /* Ensure menus are on top */
+            gap: 10px;
+        }
+
+        .top-controls {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            width: 500px;
+            gap: 10px;
+        }
+
+        .media-btn-container {
+            z-index: 11;
+            height: 32px;
+            display: flex;
+            gap: 8px;
+            width: 500px;
+            padding-left: 0;
+            padding-right: 0;
+        }
+
+        .collections-row {
+            display: flex;
+            width: 500px;
+            padding-left: 0;
+            padding-right: 0;
+            gap: 6px;
+            z-index: 11;
+        }
+
+        .collections {
+            display: flex;
+            gap: 6px;
+            z-index: 11;
+            height: 32px;
+            width: 100%;
+            white-space: nowrap;
+        }
+
+        .media-btn, .collection-btn {
+            padding: 5px 6px;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+            background-color: rgba(255, 255, 255, 0.7);
+            cursor: pointer;
+            font-size: 10px;
+            transition: all 0.2s;
+            color: #000;
+            box-shadow: none;
+            text-shadow: none;
+            height: 32px;
+            line-height: 20px;
+            flex: 1;
+            outline: none;
+            position: relative; /* Ensure buttons are interactive */
+        }
+
+        .collection-btn {
+            padding: 5px 4px;
+            font-size: 9px;
+            letter-spacing: 0px;
+        }
+
+        .media-btn {
+            font-style: italic;
+            font-weight: bold;
+            letter-spacing: 0.1px;
+        }
+
+        .all-btn {
+            font-weight: bolder !important;
+            background-color: rgba(240, 240, 240, 0.9) !important;
+        }
+        
+        .collection-btn:hover, .media-btn:hover {
+            background-color: rgba(240, 240, 240, 0.9);
+        }
+
+        /* Active state for buttons (both collection and media buttons) */
+        .collection-btn.active, .media-btn.active {
+            background-color: rgba(0, 0, 0, 0.8); /* Dark background for active state */
+            color: white; /* White text for active state */
+            opacity: 1;
+        }
+
+        /* Viewer styles */
+        #viewerContainer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            z-index: 1; /* Behind the menu */
+        }
+
+        #contentViewer,
+        #htmlViewer {
+            width: 100%;
+            height: min(100vh, 840px);
+            border: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            transition: opacity 0.3s ease;
+        }
+
+        #htmlViewer {
+            display: none;
+            background: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="top-section">
+            <div class="top-controls">
+                <div class="media-btn-container">
+                    <button class="media-btn" id="media-btn">Home</button>
+                    <button class="media-btn" id="theater-btn">Theater</button>
+                    <button class="media-btn" id="runway-btn">Runway</button>
+                    <button class="media-btn" id="gallery-top-btn">Gallery</button>
+                    <button class="media-btn" id="space-btn">Space</button>
+                    <button class="media-btn" id="avatar-top-btn">Avatar</button>
+                    <button class="media-btn" id="design-top-btn">Design</button>
+                    <button class="media-btn" id="info-btn">Info</button>
+                </div>
+            </div>
+            <div class="collections-row">
+                <div class="collections">
+                    <button class="collection-btn" id="all-btn">C2W2</button>
+                    <button class="collection-btn" id="experience-btn">C2W</button>
+                    <button class="collection-btn" id="gallery-collection-btn">Legacy</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Viewer container -->
+        <div id="viewerContainer">
+            <iframe id="contentViewer" src="about:blank"></iframe>
+            <iframe id="htmlViewer" src="about:blank"></iframe>
+        </div>
+    </div>
+    
+    <script>
+        // Cache DOM elements
+        const dom = {
+            viewer: {
+                container: document.getElementById('viewerContainer'),
+                content: document.getElementById('contentViewer'),
+                html: document.getElementById('htmlViewer')
+            }
+        };
+
+        // Function to set active state on a button
+        function setActiveButton(button, buttonType) {
+            // Determine which set of buttons to target (media or collection)
+            const selector = buttonType === 'media' ? '.media-btn' : '.collection-btn';
+            // Remove active class from all buttons of the same type
+            document.querySelectorAll(selector).forEach(btn => {
+                btn.classList.remove('active');
+            });
+            // Add active class to the clicked button
+            if (button) {
+                button.classList.add('active');
+            }
+        }
+
+        // Load content function
+        async function loadContent(url, type) {
+            const contentViewer = dom.viewer.content;
+            const htmlViewer = dom.viewer.html;
+
+            // Kill existing content
+            if (type === 'html') {
+                contentViewer.src = 'about:blank';
+                htmlViewer.srcdoc = '';
+                contentViewer.style.display = 'none';
+                htmlViewer.style.display = 'block';
+            } else {
+                htmlViewer.srcdoc = '';
+                contentViewer.src = 'about:blank';
+                htmlViewer.style.display = 'none';
+                contentViewer.style.display = 'block';
+            }
+
+            // Brief delay to ensure clean slate
+            await new Promise(resolve => setTimeout(resolve, 50));
+
+            // Load new content
+            try {
+                if (type === 'html') {
+                    const response = await fetch(url);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    const html = await response.text();
+                    htmlViewer.srcdoc = html;
+                } else {
+                    contentViewer.src = url;
+                }
+
+                // Wait for load completion
+                await new Promise((resolve, reject) => {
+                    const activeViewer = type === 'html' ? htmlViewer : contentViewer;
+                    activeViewer.onload = resolve;
+                    activeViewer.onerror = reject;
+                });
+            } catch (error) {
+                console.error('Loading error:', error);
+                htmlViewer.srcdoc = `<p>Error loading content: ${error.message}</p>`;
+            }
+        }
+
+        function setupEventListeners() {
+    // Top menu buttons (navigate to external URLs)
+    const mediaBtn = document.getElementById('media-btn');
+    const theaterBtn = document.getElementById('theater-btn');
+    const runwayBtn = document.getElementById('runway-btn');
+    const galleryTopBtn = document.getElementById('gallery-top-btn');
+    const spaceBtn = document.getElementById('space-btn');
+    const avatarTopBtn = document.getElementById('avatar-top-btn');
+    const designTopBtn = document.getElementById('design-top-btn');
+    const infoBtn = document.getElementById('info-btn');
+
+    if (mediaBtn) {
+        mediaBtn.addEventListener('click', () => {
+            console.log('Media button clicked');
+            setActiveButton(mediaBtn, 'media');
+            window.top.location.href = 'https://www.digitalforgerywork.shop/dojjo';
+        });
+    }
+    if (theaterBtn) {
+        theaterBtn.addEventListener('click', () => {
+            console.log('Theater button clicked');
+            setActiveButton(theaterBtn, 'media');
+            window.top.location.href = 'https://www.digitalforgerywork.shop/theater';
+        });
+    }
+    if (runwayBtn) {
+        runwayBtn.addEventListener('click', () => {
+            console.log('Runway button clicked');
+            setActiveButton(runwayBtn, 'media');
+            window.top.location.href = 'https://www.digitalforgerywork.shop/runway';
+        });
+    }
+    if (galleryTopBtn) {
+        galleryTopBtn.addEventListener('click', () => {
+            console.log('Gallery (top) button clicked');
+            setActiveButton(galleryTopBtn, 'media');
+            window.top.location.href = 'https://www.digitalforgerywork.shop/gallery';
+        });
+    }
+    if (spaceBtn) {
+        spaceBtn.addEventListener('click', () => {
+            console.log('Space button clicked');
+            setActiveButton(spaceBtn, 'media');
+            window.top.location.href = 'https://www.digitalforgerywork.shop/space';
+        });
+    }
+    if (avatarTopBtn) {
+        avatarTopBtn.addEventListener('click', () => {
+            console.log('Avatar (top) button clicked');
+            setActiveButton(avatarTopBtn, 'media');
+            window.top.location.href = 'https://www.digitalforgerywork.shop/avatar';
+        });
+    }
+    if (designTopBtn) {
+        designTopBtn.addEventListener('click', () => {
+            console.log('Design (top) button clicked');
+            setActiveButton(designTopBtn, 'media');
+            window.top.location.href = 'https://www.digitalforgerywork.shop/design';
+        });
+    }
+    if (infoBtn) {
+        infoBtn.addEventListener('click', () => {
+            console.log('Info button clicked');
+            setActiveButton(infoBtn, 'media');
+            window.top.location.href = 'https://www.digitalforgerywork.shop/info';
+        });
+    }
+
+    // Second menu buttons (load GitHub HTML content into viewer)
+    const allBtn = document.getElementById('all-btn');
+    const experienceBtn = document.getElementById('experience-btn');
+    const galleryBtn = document.getElementById('gallery-collection-btn');
+    const architectureBtn = document.getElementById('architecture-btn');
+    const avatarBtn = document.getElementById('avatar-collection-btn');
+    const designBtn = document.getElementById('design-collection-btn');
+
+    if (allBtn) {
+        allBtn.addEventListener('click', () => {
+            console.log('C2W2 button clicked');
+            setActiveButton(allBtn, 'collection');
+            loadContent('https://raw.githubusercontent.com/decentralize-dfw/finder/main/c2w2-avatars.html', 'html');
+        });
+    }
+    if (experienceBtn) {
+        experienceBtn.addEventListener('click', () => {
+            console.log('C2W button clicked');
+            setActiveButton(experienceBtn, 'collection');
+            loadContent('https://raw.githubusercontent.com/decentralize-dfw/finder/main/c2w-viewer.html', 'html');
+        });
+    }
+    if (galleryBtn) {
+        galleryBtn.addEventListener('click', () => {
+            console.log('Legacy button clicked');
+            setActiveButton(galleryBtn, 'collection');
+            loadContent('https://raw.githubusercontent.com/decentralize-dfw/finder/main/infoviewer.html', 'html');
+        });
+    }
+   
+    // Automatically load the first page ("ALL") on page load
+    if (allBtn) {
+        console.log('Page loaded, triggering ALL button click');
+        allBtn.click();
+    } else {
+        console.error('ALL button not found on page load');
+    }
+
+    // Set the "Avatar" button as active by default
+    if (avatarTopBtn) {
+        setActiveButton(avatarTopBtn, 'media');
+    }
+}
+
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM fully loaded, setting up event listeners');
+            setupEventListeners();
+        });
+    </script>
+</body>
+</html>
