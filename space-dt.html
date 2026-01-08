@@ -1,0 +1,2854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Topographies</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Global styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Helvetica", monospace;
+        }
+        
+        body {
+            background-color: transparent;
+            overflow: hidden;
+            color: #000;
+        }
+        
+        /* Main container */
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 800px;
+            width: 100vw;
+            margin: 0 auto;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        /* Top section with filters and search */
+        .top-section {
+            height: auto;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            padding: 15px;
+            background-color: rgba(255, 255, 255, 0);
+            z-index: 10;
+            gap: 10px;
+        }
+
+        .top-controls {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            width: 400px;
+            gap: 10px;
+        }
+
+        .title {
+            font-size: 28px;
+            font-weight: 1000;
+            margin-left: 0;
+            -webkit-text-stroke: 0.5px black;
+            width: 100%;
+        }
+
+        .media-btn-container {
+            z-index: 6;
+            height: 32px;
+            display: flex;
+            gap: 8px;
+            width: 400px;
+            padding-left: 0;
+            padding-right: 0;
+        }
+
+        .collections-row {
+            display: flex;
+            width: 400px;
+            padding-left: 0;
+            padding-right: 0;
+            gap: 6px;
+        }
+
+        .collections {
+            display: flex;
+            gap: 6px;
+            z-index: 6;
+            height: 32px;
+            width: 100%;
+            white-space: nowrap;
+        }
+
+        .search-row {
+            display: flex;
+            width: 400px;
+            padding-left: 0;
+            padding-right: 0;
+        }
+
+        .search-container {
+            z-index: 6;
+            width: 100%;
+        }
+
+        .search-input {
+            padding: 5px 10px;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+            background-color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+            width: 100%;
+            font-family: "Helvetica", monospace;
+            height: 32px;
+            line-height: 20px;
+            box-sizing: border-box;
+        }
+
+        .media-btn, .collection-btn {
+            padding: 5px 6px;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+            background-color: rgba(255, 255, 255, 0.7);
+            cursor: pointer;
+            font-size: 10px;
+            transition: all 0.2s;
+            color: #000;
+            box-shadow: none;
+            text-shadow: none;
+            height: 32px;
+            line-height: 20px;
+            flex: 1;
+            outline: none;
+        }
+
+        .collection-btn {
+            padding: 5px 4px;
+            font-size: 9px;
+            letter-spacing: 0px;
+        }
+
+        .media-btn {
+            font-style: italic;
+            font-weight: bold;
+            letter-spacing: 0.1px;
+        }
+
+        .all-btn {
+            font-weight: bolder !important;
+            background-color: rgba(240, 240, 240, 0.9);
+        }
+        
+        .collection-btn:hover, .media-btn:hover {
+            background-color: rgba(240, 240, 240, 0.9);
+        }
+        
+        .collection-btn.active, .media-btn.active {
+            background-color: rgba(100, 100, 100, 0.8);
+            color: white;
+        }
+        
+        .viewer-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 1;
+            overflow: visible;
+            pointer-events: auto;
+        }
+        
+        #viewer-canvas {
+            width: 100%;
+            height: 100%;
+            pointer-events: auto;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        
+        .viewer-container.active {
+            pointer-events: auto;
+            z-index: 1;
+        }
+        
+        .avatar-details {
+            position: absolute;
+            padding: 0;
+            max-height: 80vh;
+            overflow: hidden;
+            z-index: 4;
+            color: #000;
+            background-color: transparent;
+            width: 400px;
+            display: flex;
+            flex-direction: column;
+            margin: 0;
+            left: 15px;
+            top: 50px;
+            box-sizing: border-box;
+        }
+        
+        .details-title {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            width: 100%;
+            padding: 0;
+        }
+        
+        .compact-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+            align-items: center;
+            width: 100%;
+            padding: 0;
+        }
+        
+        .info-pill, .link-pill {
+            background-color: rgba(255, 255, 255, 0.4);
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 9px;
+            white-space: nowrap;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        
+        .link-pill {
+            cursor: pointer;
+        }
+        
+        .description-text {
+            font-size: 10px;
+            font-weight: bold;
+            line-height: 1.5;
+            text-align: left;
+            margin-bottom: 10px;
+            letter-spacing: -0.2px;
+            width: 100%;
+            padding: 0;
+        }
+        
+        .collection-text {
+            font-size: 9px;
+            font-style: italic;
+            line-height: 1.4;
+            text-align: justify;
+            width: 100%;
+            padding: 0;
+        }
+        
+        .control-label, .lighting-label {
+            font-size: 11px;
+            color: rgba(0, 0, 0, 0.7);
+            margin-bottom: 5px;
+            display: block;
+            width: 100%;
+            padding: 0;
+        }
+        
+        .control-row {
+            display: flex;
+            width: 100%;
+            gap: 14px;
+            margin-bottom: 10px;
+            align-items: center;
+            padding: 0;
+        }
+        
+        .light-btn, .action-btn {
+            padding: 8px 0;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+            background-color: rgba(255, 255, 255, 0.5);
+            color: #000;
+            cursor: pointer;
+            font-size: 9px;
+            transition: all 0.2s;
+            text-align: center;
+            flex: 1;
+            box-sizing: border-box;
+        }
+        
+        .light-label {
+            font-size: 9px;
+            display: inline-block;
+            vertical-align: middle;
+            margin: 0;
+            padding: 0;
+            flex: 0 0 30px;
+        }
+        
+        .light-btn:hover, .action-btn:hover {
+            background-color: rgba(220, 220, 220, 0.9);
+        }
+        
+        .light-btn.active {
+            background-color: rgba(100, 100, 100, 0.8);
+            color: white;
+        }
+        
+        .bottom-section {
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 80px;
+            z-index: 5;
+            text-align: center;
+        }
+        
+        .avatar-selector {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+        
+        .avatar-carousel {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .avatar-item {
+            width: 64.5px;
+            height: 80px;
+            position: absolute;
+            transform-origin: center;
+            transition: all 0.3s ease;
+            opacity: 0.7;
+            z-index: 1;
+            margin: 0;
+            padding: 0;
+            cursor: pointer;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+        }
+        
+        .avatar-thumbnail {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 8px;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            background-color: #fff;
+            margin-bottom: 0;
+        }
+        
+        .avatar-item.active .avatar-thumbnail {
+            border-color: rgba(0, 120, 255, 0.8);
+            box-shadow: 0 0 10px rgba(0, 120, 255, 0.5);
+            opacity: 1;
+        }
+        
+        .avatar-name, .media-item-name {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(255, 255, 255, 0.8);
+            color: #000;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            z-index: 50;
+            opacity: 0;
+            font-weight: normal;
+        }
+        
+        .avatar-item:hover .avatar-name, .media-item:hover .media-item-name {
+            opacity: 1;
+        }
+        
+        .media-view {
+            position: absolute;
+            top: 90px;
+            left: 10px;
+            right: 10px;
+            bottom: 120px;
+            background-color: transparent;
+            z-index: 2;
+            display: none;
+            pointer-events: none;
+        }
+        
+        .media-view.active {
+            pointer-events: auto;
+        }
+        
+        .media-content {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: transparent !important;
+        }
+        
+        .media-preview {
+            width: 80%;
+            height: 80%;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: visible;
+            background: transparent !important;
+            position: relative;
+        }
+        
+        .media-image {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        
+        .media-video-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: transparent !important;
+            position: relative;
+        }
+
+        .media-video {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            width: auto;
+            height: auto;
+            background: transparent !important;
+            aspect-ratio: 16/9;
+        }
+        
+        .media-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.3s ease;
+            z-index: 5;
+            pointer-events: none;
+        }
+        
+        .media-video-container:hover .media-overlay,
+        .media-preview:hover .media-overlay {
+            opacity: 0;
+        }
+        
+        .media-overlay-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #000;
+            margin-bottom: 10px;
+            text-align: center;
+            padding: 0 20px;
+        }
+        
+        .media-overlay-description {
+            font-size: 12px;
+            color: #000;
+            text-align: center;
+            padding: 0 20px;
+            line-height: 1.4;
+        }
+        
+        .media-text {
+            width: 50%;
+            height: 90%;
+            padding: 0px;
+            padding-right: 10px;
+            letter-spacing: -0.15px;
+            background-color: rgba(255, 255, 255, 0);
+            overflow-y: auto;
+            border-radius: 0px;
+            color: #000;
+            font-size: 16px;
+            line-height: 1.5;
+            text-align: justify;
+            text-align-last: left;
+            justify-content: flex-start;
+            max-height: 80%;
+            box-sizing: border-box;
+        }
+
+        .media-text p {
+            margin: 0 0 1.5em 0;
+            padding: 0;
+        }
+
+        .media-text p:empty {
+            display: none;
+        }
+
+        .media-text h2 {
+            margin-bottom: 1em;
+        }
+        
+        .media-text h4 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 0.8em;
+            margin-top: 1.2em;
+            line-height: 1.3;
+        }
+
+        .media-item {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            transform-origin: center center;
+            opacity: 0.7;
+            z-index: 10;
+            border-radius: 8px;
+            overflow: visible;
+            margin-top: 25px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+        }
+        
+        .media-item.image { background-color: white; }
+        .media-item.video { background-color: white; }
+        .media-item.text { background-color: white; }
+        
+        .media-item-thumbnail {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 8px;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            z-index: 11;
+            position: relative;
+            margin-bottom: 0;
+        }
+        
+        .media-item.active .media-item-thumbnail {
+            border-color: rgba(0, 120, 255, 0.8);
+            box-shadow: 0 0 10px rgba(0, 120, 255, 0.5);
+        }
+        
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: transparent;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            color: #000;
+        }
+        
+        .loading-text {
+            font-size: 18px;
+            margin-bottom: 10px;
+            background-color: rgba(255, 255, 255, 0);
+            padding: 5px 15px;
+            border-radius: 4px;
+            font-family: "Lucida Console", monospace;
+            letter-spacing: -1px;
+        }
+        
+        .loading-progress {
+            width: 200px;
+            height: 6px;
+            background-color: rgba(0, 0, 0, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background-color: rgba(0, 120, 255, 0.8);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .media-video-container iframe.media-video {
+            width: auto;
+            height: 100%;
+            max-width: 100%;
+            max-height: 100%;
+            aspect-ratio: 16/9;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .video-container, .media-video-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+        }
+
+        .avatar-grid-container {
+            position: absolute;
+            top: 250px;
+            left: 0;
+            right: 0;
+            bottom: 0px;
+            padding: 15px;
+            overflow-y: auto;
+            z-index: 6;
+            background-color: rgba(255, 255, 255, 1);
+            display: none;
+        }
+
+        .avatar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 20px;
+            padding: 10px;
+        }
+
+        .grid-item {
+            width: 100%;
+            aspect-ratio: 1;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+        }
+
+        .grid-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 8px;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            background-color: #fff;
+            margin-bottom: 0;
+        }
+
+        .grid-item:hover img {
+            transform: scale(1.05);
+            border-color: rgba(0, 120, 255, 0.8);
+        }
+
+        .grid-item-name {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 5px;
+            font-size: 10px;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            word-break: break-word;
+        }
+
+        .grid-item:hover .grid-item-name {
+            opacity: 1;
+        }
+
+        .grid-toggle-button {
+            position: absolute;
+            bottom: 150px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.85);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 10;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .grid-toggle-button:hover {
+            background-color: rgba(220, 220, 220, 0.9);
+        }
+
+        .no-results {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/DRACOLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/RGBELoader.js"></script>
+    <script src="https://unpkg.com/meshoptimizer@0.18.1/meshopt_decoder.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="top-section">
+            <div class="top-controls">
+                
+                <div class="media-btn-container">
+                    <button class="media-btn" id="runway-btn">DT_Museum</button>
+                    <button class="media-btn" id="retail-btn">Isometric ExhB.</button>
+                    <button class="media-btn" id="market-btn">Market</button>
+                    <button class="media-btn" id="media-btn">Media</button>
+                </div>
+            </div>
+            <div class="collections-row">
+                <div class="collections" id="collections"></div>
+            </div>
+            <div class="search-row">
+                <div class="search-container">
+                    <input type="text" class="search-input" id="search-input" placeholder="Search spaces...">
+                </div>
+            </div>
+        </div>
+
+        <div class="avatar-grid-container" id="avatar-grid-container">
+            <div class="avatar-grid" id="avatar-grid"></div>
+        </div>
+        
+        <div class="viewer-container" id="viewer-container">
+            <canvas id="viewer-canvas"></canvas>
+            <div class="avatar-details" id="avatar-details">
+                <div class="details-title" id="avatar-title">POTBELLY Q_FU</div>
+                <div class="details-info" id="details-info"></div>
+                <div class="control-row">
+                    <span class="light-label">Light</span>
+                    <button class="light-btn active" id="light-btn-1">1</button>
+                    <button class="light-btn" id="light-btn-2">2</button>
+                    <button class="light-btn" id="light-btn-3">3</button>
+                    <button class="light-btn" id="light-btn-4">4</button>
+                    <button class="light-btn" id="light-btn-5">5</button>
+                </div>
+                <div class="control-row">
+                    <button class="action-btn" id="buy-btn">Mint</button>
+                </div>
+                <div class="description-text" id="description-text"></div>
+                <div class="collection-text" id="collection-text"></div>
+            </div>
+            <div class="loading-overlay" id="loading-overlay">
+                <div class="loading-text">Forging... <span id="loading-percentage">0%</span></div>
+                <div class="loading-progress">
+                    <div class="progress-bar" id="progress-bar"></div>
+                </div>
+            </div>
+            <div class="media-view" id="media-view">
+                <div class="media-content" id="media-content">
+                    <div class="media-preview" id="media-preview"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid-toggle-button" id="grid-toggle-button">
+            <i class="fas fa-th-large"></i>
+        </div>
+        
+        <div class="bottom-section" id="bottom-section">
+            <div class="avatar-selector">
+                <div class="avatar-carousel" id="avatar-carousel"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Configurable Parameters
+        const CONFIG = {
+            thumbnails: { size: 80, spacing: 40, minSideOffset: 40 },
+            ui: { detailsBox: { top: 220, left: 0, width: 400 } },
+            viewer: {
+                top: 0, left: 10, right: 10, bottom: 0, modelScale: 1.0,
+                camera: { 
+                    position: { x: 0, y: 0, z: 70 }, // Kamerayı daha yakına aldık
+                    target: { x: 0, y: 0, z: 0 }, // Modelin merkezi (0,0,0)
+                    orthoSize: 48 // Orthographic kamera için görünüm alanı (48m x 48m modele göre ayarlandı)
+                }
+            },
+            media: { top: 90, left: 10, right: 10, bottom: 120 },
+            sectionPositions: { avatarBar: { bottom: 30 }, mediaBar: { bottom: 55 } }
+        };
+
+        // Global Variables
+        let scene, camera, renderer, controls, clock = new THREE.Clock();
+        let mixer = null, currentModel = null;
+        let activeSpace = null, SpaceData = [], collections = [], activeCollection = "ALL";
+        let modelAnimations = [], activeSpaceIndex = 0, isModelLoading = false;
+        let mediaData = [], activeMediaIndex = 0, isMediaMode = false, activeHdriIndex = 0;
+        let isGridView = true;
+        let wasAutoRotateEnabled = false;
+        let initialLoad = true;
+        let hasSpaceBeenSelected = false;
+
+        const collectionDescriptions = {
+            "Gallery": "Spaces designed for exhibitions and artistic displays.",
+            "Multi": "Versatile, multipurpose complexes for various activities.",
+            "HQ": "Modern office spaces with innovative designs."
+        };
+
+        const hdriPaths = [
+            'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/equirectangular/venice_sunset_1k.hdr',
+            'https://raw.githubusercontent.com/decentralize-dfw/c2w2/main/nebula-hdr.hdr',
+            'https://raw.githubusercontent.com/decentralize-dfw/c2w2/main/surreal_hdr.hdr',
+            'https://raw.githubusercontent.com/decentralize-dfw/c2w2/main/DARK-NEBULA.hdr',
+            'https://raw.githubusercontent.com/decentralize-dfw/c2w2/main/photo_studio_01_2k.hdr'
+        ];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initMeshoptDecoder();
+            applyUIConfiguration();
+            initApp();
+        });
+
+        function initMeshoptDecoder() {
+            if (typeof MeshoptDecoder === 'undefined') {
+                console.error("MeshoptDecoder not available!");
+                return;
+            }
+            THREE.GLTFLoader.prototype.setMeshoptDecoder = function(decoder) {
+                this.meshoptDecoder = decoder;
+                return this;
+            };
+        }
+
+        function applyUIConfiguration() {
+            const viewerContainer = document.getElementById('viewer-container');
+            viewerContainer.style.top = `${CONFIG.viewer.top}px`;
+            viewerContainer.style.left = `${CONFIG.viewer.left}px`;
+            viewerContainer.style.right = `${CONFIG.viewer.right}px`;
+            viewerContainer.style.bottom = `${CONFIG.viewer.bottom}px`;
+            
+            const avatarDetails = document.getElementById('avatar-details');
+            avatarDetails.style.top = `${CONFIG.ui.detailsBox.top}px`;
+            avatarDetails.style.left = `${CONFIG.ui.detailsBox.left}px`;
+            avatarDetails.style.width = `${CONFIG.ui.detailsBox.width}px`;
+            
+            const mediaView = document.getElementById('media-view');
+            mediaView.style.top = `${CONFIG.media.top}px`;
+            mediaView.style.left = `${CONFIG.media.left}px`;
+            mediaView.style.right = `${CONFIG.media.right}px`;
+            mediaView.style.bottom = `${CONFIG.media.bottom}px`;
+            
+            const bottomSection = document.getElementById('bottom-section');
+            bottomSection.style.bottom = `${CONFIG.sectionPositions.avatarBar.bottom}px`;
+        }
+
+        function initApp() {
+            initScene();
+            loadSpaceData();
+            loadMediaData();
+            setupEventListeners();
+            
+            populateAvatarGrid();
+            toggleGridView(true);
+            
+            document.getElementById('loading-overlay').style.display = 'none';
+            
+            const filteredSpaces = activeCollection === 'ALL' ? [...SpaceData] : SpaceData.filter(space => space.collection === activeCollection);
+            if (filteredSpaces.length > 0) {
+                activeSpace = filteredSpaces[0];
+                activeSpaceIndex = 0;
+                updateAvatarDetails(activeSpace);
+                updateActionButtons(activeSpace);
+                document.getElementById('avatar-details').style.display = 'none';
+                updateAvatarCarousel();
+            }
+            
+            document.getElementById('viewer-canvas').style.display = 'none';
+        }
+
+        function initScene() {
+            scene = new THREE.Scene();
+            scene.background = null;
+            
+            const canvasContainer = document.querySelector('.viewer-container');
+            const width = canvasContainer.clientWidth;
+            const height = canvasContainer.clientHeight;
+            const aspect = width / height;
+            
+            // Orthographic Camera Setup
+            const orthoSize = CONFIG.viewer.camera.orthoSize;
+            camera = new THREE.OrthographicCamera(
+                -orthoSize * aspect, // left
+                orthoSize * aspect,  // right
+                orthoSize,           // top
+                -orthoSize,          // bottom
+                0.1,                 // near
+                1000                 // far
+            );
+            camera.position.set(
+                CONFIG.viewer.camera.position.x,
+                CONFIG.viewer.camera.position.y,
+                CONFIG.viewer.camera.position.z
+            );
+            camera.lookAt(
+                CONFIG.viewer.camera.target.x,
+                CONFIG.viewer.camera.target.y,
+                CONFIG.viewer.camera.target.z
+            );
+            
+            renderer = new THREE.WebGLRenderer({ 
+                canvas: document.getElementById('viewer-canvas'),
+                antialias: true, alpha: true, powerPreference: 'high-performance'
+            });
+            renderer.setSize(width, height);
+            renderer.outputEncoding = THREE.sRGBEncoding;
+            renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            renderer.toneMappingExposure = 1.0;
+            renderer.physicallyCorrectLights = true;
+            
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.enablePan = true;
+            controls.enableRotate = true; // Rotasyon özelliğini geri ekledik
+            controls.enableZoom = true;
+            controls.minZoom = 0.5;
+            controls.maxZoom = 20;
+            controls.target.set(
+                CONFIG.viewer.camera.target.x,
+                CONFIG.viewer.camera.target.y,
+                CONFIG.viewer.camera.target.z
+            );
+            controls.update();
+            
+            document.querySelector('.viewer-container').classList.add('active');
+            
+            window.addEventListener('resize', onWindowResize);
+            setupHDRIEnvironment(activeHdriIndex);
+            addBasicLighting();
+            animate();
+        }
+
+        function setupHDRIEnvironment(hdriIndex = 0) {
+            updateLoadingProgress(10, 'Loading environment...');
+            const pmremGenerator = new THREE.PMREMGenerator(renderer);
+            pmremGenerator.compileEquirectangularShader();
+            new THREE.RGBELoader().load(hdriPaths[hdriIndex], texture => {
+                const envMap = pmremGenerator.fromEquirectangular(texture).texture;
+                scene.environment = envMap;
+                texture.dispose();
+                pmremGenerator.dispose();
+                updateLoadingProgress(20, 'Environment loaded');
+            });
+        }
+
+        function changeHDRIEnvironment(index) {
+            if (index === activeHdriIndex) return;
+            activeHdriIndex = index;
+            updateLoadingProgress(10, 'Changing lighting...');
+            const pmremGenerator = new THREE.PMREMGenerator(renderer);
+            pmremGenerator.compileEquirectangularShader();
+            new THREE.RGBELoader().load(hdriPaths[index], texture => {
+                const envMap = pmremGenerator.fromEquirectangular(texture).texture;
+                scene.environment = envMap;
+                texture.dispose();
+                pmremGenerator.dispose();
+                updateLoadingProgress(100, 'Lighting updated');
+            });
+            document.querySelectorAll('.light-btn').forEach((btn, i) => btn.classList.toggle('active', i === index));
+        }
+
+        function addBasicLighting() {
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.1);
+            scene.add(ambientLight);
+            const dirLight = new THREE.DirectionalLight(0xffffff, 0.1);
+            dirLight.position.set(5, 5, 5);
+            scene.add(dirLight);
+        }
+
+        function onWindowResize() {
+            const canvasContainer = document.querySelector('.viewer-container');
+            const width = canvasContainer.clientWidth;
+            const height = canvasContainer.clientHeight;
+            const aspect = width / height;
+            
+            // Update orthographic camera
+            const orthoSize = CONFIG.viewer.camera.orthoSize;
+            camera.left = -orthoSize * aspect;
+            camera.right = orthoSize * aspect;
+            camera.top = orthoSize;
+            camera.bottom = -orthoSize;
+            camera.updateProjectionMatrix();
+            
+            renderer.setSize(width, height);
+            if (isMediaMode) updateMediaCarousel();
+            else updateAvatarCarousel();
+        }
+
+        function animate() {
+            if (!isMediaMode) {
+                requestAnimationFrame(animate);
+                if (controls && controls.enabled) controls.update();
+                if (mixer) mixer.update(clock.getDelta());
+                if (renderer) renderer.render(scene, camera);
+            }
+        }
+
+        function setupEventListeners() {
+            document.getElementById('media-btn').addEventListener('click', toggleMediaMode);
+            document.getElementById('runway-btn').addEventListener('click', () => window.open('https://hyperfy.io/scaffold', '_blank'));
+            document.getElementById('retail-btn').addEventListener('click', () => window.open('https://v2.oncyber.io/digitaltopographies', '_blank'));
+            document.getElementById('market-btn').addEventListener('click', () => window.open('https://monaverse.com/collections/8453/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/', '_blank'));
+            
+            document.querySelectorAll('.light-btn').forEach((btn, index) => {
+                btn.addEventListener('click', () => changeHDRIEnvironment(index));
+            });
+            
+            document.getElementById('buy-btn').addEventListener('click', () => {
+                if (activeSpace && activeSpace.buyLink && activeSpace.buyLink !== "null") window.open(activeSpace.buyLink, '_blank');
+            });
+            
+            document.querySelector('.avatar-selector').addEventListener('wheel', e => {
+                e.preventDefault();
+                const scrollDirection = e.deltaY > 0 ? 1 : -1;
+                if (isMediaMode) changeActiveMedia(scrollDirection);
+                else changeActiveSpace(scrollDirection);
+            }, { passive: false });
+            
+            document.addEventListener('keydown', e => {
+                if (isMediaMode) {
+                    if (e.key === 'ArrowLeft') changeActiveMedia(-1);
+                    else if (e.key === 'ArrowRight') changeActiveMedia(1);
+                    else if (e.key === 'Escape') toggleMediaMode();
+                } else {
+                    if (e.key === 'ArrowLeft') changeActiveSpace(-1);
+                    else if (e.key === 'ArrowRight') changeActiveSpace(1);
+                }
+            });
+            
+            let searchTimeout;
+            document.getElementById('search-input').addEventListener('input', e => {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    const searchTerm = e.target.value;
+                    if (isMediaMode) filterMedia(searchTerm);
+                    else filterSpaces(searchTerm);
+                }, 300);
+            });
+            
+            document.addEventListener('click', e => {
+                if (e.target.classList.contains('collection-btn')) handleCollectionClick(e.target);
+            });
+
+            document.getElementById('grid-toggle-button').addEventListener('click', () => {
+                toggleGridView(!isGridView);
+            });
+        }
+
+        function toggleMediaMode() {
+            if (isMediaMode) {
+                exitMediaMode();
+                controls.enabled = true;
+                document.querySelector('.viewer-container').classList.add('active');
+                document.querySelector('.media-view').classList.remove('active');
+                populateAvatarItems();
+                document.querySelectorAll('.collection-btn').forEach(btn => btn.classList.toggle('active', btn.textContent === activeCollection));
+                
+                populateAvatarGrid();
+                toggleGridView(true);
+                
+                document.getElementById('grid-toggle-button').style.display = 'flex';
+                
+                const filteredSpaces = activeCollection === 'ALL' ? [...SpaceData] : SpaceData.filter(space => space.collection === activeCollection);
+                if (filteredSpaces.length > 0) {
+                    if (!hasSpaceBeenSelected || !activeSpace || !filteredSpaces.find(space => space.id === activeSpace.id)) {
+                        activeSpaceIndex = 0;
+                        activeSpace = filteredSpaces[0];
+                    } else {
+                        activeSpaceIndex = filteredSpaces.findIndex(space => space.id === activeSpace.id);
+                        if (activeSpaceIndex === -1) {
+                            activeSpaceIndex = 0;
+                            activeSpace = filteredSpaces[0];
+                        }
+                    }
+                    updateAvatarDetails(activeSpace);
+                    updateActionButtons(activeSpace);
+                    updateAvatarCarousel();
+                    document.getElementById('avatar-details').style.display = 'none';
+                }
+            } else {
+                isGridView = false;
+                toggleGridView(false);
+                
+                document.getElementById('grid-toggle-button').style.display = 'none';
+                
+                document.getElementById('avatar-details').style.display = 'none';
+                
+                clearScene();
+                scene.background = null;
+                renderer.clear();
+                cancelAnimationFrame(animate);
+                
+                isMediaMode = true;
+                document.getElementById('media-btn').classList.add('active');
+                document.getElementById('media-view').style.display = 'block';
+                document.getElementById('media-view').classList.add('active');
+                document.querySelector('.viewer-container').classList.remove('active');
+                document.getElementById('viewer-canvas').style.display = 'none';
+                document.getElementById('search-input').placeholder = "Search media...";
+                const bottomSection = document.getElementById('bottom-section');
+                bottomSection.style.bottom = `${CONFIG.sectionPositions.mediaBar.bottom}px`;
+                bottomSection.style.display = 'block';
+                document.querySelectorAll('.collection-btn').forEach(btn => btn.classList.remove('active'));
+                
+                populateMediaItems();
+                if (mediaData.length > 0) {
+                    activeMediaIndex = 0;
+                    updateMediaCarousel();
+                    displayMediaContent(mediaData[0]);
+                }
+                
+                document.getElementById('loading-overlay').style.display = 'none';
+            }
+        }
+
+        function loadMediaData() {
+            mediaData = [
+                
+         
+    { 
+                    id: 1, 
+                    name: "Project Information", 
+                    type: "text", 
+                    thumbnailUrl: "https://cdn-icons-png.flaticon.com/512/2911/2911228.png", 
+                    title: "C2W2 Project Overview", 
+                    description: "Detailed information about the C2W2 project.",
+                    content: "<h2>Digital Topographies: Reimagining Architecture for the Metaverse</h2><p>Digital Topographies is a sweeping exploration into what architecture could become when freed from the earthly constraints of gravity, weather, and material scarcity. Conceived by Digital Forgery Workshop (DFW) and disseminated as a series of lightweight 3D models, this body of work functions both as a portfolio and as a provocative research project. It asks fundamental questions about the nature of space in the digital age: How does one design for avatars instead of bodies? How does one imbue intangible environments with atmosphere, orientation, and meaning? How can architecture, liberated from the cost of bricks and mortar, serve cultural and social needs in the metaverse? The project’s guiding ethos—to “reimagine the borders and parameters of the spatial reflections of virtual daily life”—reminds us that spatial design is always a cultural act, even when the medium is code rather than concrete.</p><h4>Rethinking Spatial Foundations</h4><p>In the physical world, architecture is grounded in tectonics: walls hold up roofs, windows hold in heat, materials age and weather. For much of the discipline’s history, the architect’s role has been to reconcile human needs with the physics of the built environment. Digital architecture replaces tectonics with algorithms. In a virtual environment, there is no gravity unless coded; materials never decay unless rendered; light is a shader rather than a beam of photons. This shift means that architects must reconsider their priorities. Instead of structural calculations, they must focus on performance metrics such as file size and rendering speed. Instead of specifying building codes, they must consider platform compatibility. Instead of thinking in terms of square meters, they must think in terms of polygons and textures. Digital Topographies embraces this new foundation by treating its models as performative objects. Each space is designed to load quickly and run smoothly on a range of devices. The designers employ mesh optimization, level of detail (LOD) strategies, and efficient texture mapping to keep file sizes manageable. They choose glTF/GLB format because it supports PBR (physically based rendering) materials, which allow for realistic shading without heavy computational overhead. They also ensure that the models’ collision meshes are accurate so that avatars can interact with ramps, stairs, and platforms without falling through. In short, the technical foundations of each model are as carefully considered as the aesthetic choices.</p><h4>Typological Diversity as a Testbed</h4><p>To investigate the full potential of metaverse architecture, DFW organizes its work into thematic categories: galleries, multi-purpose halls, headquarters, event venues, sculptural pavilions, and retail environments. These categories are not rigid boxes but starting points for experimentation. By working within recognizable typologies, the designers can highlight the differences between physical and digital design without disorienting users. At the same time, the variety ensures that the project addresses a broad spectrum of activities that might occur in virtual worlds.</p><h4>Spaces for Art and Culture</h4><p>In the physical world, museums and galleries are often composed of rectilinear rooms connected by corridors. Lighting is controlled through skylights and fixtures; wall surfaces are carefully designed for the display of paintings or sculptures. Digital Topographies treats exhibition spaces as immersive narratives rather than static boxes. Some models lay out a continuous spiral that slowly climbs upward, with viewing platforms nested along the way. Others scatter exhibition pods across a floating plane, connected by translucent bridges. A few experiments invert the gallery entirely, placing artworks on the ceiling or embedding them within translucent walls. Without concerns about structural load or fire safety, the designers can position viewing decks in mid-air or wrap an entire exhibition around a central void. These exhibition spaces also harness dynamic lighting. Because the light sources in a virtual space can be animated or triggered by user proximity, the mood of a gallery can shift as a visitor moves. In some models, approaching an artwork causes surrounding lights to brighten and focus, while the rest of the space dims. In others, a general ambiance is created by environmental HDRI maps—panoramic images of nebulae, sunsets, or dreamlike interiors—so that the space feels connected to a larger cosmos. All of this is possible because light is data rather than electricity. Another innovation in the exhibition typology is the integration of sound and interactive media. Digital Topographies includes galleries in which soundscapes change based on the objects being viewed or the number of visitors present. Some models allow artworks themselves to trigger animations in the architecture: when a digital painting is selected, the walls might ripple or shift, emphasizing the fluidity of the medium. This level of interactivity is rarely possible in physical museums, where conservation and safety concerns limit what can be done with infrastructure.</p><h4>Multi-purpose Environments</h4><p>Multi-purpose halls in Digital Topographies are conceived as infrastructure for social gatherings, learning, markets, and informal events. In physical buildings, multi-purpose spaces often take the form of halls with retractable seating, stage lighting, and movable partitions. In the metaverse, such requirements are replaced by an emphasis on modular programming and fluid movement. Some halls feature concentric circles of platforms connected by radial ramps, allowing activities to occur simultaneously at different elevations. Others are built as open grids of units that users can claim and customize. Without weight constraints, large overhangs and cantilevers become commonplace, creating covered plazas and mezzanines that float above open areas. These spaces also address the need for orientation. Because users might enter from any direction, wayfinding is designed through color gradients, guiding lines on the floor, or gradually shifting textures. In some models, a central landmark—a tower of light or a cluster of animated shapes—serves as an orientation marker visible from all parts of the hall. The designers incorporate signage and interface elements that hover in space, providing information without obstructing views. The result is an environment where a conference, a market, and a dance party could occur simultaneously, each in its own zone yet visually connected.</p><h4>Reimagining Work and Collaboration</h4><p>The headquarters category explores the future of workspaces in virtual contexts. In the physical realm, corporate headquarters are often monolithic structures that symbolize stability and hierarchy. Digital Topographies rejects this symbolism. Its workspaces are composed of clusters of rooms and terraces that can be rearranged. Instead of cubicles and boardrooms, there are collaborative zones shaped like amphitheaters or lounges suspended in voids. Private meeting rooms are enclosed in transparent shells, allowing users to sense activity without hearing content. Social areas—cafés, gardens, lounges—are integrated into the work environment, acknowledging that spontaneous interaction is essential for creativity. An important feature of these digital workspaces is the integration of external data. Virtual screens display live feeds, 3D charts, or collaborative documents. Interactive tables allow users to manipulate data models in real time, mirroring the kind of gestures one might see in science fiction films. The architecture acts as both container and interface. Because the environment is digital, the boundaries between space and software disappear; walls become displays, floors become input surfaces. This integration is far easier in the metaverse than in physical buildings, where hardware must be physically mounted and replaced.</p><h4>Stages and Arenas</h4><p>Event spaces in Digital Topographies are designed to challenge traditional notions of performance. In a concert hall or theater in the physical world, a stage is elevated, and seating is oriented toward it. DFW’s digital arenas often remove this separation. Some models feature concentric rings where performers and audience members share the same plane, free to move around each other. Others create floating stages that can rotate or rearrange themselves during a performance. There are even event spaces inspired by natural forms: one model evokes a cavernous cave with stalactite-like columns; another resembles a forest canopy with platforms suspended among branches. Lighting in these spaces is highly dynamic. Stages can change color, opacity, and pattern in response to music or movement. Sound is spatialized so that each listener hears a slightly different mix depending on their position. The architecture acts as a musical instrument: ramps and bridges can reverberate with sound, and walls can glow or pulse. The focus is on creating immersive experiences that encourage participation rather than passive observation. The design of these event spaces also acknowledges the global nature of virtual audiences. Ramps and platforms are wide enough for large numbers of avatars; access points are multiple; stages are visible from many angles.</p><h4>Sculptural Exploration</h4><p>The sculptural pavilions in Digital Topographies are exercises in formal and spatial freedom. Without a specific program, they become laboratories for experimenting with geometry, light, and movement. Many of these structures expose frameworks that in the physical world would be hidden behind cladding. By weaving pipes, beams, and ribbons in complex patterns, the designers create volumes that are simultaneously solid and void. Visitors can walk on these structures, traverse them like obstacles, or simply float through them, appreciating the interplay of lines and shadows. Some pavilions explore the idea of infinite surfaces: a continuous band loops and twists, forming floors, walls, and ceilings in one gesture. Others investigate modularity: a single unit is repeated, scaled, and rotated to generate a dense field of structures. Because physical limitations are absent, scale is no obstacle. A pavilion might contain a giant sphere floating within a lattice, or a towering column of stacked rings. The aim is not to produce a habitable building but to explore how form can evoke emotions and provoke curiosity in the metaverse.</p><h4>Commerce as Experience</h4><p>Retail environments in Digital Topographies treat shopping as a cultural narrative. Digital goods—whether fashion items, artworks, or virtual services—are displayed in spaces that encourage storytelling. One model might feature a spiral ramp with niches for products, each accompanied by interactive panels that explain the item’s provenance. Another might embed the products within an environment that evokes their inspiration: a futuristic clothing line displayed in a crystalline cavern, or a series of handcrafted digital artifacts arranged in a digital forest. These retail spaces prioritize immersion and education. Instead of static shelves, there are interactive pedestals that allow users to preview how a garment looks on their avatar or to see a 3D animation of how a gadget functions. Audio guides and holographic characters might welcome visitors, narrating the story of a brand. Payment is integrated through secure links to decentralized platforms, reflecting the project’s alignment with blockchain-based commerce. By elevating the shopping environment into an experience, the designers hope to transform consumption into connection.</p><h4>Structural Logic and Ornament</h4><p>An overarching theme across all categories is the transformation of structure into ornament. In physical architecture, structural honesty is often admired—think of the exposed beams in a modernist house or the visible trusses in an airport terminal. DFW translates this honesty into digital form. In early works, lattices of ribs create soaring vaults reminiscent of Gothic cathedrals, but these ribs are freed from gravity and can form pyramids or spheres. Later explorations employ tubular networks that crisscross and enclose space, creating volumes defined by the spaces between pipes rather than by solid surfaces. In some models, a ring motif repeats at different scales: small rings form handrails; larger rings become walls; giant rings wrap around the entire structure. This structural language is both practical and poetic. Practically, it provides a clear spatial order that helps users navigate. When a visitor sees a repeating pattern of rings or pipes, they understand where the boundaries are and where circulation paths might lead. Poetically, the exposed frameworks evoke metaphors: a nest of pipes suggests protection and enclosure; a lattice of beams evokes a web or network. This blending of function and symbolism embodies the project’s commitment to making virtual space legible and meaningful.</p><h4>Narratives and Metaphors without Names</h4><p>Although the project comprises dozens of individual models, their stories are woven together through shared metaphors rather than explicit references. Early pieces explore primal geometries: pyramidal forms with hollow centers, circular floors that ascend like shells, torus-shaped complexes with internal courtyards. These forms resonate with ancient archetypes (pyramid, spiral, circle) but are reinterpreted as fluid and permeable. Mid-period works investigate verticality: stacks of slabs wrapped by ramps, towers enclosed by cylindrical screens, and vertical runways that loop like Möbius strips. These vertical experiments challenge the notion of floor and ceiling. Later projects delve into spheres and networks: spherical rooms connected by tubes, clusters of globes that form modular complexes, and networks that sprawl like coral reefs. These evoke ideas of constellations, molecules, and neural networks. The use of metaphor extends to the user’s experience. A museum that slowly climbs upward might evoke a journey of growth. A workspace shaped like a branching tree suggests decentralization and organic collaboration. A retail space arranged along a ribbon invites visitors to follow a storyline. An event hall inspired by a cave encourages intimacy and acoustics. By embedding these metaphors into the design, the spaces communicate their purpose and identity without the need for signage or explicit narrative.</p><h4>Innovation and Vision</h4><p>Digital Topographies is innovative not only in its forms but also in its process and dissemination. By releasing models as glb files, the project democratizes access to high-quality digital architecture. Artists, curators, educators, and everyday users can download these spaces, place them in their own virtual worlds, or modify them to suit their needs. Some models are available for purchase on decentralized platforms, hinting at a future in which virtual real estate is traded like digital art. This approach challenges traditional architectural practice, which often relies on client commissions and built projects for recognition and income. The project also embodies a vision of architecture as an evolving conversation. Because the models are open and modifiable, they can spawn derivatives. A user might download a hall and adapt it for a community gallery, or take a pavilion and integrate it into a larger campus. DFW encourages this kind of remixing, seeing it as a way to build a shared vocabulary for virtual space. In doing so, the studio positions itself as a contributor to an emergent field rather than as the sole author of finished works. This open stance reflects the collaborative ethos of many digital communities.</p><h4>Technical Craft in Detail</h4><p>At the heart of Digital Topographies is a deep understanding of 3D modeling and optimization. The designers build models using industry-standard software, sculpting forms with nurbs and polygons, then refining them with mesh decimation to reduce unnecessary faces. They create UV maps to ensure that textures wrap correctly around complex geometries. When exporting, they embed texture images into the glb file to simplify loading. For lighting, they choose environment maps that provide global illumination without requiring heavy processing. Many models use baked lighting for static areas and real-time lighting only where interactivity is needed, balancing visual quality and performance. Interactive elements are scripted using JavaScript or in-platform languages. Buttons, sliders, or hotspots respond to user actions, triggering animations or sound. For example, in one exhibition space, approaching a sculpture triggers a subtle rotation of the object and a change in ambient color; in a retail space, selecting an item launches a preview window. Sound is implemented using spatial audio engines that simulate directionality. Footsteps echo differently depending on the height of the ceiling or the material of the floor. This attention to sensory detail enhances immersion and demonstrates the richness that digital architecture can achieve when technical craft is taken seriously.</p><h4>Cultural and Social Implications Revisited</h4><p>The cultural impact of Digital Topographies is significant. Virtual spaces are increasingly important for social interaction, education, entertainment, and commerce. By designing environments that emphasize inclusivity, creativity, and participation, DFW contributes to shaping the norms of these spaces. The project challenges hierarchical spatial arrangements, encouraging egalitarian interactions. Stages are level with audience areas; offices open onto plazas; retail spaces invite exploration rather than passive browsing. This spatial democracy reflects values of openness and collaboration that many digital communities share. At the same time, the project acknowledges inequalities in digital access. The designers optimize models for low-end hardware, but they also recognize that not everyone has access to reliable internet or VR headsets. They see their work as part of a broader movement to make digital culture accessible to more people. By releasing their models freely or at low cost, they aim to lower economic barriers. However, the project also raises questions about who owns virtual spaces, who profits from them, and how to ensure that digital commons are not enclosed by corporate interests. These questions are left open, inviting debate within the community. The social dimension extends to the design of user interactions. Digital Topographies includes features that allow visitors to leave messages, curate temporary exhibitions, or host events. Some models incorporate feedback mechanisms, enabling users to vote on future modifications or to request features. This participatory design approach aligns with the ethos of open-source software and decentralized governance. It suggests that architecture in the metaverse can be co-created and evolved collectively.</p><h4>Aesthetic Richness and Description</h4><p>The visual language of Digital Topographies is diverse yet cohesive. Early works exhibit monochromatic palettes that highlight structural patterns. Stainless steel pipes, white concrete planes, and translucent membranes dominate, creating an almost surgical aesthetic. Later pieces introduce more color and texture. Some event spaces glow with neon hues, their surfaces shifting from purple to aqua. Retail environments might use warm hues and wood textures to evoke calm, while exhibition halls adopt cool tones and frosted surfaces for neutrality. Textures range from polished metal and rough stone to holographic gradients and animated patterns. Because the materials are digital, textures can do things that physical materials cannot: a floor might shimmer like water; a wall might display slowly moving stars; a ceiling might transform into a cloud when a user touches it. Dynamic lighting further enriches the aesthetic experience. In some spaces, light sources move along tracks or change color over time, painting the architecture with evolving hues. In others, light responds to user movement, creating interactive shadows. Reflective materials mirror and distort other parts of the space, producing kaleidoscopic views. The interplay of light and material is a key aspect of the project’s aesthetic, highlighting the possibilities of digital rendering. Descriptions of these spaces often resort to metaphors because they defy easy classification. A gallery might feel like walking through a shell; a multi-purpose hall like moving inside a beehive; a pavilion like traversing a giant musical instrument. These analogies help convey the sensory richness of the spaces. They also demonstrate the project’s commitment to creating environments that engage the senses holistically, not just visually. Sound, touch (through haptic feedback in some platforms), and even implied smell (through visual cues) are part of the experience.</p><h4>Accessibility and User-centered Design</h4><p>Accessibility is both a technical and a design goal in Digital Topographies. On the technical side, the project ensures that models can be downloaded and run on devices with limited processing power. This is achieved through careful optimization and by offering different versions of models—high fidelity for powerful systems and simplified versions for smartphones or web browsers. On the design side, spaces include ramps, lifts, and wide passageways. Navigation relies on intuitive cues—contrasting textures, gently sloping paths, clear sightlines—rather than on text labels alone. For users with visual impairments, some models incorporate audio guidance or high-contrast modes. For those with hearing impairments, captioning or visual cues accompany sound. The user experience also extends to the ability to customize spaces. Many models are modular, allowing users to rearrange walls, insert new objects, or change color schemes. This adaptability ensures that spaces can meet diverse needs. For example, a work lounge can be converted into a lecture hall by flipping a few modules; a pavilion can host a wedding or a concert. Such flexibility is rare in physical architecture but vital in virtual environments where different communities share common infrastructure.</p><h4>Overall Impact and Inspiration</h4><p>Taken as a whole, Digital Topographies is both inspiring and instructive. It demonstrates that digital architecture is not simply about visual spectacle but about creating meaningful, functional, and inclusive environments. The project shows how familiar typologies can be reimagined in ways that encourage new behaviors. It provides a blueprint for how architects might operate in digital contexts—embracing collaboration, sharing tools, and iterating designs openly. It also sparks imagination about future possibilities: what might a digital library look like? How could a virtual university campus be designed? What is the digital equivalent of a public square? By focusing on both theory and practice, the project bridges abstract thinking and concrete implementation. It invites further research into issues like digital equity, governance, sustainability (in terms of server energy and data storage), and cultural representation. It also sets a standard for quality in a realm where many early metaverse projects have been criticized for being visually crude or socially shallow. Digital Topographies counters this trend by demonstrating care, craft, and critical thought.</p><h4>Conclusion</h4><p>As virtual worlds become more prevalent, the design of digital spaces will play a crucial role in shaping social, cultural, and economic life. Digital Topographies is an early yet comprehensive effort to define what this design could look like. By exploring a wide range of typologies, elaborating a language of structural ornament, integrating narrative and metaphor, attending to technical optimization, emphasizing accessibility, and inviting user participation, the project lays a foundation for future explorations. It encourages architects to engage with technology not as a threat to their craft but as an expanded medium. It challenges developers to think like designers, considering how software architecture can shape human experience. And it invites users to see themselves as co-creators, not just consumers, of digital space. Above all, Digital Topographies embodies the belief that architecture—whether built or coded—should aim to enrich life, foster community, and inspire imagination.</p><h2>The Future of Digital Topographies</h2><p>As the metaverse continues to mature, the concept of Digital Topographies is poised to evolve in parallel. One obvious trajectory is the integration of increasingly sophisticated technologies such as real-time ray tracing, haptic feedback, and artificial intelligence. Lighting engines that mimic global illumination and simulate subtle material properties will make virtual environments more convincing and emotionally resonant. Haptic devices will allow users to feel the texture of a wall or the weight of a virtual chair, narrowing the gap between digital and physical experience. Artificial intelligence could enable spaces to adapt themselves in response to user behavior—expanding when crowd sizes grow, altering color schemes based on mood, or even generating entire rooms on demand. Another direction for the future lies in interoperability across platforms. Currently, many metaverse applications are siloed, with different file formats, avatar systems, and economic models. For Digital Topographies to reach its full potential, models need to be portable across ecosystems. Initiatives like the Metaverse Standards Forum are working to create open protocols and standards, and DFW’s choice of glTF/GLB format already aligns with this movement. In the future, a gallery designed within this project could seamlessly be imported into a social VR platform, an educational AR application, or a blockchain-based world. Such interoperability will enable communities to curate and combine spaces, fostering hybrid environments that blend different typologies and uses. The future may also bring deeper integration between digital and physical spaces. Technologies like augmented reality (AR) and mixed reality (MR) allow virtual architecture to overlay onto physical sites. A museum exhibition could extend into a city square via AR, or a workplace designed in the metaverse could have a physical counterpart that mirrors its layout. This blending challenges the dichotomy between digital and physical architecture. DFW’s frameworks could inspire the design of flexible, modular physical structures that embrace similar patterns of connectivity and adaptability. Conversely, physical buildings could serve as anchor points for virtual layers, enriching them with additional narratives or functions. Looking ahead, sustainability will be a growing concern. Server farms and network infrastructure consume energy, and the carbon footprint of digital experiences is not negligible. Designers will need to consider the energy cost of rendering complex models and the environmental impact of perpetually running virtual worlds. Solutions might include optimizing code for energy efficiency, using more sustainable servers, or encouraging time-limited experiences rather than always-on worlds. Digital Topographies has already demonstrated how optimization can reduce file size and processing demands; future iterations could incorporate metrics for energy use and provide guidelines for sustainable virtual design. Finally, the future of Digital Topographies will likely involve more participatory creation. Community members could collaborate on new spaces through version control systems similar to those used in software development. Forks and branches of original models might proliferate, creating a family tree of designs. Governance mechanisms—whether on a blockchain or through a cooperative platform—could enable users to vote on the evolution of shared spaces. This participatory future aligns with the project’s ethos of openness and suggests that architecture in the metaverse will become less about singular authorship and more about collective stewardship.</p><h4>NFT Marketplace Valuation Potential</h4><p>One of the most provocative aspects of Digital Topographies is its connection to blockchain technology and non-fungible tokens (NFTs). By tokenizing virtual spaces, the project raises questions about value, ownership, and scarcity in the digital realm. At the heart of NFT valuation is the notion of uniqueness and provenance. Just as a physical building’s location and design contribute to its real-estate value, a digital space’s design, use-case, and community significance could determine its worth. A well-crafted gallery that becomes a hub for digital art might acquire cultural cachet and, consequently, market value. The potential valuation of digital architecture NFTs depends on multiple factors. The technical quality and aesthetic appeal of a model will influence collectors and investors. If a space is built with efficient geometry, high-quality textures, and strong narrative themes, it will stand out in a crowded marketplace. Utility is another key factor. Spaces that offer functionality—such as hosting events, supporting multi-user interactions, or integrating with social platforms—will be more attractive to buyers. Provenance and rarity will play a role: a space created by a respected studio like DFW, especially if it is a one-of-a-kind or limited edition, may command higher prices. Market perception also hinges on the broader adoption of virtual worlds. If the metaverse becomes a significant venue for commerce, entertainment, and socializing, demand for well-designed virtual real estate could surge. Conversely, if the metaverse remains niche, the market could be limited to collectors and enthusiasts. The interplay between digital and physical value perceptions will be crucial. In the art world, digital artworks with strong narratives and reputable creators have achieved high valuations. Digital architecture could follow a similar path, especially if these spaces become iconic meeting places or venues for high-profile events. However, there are also risks. The NFT market has been volatile, with periods of rapid appreciation followed by steep corrections. Value is often speculative and influenced by hype. There is a danger that investors might treat digital architecture as a short-term asset rather than as a long-term cultural resource. Regulatory uncertainties around digital property, intellectual-property rights, and taxation could also affect valuations. Additionally, issues of accessibility and inclusivity arise: if only wealthy investors can own and control desirable virtual spaces, the egalitarian potential of the metaverse might be undermined. To mitigate these risks, DFW and similar creators might explore models such as fractional ownership, where multiple stakeholders share rights and responsibilities, or cooperative governance structures that prioritize community use over speculation. Looking ahead, the NFT marketplace could evolve to recognize the intrinsic social and cultural value of digital architecture. Spaces that foster vibrant communities, host meaningful events, or embody particular historical moments could become digital heritage sites. Their value would not only be measured in cryptocurrency but also in the stories and memories they hold. As standards emerge for evaluating and preserving digital spaces, and as mainstream audiences become more familiar with virtual real estate, the potential for sustainable valuation will grow. Digital Topographies situates itself at the forefront of this emerging market, inviting discussions about how we assign value to places that exist only in code.</p><h4>The Effect of Digital Topographies on Mainstream Architecture</h4><p>If the ideas embedded in Digital Topographies were embraced by mainstream architecture, the ripple effects would be significant. In academia, curricula would expand to include courses on digital space design, 3D modeling optimization, and metaverse ethics. Students would be encouraged to think beyond site plans and building codes, exploring how user interfaces, network performance, and immersive storytelling intersect with architectural design. Studios would require skills in programming and game engines alongside model building. This would create a generation of architects comfortable operating across physical and digital domains. In practice, architectural firms might integrate metaverse work into their portfolios, offering clients both physical and virtual environments. A cultural institution could commission a digital gallery alongside its physical extension; a corporation could request a virtual headquarters to complement its real offices. This dual approach would provide users with continuous engagement regardless of location. The experiential design methods developed in Digital Topographies—such as dynamic lighting, responsive soundscapes, and modular layouts—could inform physical projects as well. We might see physical buildings with more porous boundaries, flexible interiors, and embedded digital layers that respond to occupants in real time. A mainstream embrace would also influence regulatory and professional frameworks. Building codes, zoning laws, and professional licensure could evolve to address digital projects. Questions about liability, accessibility standards, and intellectual property in virtual spaces would require new policies. Architects might be tasked with ensuring not only physical safety but also data privacy and inclusivity. Professional organizations could adopt guidelines for virtual design ethics, sustainability, and cultural sensitivity. Beyond practice, the cross-pollination of ideas could transform architectural aesthetics. Physical structures might take inspiration from the expressive frameworks of virtual pavilions, incorporating lattices, rings, and fluid forms that were previously impractical. Conversely, digital projects might draw on tactile qualities of materials, adopting simulated textures and light qualities that evoke stone, wood, or fabric. The interplay between digital and physical could lead to hybrid typologies—buildings that exist simultaneously in both realms, each influencing the other. For instance, a stadium might have a physical structure with embedded AR overlays that extend seating capacity or offer alternative views; a museum might host simultaneous exhibitions in its halls and in a virtual twin. Finally, the cultural perception of architecture could expand. As more people experience well-designed virtual spaces, they may demand higher quality and more thoughtful design in physical environments. The accessibility ethos of Digital Topographies—wide ramps, inclusive circulation, open participation—could pressure developers to adopt similar values. The focus on community and narrative in digital design might inspire physical architects to incorporate storytelling and participatory elements. Overall, mainstream recognition of Digital Topographies would blur the line between architecture and digital media, positioning architects not only as builders but also as experience designers.</p><h4>User Agency and Co-creation in the Metaverse</h4><p>A critical yet often underexplored aspect of digital architecture is the agency afforded to users. Traditional buildings are mostly fixed; occupants adapt their behavior to the space. In contrast, virtual environments can adapt to the users. Digital Topographies hints at this potential by publishing modifiable models, but the conversation can go further. In a truly user-centric metaverse, visitors might be able to alter spaces in real time—adding a platform for a meeting, adjusting lighting for mood, or rearranging modules to create a dance floor. Such modifications could be temporary or saved as personalized versions of a space. Co-creation transforms the role of the designer into that of a facilitator. The designer provides tools, modules, and guidelines rather than a finished composition. Users become active participants in shaping the environment. This participatory approach could mirror practices in open-source software, where contributors fork and merge projects. A digital gallery could have numerous versions curated by different communities; a workplace could be configured differently by various teams. Governance structures would be needed to manage these variations—mechanisms for voting, moderation, and consensus. Smart contracts on blockchains could automate permissions and rights, ensuring that changes are traceable and reversible. The implications of such agency extend to social dynamics. Spaces that users can shape are more likely to engender a sense of ownership and belonging. They become social commons rather than mere services. However, co-creation also raises questions about quality control and coherence. If everyone can modify a space, how do you prevent visual chaos or functional breakdown? Solutions could include tiered editing rights, where trusted members have more influence, or sandboxed areas where experimentation can occur without impacting the core environment. User agency also relates to identity and expression. In digital spaces, avatars are the primary vehicles for self-presentation. Architecture can complement or challenge these identities. A flexible environment allows users to host events that reflect their interests or cultures, decorate spaces with symbols meaningful to them, or embed narratives relevant to their communities. This kind of personalization fosters diversity and representation, making the metaverse more inclusive. It also encourages cross-cultural exchange, as users experience spaces designed or modified by others. Lastly, co-creation can be a catalyst for learning. As users tinker with layouts or lighting, they gain insights into architectural principles—how circulation works, how scale affects perception, how light influences mood. Digital Topographies, with its emphasis on structural logic and narrative, provides an educational template. If accompanied by tutorials or mentor communities, these models could become tools for teaching design and spatial thinking. Empowering users to be creators not only enriches the metaverse but also democratizes the knowledge of architecture itself.</p>"
+                },
+                {
+        id: 2,
+        name: "dfw metaoffice",
+        type: "video",
+        url: "https://video.wixstatic.com/video/54a996_e6d16d06cf7b490bbc64d936760c2dae/1080p/mp4/file.mp4",
+        thumbnailUrl: "https://static.wixstatic.com/media/54a996_5a17303dc4d246f1818591922f059ebe~mv2.png",
+        title: "DFW Metaoffice",
+        description: "howទhow we think? what we build?"
+    },
+    {
+        id: 3,
+        name: "Digital Topographies Havoc",
+        type: "video",
+        url: "https://video.wixstatic.com/video/54a996_bc5e4a8565ee4af4a9d31b14bce8083b/480p/mp4/file.mp4",
+        thumbnailUrl: "https://static.wixstatic.com/media/54a996_186e1cc0c6c04617bad785d72cbdeaf6~mv2.png",
+        title: "Digital Topographies Havoc",
+        description: "DFW Architecture Works bundle"
+    },
+    {
+        id: 4,
+        name: "ummuse, neon build_athon_1",
+        type: "video",
+        url: "https://video.wixstatic.com/video/54a996_81dcccae716947fb925a2365cccaf4a9/720p/mp4/file.mp4",
+        thumbnailUrl: "https://static.wixstatic.com/media/54a996_e92bd436313044798cc075a48dba9727~mv2.png",
+        title: "ummuse, neon build_athon_1",
+        description: "UMMUSE is a museum edifice made during the Neon Build_athon. Its purpose is to exhibit the Neon DAO's Clone X Edits."
+    },
+    {
+        id: 5,
+        name: "dfw presentation 2022",
+        type: "video",
+        url: "https://video.wixstatic.com/video/54a996_dcc34db653704ed9962289d9ed73dcd7/1080p/mp4/file.mp4",
+        thumbnailUrl: "https://static.wixstatic.com/media/54a996_5a17303dc4d246f1818591922f059ebe~mv2.png",
+        title: "dfw presentation 2022",
+        description: "Vintage DFW Presentation about spatial design in metaverse"
+    },
+    {
+        id: 6,
+        name: "cave design store video",
+        type: "video",
+        url: "https://video.wixstatic.com/video/54a996_ea70bd1806ff4aa7a469ef888b17d1f6/1080p/mp4/file.mp4",
+        thumbnailUrl: "https://static.wixstatic.com/media/54a996_b5e407ed2dba4d58a63b4384675db003~mv2.png",
+        title: "cave design store video",
+        description: "Pop-up design made for Neon Buildathon 2- Booth-a-palooza"
+    },
+    {
+        id: 7,
+        name: "Deconstuctivist Eagle Nest Pavillion",
+        type: "video",
+        url: "https://video.wixstatic.com/video/54a996_7c2e66da063e4e5ba73e009ba2d608a9/1080p/mp4/file.mp4",
+        thumbnailUrl: "https://static.wixstatic.com/media/54a996_8d662b08e00b4034809e322fc4917c36~mv2.png",
+        title: "Deconstuctivist Eagle Nest Pavillion",
+        description: "Sctulptural Space design"
+    },
+    {
+        id: 8,
+        name: "Poddio Verticale",
+        type: "video",
+        url: "https://video.wixstatic.com/video/54a996_a16046c2726043ba8e427439fe90560c/1080p/mp4/file.mp4",
+        thumbnailUrl: "https://static.wixstatic.com/media/54a996_0c3d18723d55484d872baee3d771e6f2~mv2.png",
+        title: "Poddio Verticale",
+        description: "Poddio Verticale is a transformation of an open building into a vertical podium for a fashion runway show with a ramp looping around its semi-transparent marble skin, and slabs hooked up to the ramp. Its material touches, precise sharp geometry, the main scheme as a patio, and solid-void proportions give the impression that an abstract Milanese edifice has been exported to the metaverse."
+    },
+    {
+        id: 9,
+        name: "La Bibliotheque de L'Ecole Polytechnique Federale De Metaverse",
+        type: "video",
+        url: "https://video.wixstatic.com/video/54a996_d516d5cabc9b4996b7040467a076d371/720p/mp4/file.mp4",
+        thumbnailUrl: "https://static.wixstatic.com/media/54a996_e7d32f56088443a49cb27e4920e84ecd~mv2.png",
+        title: "La Bibliotheque de L'Ecole Polytechnique Federale De Metaverse",
+        description: "Open planned multi-functioned virtual complex (Education, Exhibition, Gathering, Office) (2 Floors, 111x112x33m) Optimized to be platform agnostic, v2 with an additional entrance from ground zero"
+    },
+    {
+        id: 10,
+        name: "Beyond Infinity, 2001 Remake",
+        type: "video",
+        url: "https://video.wixstatic.com/video/54a996_9ead39d0f68944ac8f9751a84ddae214/720p/mp4/file.mp4",
+        thumbnailUrl: "https://static.wixstatic.com/media/54a996_8a3d96c1923642aa871699aa3c7b2b9d~mv2.png",
+        title: "Beyond Infinity, 2001 Remake",
+        description: "Beyond Infinity, 2001 Remake"
+    },
+    {
+        id: 11,
+        name: "Matisse Time Chaipel",
+        type: "video",
+        url: "https://video.wixstatic.com/video/54a996_b94f28de763848129b330a544614216c/1080p/mp4/file.mp4",
+        thumbnailUrl: "https://static.wixstatic.com/media/54a996_4aceb77821bb40488b8e927d926f1d5b~mv2.png",
+        title: "Matisse Time Chaipel",
+        description: "Incorporating similar aesthetical sources from several timezones, Digital Forgery Workshop re-meditated mid-scaled religious typologies from the Renaissance using today's perception and technology. A nebulous chapel in a virtual parallel universe's past, or inside a Matisse painting, or kneaded with physicality as fluid as Dali, AI-painted with Caravaggio or Da Vinci interpretations of the metaverse. Like the Sistine Chapel in Ronchamp form, the machinated ceiling covers a wavy interior for gatherings, concerts, or as a conceptual exhibition space."
+    },
+    {
+        id: 12,
+        name: "K-Dociine HQ Vertical Section",
+        type: "video",
+        url: "https://video.wixstatic.com/video/54a996_aa82207556e24166ab2d2f2e7ae93e4e/1080p/mp4/file.mp4",
+        thumbnailUrl: "https://static.wixstatic.com/media/54a996_a0cbcee0bc7143e4ac396b8c88c12be6~mv2.png",
+        title: "K-Dociine HQ Vertical Section",
+        description: "The 4-story headquarters building (32x32m / 2x2 DCL) was designed using a diversity of ideas, and the varying forms on each floor define the various public and private zones for working or communicating. The structure or skin or the building itself demonstrates a range of social and professional settings in the metaverse while also displaying the aesthetic preferences of any company or brand. It can be engaging to hold a conference in an unusual, organic structure on Mars or in the middle of a desert."
+    },
+    {
+        id: 13,
+        name: "PDTV-360'",
+        type: "video",
+        url: "https://video.wixstatic.com/video/54a996_b4eacacaac894570ad8b93cb1f027693/720p/mp4/file.mp4",
+        thumbnailUrl: "https://static.wixstatic.com/media/54a996_37a3dbb8a0a5418b90e2e1e9ab996c9a~mv2.png",
+        title: "PDTV-360'",
+        description: "Derived from Poddio Verticale, Poddio Dark Twisted Verticale is a transformation of an open building into a twisted vertical podium for a fashion runway show. Its dark materials, funky geometry, the main scheme as a patio, and playful ramps with random subspaces create a futuro-dystopic scene flamed by sentiments of romance and sorrow that harvests an impulse of assembling a futuristic fashion house that breathes in the deepest layers of Decentraland."
+    },
+    {
+        id: 14,
+        name: "Finger Dome Section",
+        type: "video",
+        url: "https://video.wixstatic.com/video/54a996_8085ac9efc6543a6ad7dbebc4e6c4bb2/720p/mp4/file.mp4",
+        thumbnailUrl: "https://static.wixstatic.com/media/54a996_4936122ab39a462da893b3e777b51c30~mv2.png",
+        title: "Finger Dome Section",
+        description: "Excellent music can be heard in the streets where the musician and the listeners can meet on equal terms, without any higher platform. Another example is a rock or rap concert, where the stage is elevated, and the audience stands on the ground. Or, similar to an airport terminal, a symphony hall's entrances and exits are separated for each part like a labyrinth, and each spot has a different performative income. I've been to Milan's La Scala several times, and each visit has been unique. Of course, it's a wonderful thing that an edifice may have such a fragmented plan and experience, but I was hoping to uncover something more simple, like a 0 and a 1."
+    },
+    {
+        id: 15,
+        name: "Astral Egg Plant",
+        type: "video",
+        url: "https://video.wixstatic.com/video/54a996_266138a1797c4abda20df260c169261f/1080p/mp4/file.mp4",
+        thumbnailUrl: "https://static.wixstatic.com/media/54a996_4e06dd85b0dd4fdabbabd31f3674eee5~mv2.png",
+        title: "Astral Egg Plant",
+        description: "In a galaxy where chickens are so enormous and dominative, It would be fun to dream of a tree out of their broken eggs where people are occupying the ruins like a smirking dystopia. The form's primal origins in the upper floor spaces and their interpretation in the raw material choice can only be a metaverse-level experience as if the cracks are data centers for chickens. Further, the ground floor features elements of the desired spatial narrative, such as transforming the egg's capillaries into the stage and seating area or the entrance tunnel's passage by piercing through a snowdrift."
+    },
+    {
+        id: 16,
+        name: "Matsouka Hills Mansion",
+        type: "video",
+        url: "https://video.wixstatic.com/video/54a996_748666d2ee134373930b6bb91f5e23db/1080p/mp4/file.mp4",
+        thumbnailUrl: "https://static.wixstatic.com/media/54a996_f1fae5bcb41f476ea0e715af482d511c~mv2.png",
+        title: "Matsouka Hills Mansion",
+        description: "Matsuoka Hills Mansion is an uncommon but stimulating combination of domestic elements in a museum-like layout, with its open yet curvy form, which questions how a mansion should create privacy borders in open virtual habitats."
+    },
+    {
+        id: 17,
+        name: "Scaffold",
+        type: "video",
+        url: "https://video.wixstatic.com/video/54a996_ac819c2d59714a1e9059aa9019f8443c/1080p/mp4/file.mp4",
+        thumbnailUrl: "https://static.wixstatic.com/media/54a996_610326d29cfd4daa96db8c86d1cb033b~mv2.png",
+        title: "Scaffold",
+        description: "A silent structure that is built around architectural smart objects. Explore all 50 of digital topographies with a single click, or experiment with guided tours via NPCs."
+    },
+    {
+        id: 18,
+        name: "Neue2Dojo",
+        type: "video",
+        url: "https://video.wixstatic.com/video/54a996_ef95007416634bfb947f326f863bb810/1080p/mp4/file.mp4",
+        thumbnailUrl: "https://static.wixstatic.com/media/54a996_e2b6353a23e14e489ee6ee3d341fdd80~mv2.png",
+        title: "Neue2Dojo",
+        description: "The Neue² Dojo Gallery stands at the forefront of a cultural revolution, exemplifying how art and technology can coalesce to create entirely new paradigms for cultural expression and engagement. This pioneering project, anchored firmly on the blockchain and realized within the boundless possibilities of 3D web technology, redefines the essence of a gallery not as a physical space, but as a fluid, virtual environment that can adapt and transform to suit the thematic and aesthetic needs of each exhibition it hosts."
+    },
+    {
+        id: 19,
+        name: "tar rooms collection launch promo",
+        type: "video",
+        url: "https://video.wixstatic.com/video/54a996_0861f4ca6b454f719eb9afe8851ebcfc/1080p/mp4/file.mp4",
+        thumbnailUrl: "https://static.wixstatic.com/media/54a996_bfaf132093d2475f9cd8da1247292760~mv2.png",
+        title: "tar rooms collection launch promo",
+        description: "Transparent Animal Rooms promo for launch, made for MOCA ROOMS"
+    },
+    {
+        id: 20,
+        name: "muog ii design shot",
+        type: "video",
+        url: "https://video.wixstatic.com/video/54a996_1f5a007d60f94833bd633d63f4da54de/1080p/mp4/file.mp4",
+        thumbnailUrl: "https://static.wixstatic.com/media/54a996_585e97315b584bda815bb7bce50a94d8~mv2.png",
+        title: "muog ii design shot",
+        description: "Reimagination of Le Corbusier's sketch with transparent spiral corridors to test redefining spatial boundaries, by investigating a new concept that combines modernist dynamics with virtuality."
+    },
+    {
+        id: 21,
+        name: "muog ii explanation",
+        type: "video",
+        url: "https://video.wixstatic.com/video/54a996_f6870c2274574dd9b08871e4d974273c/1080p/mp4/file.mp4",
+        thumbnailUrl: "https://static.wixstatic.com/media/54a996_585e97315b584bda815bb7bce50a94d8~mv2.png",
+        title: "muog ii explanation",
+        description: "Reimagination of Le Corbusier's sketch with transparent spiral corridors to test redefining spatial boundaries, by investigating a new concept that combines modernist dynamics with virtuality."
+    },
+    {
+        id: 22,
+        name: "space time rooms",
+        type: "video",
+        url: "https://video.wixstatic.com/video/54a996_f1badb8e4dea43d59eae277d5b2c94be/1080p/mp4/file.mp4",
+        thumbnailUrl: "https://static.wixstatic.com/media/54a996_bfaf132093d2475f9cd8da1247292760~mv2.png",
+        title: "space time rooms",
+        description: "The Moca Space Time Rooms are a collection of conceptual rooms that transgress and spatially deconstruct the bounds of the traditional 'room' (a box with four walls, a floor, and a roof) paradigm. In a tone inspired by space-time relativity that bends with the mass/gravity of artworks, paper-light floors produce components that flex and flow into each other. Even though they are based on historical/traditional 'room' characteristics, these elements, with their flexibility, define the utility of a new experimental form beyond just being a wall, ceiling, or floor. A complicated system developed from a single, rich component and supported by further additions results in an abstract vertical floor with a variety of rooms."
+    },
+    {
+        id: 23,
+        name: "the fly club, TAR Rooms",
+        type: "video",
+        url: "https://video.wixstatic.com/video/54a996_e8813c13a8aa42a8bc62718caf9a7542/1080p/mp4/file.mp4",
+        thumbnailUrl: "https://static.wixstatic.com/media/54a996_bf5d98fe308d4e219476f455a265a34f~mv2.png",
+        title: "the fly club, TAR Rooms",
+        description: "Museum design that creatively combines arch-based structures inspired by Salvador Dali's elephants with a transparent vertical reproduction of Le Corbusier's Museum of Unlimited Growth, incorporating the use of pipes as a deliberate design choice."
+    },
+    {
+        id: 24,
+        name: "Metaboilerism",
+        type: "video",
+        url: "https://video.wixstatic.com/video/54a996_5795369b30bf41b08a25ba36b5f357e9/1080p/mp4/file.mp4",
+        thumbnailUrl: "https://static.wixstatic.com/media/54a996_5ad4cee848d04581a96d2762fd1ca332~mv2.png",
+        title: "Metaboilerism",
+        description: "NoiseDAO Forge Museums world facility."
+    },
+    {
+        id: 25,
+        name: "tes am",
+        type: "video",
+        url: "https://video.wixstatic.com/video/54a996_f2c748dbd1ff43b8a4e1cbff5fc8a105/1080p/mp4/file.mp4",
+        thumbnailUrl: "https://static.wixstatic.com/media/54a996_5ad4cee848d04581a96d2762fd1ca332~mv2.png",
+        title: "tes am",
+        description: "NoiseDAO Forge Museums world facility."
+    },
+    {
+        id: 26,
+        name: "PXL DUOMO",
+        type: "video",
+        url: "https://www.youtube.com/embed/qo-j3IBLEB0",
+        thumbnailUrl: "https://static.wixstatic.com/media/54a996_bbe3c10b067548ac9fde8eda8e3d4985~mv2.png",
+        title: "PXL DUOMO",
+        description: "A cross-planned space with frosted glass skin designed to house virtual interactions."
+    },
+    {
+        id: 27,
+        name: "centipede",
+        type: "video",
+        url: "https://video.wixstatic.com/video/54a996_d3131d04b6f14f70982f2136d1413793/1080p/mp4/file.mp4",
+        thumbnailUrl: "https://static.wixstatic.com/media/54a996_5ad4cee848d04581a96d2762fd1ca332~mv2.png",
+        title: "centipede",
+        description: "NoiseDAO Forge Museums world facility."
+    },
+    {
+        id: 28,
+        name: "0pp13",
+        type: "video",
+        url: "https://video.wixstatic.com/video/54a996_6cd57d3220e1465791e295d2d5cfba2d/1080p/mp4/file.mp4",
+        thumbnailUrl: "https://static.wixstatic.com/media/54a996_5ad4cee848d04581a96d2762fd1ca332~mv2.png",
+        title: "0pp13",
+        description: "NoiseDAO Forge Museums world facility."
+    },
+    {
+        id: 29,
+        name: "neue2dojo walkthrough",
+        type: "video",
+        url: "https://www.youtube.com/embed/SF9brlPTfdQ",
+        thumbnailUrl: "https://static.wixstatic.com/media/54a996_e2b6353a23e14e489ee6ee3d341fdd80~mv2.png",
+        title: "neue2dojo walkthrough",
+        description: "The Neue² Dojo Gallery stands at the forefront of a cultural revolution, exemplifying how art and technology can coalesce to create entirely new paradigms for cultural expression and engagement. This pioneering project, anchored firmly on the blockchain and realized within the boundless possibilities of 3D web technology, redefines the essence of a gallery not as a physical space, but as a fluid, virtual environment that can adapt and transform to suit the thematic and aesthetic needs of each exhibition it hosts."
+    },
+    {
+        id: 30,
+        name: "neue2dojo making of",
+        type: "video",
+        url: "https://www.youtube.com/embed/LNzH_Hh71go",
+        thumbnailUrl: "https://static.wixstatic.com/media/54a996_e2b6353a23e14e489ee6ee3d341fdd80~mv2.png",
+        title: "neue2dojo making of",
+        description: "The Neue² Dojo Gallery stands at the forefront of a cultural revolution, exemplifying how art and technology can coalesce to create entirely new paradigms for cultural expression and engagement. This pioneering project, anchored firmly on the blockchain and realized within the boundless possibilities of 3D web technology, redefines the essence of a gallery not as a physical space, but as a fluid, virtual environment that can adapt and transform to suit the thematic and aesthetic needs of each exhibition it hosts."
+    },
+    {
+        id: 31,
+        name: "#np17658, neon build_athon_1",
+        type: "video",
+        url: "https://video.wixstatic.com/video/54a996_15c2541f73fb4084aa3f7860dbf681b6/720p/mp4/file.mp4",
+        thumbnailUrl: "https://static.wixstatic.com/media/54a996_3ba11bba9433456996f9a3980dbe5c34~mv2.png",
+        title: "#np17658, neon build_athon_1",
+        description: "Vertical Gallery design to exhibit the collection of NeonDAO."
+    }
+
+            ];
+        }
+
+        function populateMediaItems() {
+            const carouselContainer = document.getElementById('avatar-carousel');
+            carouselContainer.innerHTML = '';
+            mediaData.forEach((media, index) => {
+                const mediaItem = document.createElement('div');
+                mediaItem.className = `media-item ${media.type}`;
+                mediaItem.dataset.id = media.id;
+                mediaItem.dataset.index = index;
+                const thumbnailUrl = media.thumbnailUrl || getDefaultThumbnail(media.type);
+                mediaItem.innerHTML = `<img src="${thumbnailUrl}" class="media-item-thumbnail" alt="${media.name}"><div class="media-item-name">${media.name}</div>`;
+                mediaItem.addEventListener('click', () => {
+                    activeMediaIndex = index;
+                    updateMediaCarousel();
+                    displayMediaContent(media);
+                });
+                carouselContainer.appendChild(mediaItem);
+            });
+            updateMediaCarousel();
+        }
+
+        function getDefaultThumbnail(type) {
+            return {
+                'video': 'https://cdn-icons-png.flaticon.com/512/711/711245.png',
+                'image': 'https://cdn-icons-png.flaticon.com/512/1829/1829371.png',
+                'text': 'https://cdn-icons-png.flaticon.com/512/2911/2911228.png'
+            }[type] || 'https://cdn-icons-png.flaticon.com/512/831/831509.png';
+        }
+
+        function changeActiveMedia(direction) {
+            const numMedia = mediaData.length;
+            if (numMedia === 0) return;
+            activeMediaIndex = (activeMediaIndex + direction + numMedia) % numMedia;
+            updateMediaCarousel();
+            displayMediaContent(mediaData[activeMediaIndex]);
+        }
+
+        function updateMediaCarousel() {
+            const mediaItems = document.querySelectorAll('.media-item');
+            const numItems = mediaItems.length;
+            if (numItems === 0) return;
+            mediaItems.forEach(item => {
+                item.classList.remove('active');
+                item.style.display = 'none';
+            });
+            const windowWidth = window.innerWidth;
+            const itemWidth = CONFIG.thumbnails.size;
+            const spacing = CONFIG.thumbnails.spacing;
+            const minSideOffset = CONFIG.thumbnails.minSideOffset;
+            const availableWidth = windowWidth - (2 * minSideOffset);
+            const maxItemsVisible = Math.floor(availableWidth / (itemWidth + spacing));
+            const itemsPerSide = Math.floor(maxItemsVisible / 2);
+            const centerX = windowWidth / 2;
+            for (let i = 0; i < numItems; i++) {
+                let relativePos = ((i - activeMediaIndex) + numItems) % numItems;
+                if (relativePos > numItems / 2) relativePos -= numItems;
+                if (Math.abs(relativePos) <= itemsPerSide) {
+                    const item = mediaItems[i];
+                    item.style.display = '';
+                    const xPos = centerX - (itemWidth / 2) + (relativePos * (itemWidth + spacing));
+                    item.style.left = `${xPos}px`;
+                    item.style.top = '0px';
+                    item.style.opacity = relativePos === 0 ? '1' : '0.7';
+                    item.style.zIndex = 100 - Math.abs(relativePos);
+                    if (i === activeMediaIndex) item.classList.add('active');
+                }
+            }
+        }
+
+        function displayMediaContent(media) {
+            if (!media) return;
+            const mediaPreview = document.getElementById('media-preview');
+            mediaPreview.innerHTML = '';
+            
+            switch (media.type) {
+                case 'video':
+                    const videoContainer = document.createElement('div');
+                    videoContainer.className = 'media-video-container';
+                    
+                    const overlay = document.createElement('div');
+                    overlay.className = 'media-overlay';
+                    overlay.innerHTML = `
+                        <div class="media-overlay-title">${media.title || media.name}</div>
+                        <div class="media-overlay-description">${media.description || ''}</div>
+                    `;
+                    videoContainer.appendChild(overlay);
+                    
+                    if (media.url.includes('youtube.com') || media.url.includes('youtu.be')) {
+                        let videoId = media.url.includes('youtube.com') ? media.url.split('v=')[1]?.split('&')[0] : media.url.split('youtu.be/')[1]?.split('?')[0];
+                        const iframe = document.createElement('iframe');
+                        iframe.className = 'media-video';
+                        iframe.src = `https://www.youtube.com/embed/${videoId}?controls=1&rel=0`;
+                        iframe.allow = 'encrypted-media';
+                        iframe.allowFullscreen = true;
+                        videoContainer.appendChild(iframe);
+                        iframe.style.height = '100%';
+                        iframe.style.width = 'auto';
+                    } else {
+                        const video = document.createElement('video');
+                        video.className = 'media-video';
+                        video.src = media.url;
+                        video.controls = true;
+                        video.autoplay = false;
+                        videoContainer.appendChild(video);
+                    }
+                    mediaPreview.appendChild(videoContainer);
+                    break;
+                    
+                case 'image':
+                    const imgContainer = document.createElement('div');
+                    imgContainer.style.position = 'relative';
+                    imgContainer.style.width = '100%';
+                    imgContainer.style.height = '100%';
+                    imgContainer.style.display = 'flex';
+                    imgContainer.style.justifyContent = 'center';
+                    imgContainer.style.alignItems = 'center';
+                    
+                    const imgOverlay = document.createElement('div');
+                    imgOverlay.className = 'media-overlay';
+                    imgOverlay.innerHTML = `
+                        <div class="media-overlay-title">${media.title || media.name}</div>
+                        <div class="media-overlay-description">${media.description || ''}</div>
+                    `;
+                    imgContainer.appendChild(imgOverlay);
+                    
+                    const img = document.createElement('img');
+                    img.className = 'media-image';
+                    img.src = media.url;
+                    img.alt = media.name;
+                    imgContainer.appendChild(img);
+                    mediaPreview.appendChild(imgContainer);
+                    break;
+                    
+                case 'text':
+                    const textDiv = document.createElement('div');
+                    textDiv.className = 'media-text';
+                    textDiv.innerHTML = media.content || `
+                        <h2>${media.title || media.name}</h2>
+                        <p>${media.description || ''}</p>
+                    `;
+                    textDiv.style.overflowY = 'auto';
+                    textDiv.style.maxHeight = '100%';
+                    mediaPreview.appendChild(textDiv);
+                    break;
+            }
+            document.getElementById('bottom-section').style.display = 'block';
+        }
+
+        function filterMedia(searchTerm) {
+            searchTerm = searchTerm.toLowerCase().trim();
+            const filteredMedia = searchTerm ? mediaData.filter(media => 
+                media.name.toLowerCase().includes(searchTerm) || 
+                (media.description && media.description.toLowerCase().includes(searchTerm)) ||
+                (media.title && media.title.toLowerCase().includes(searchTerm))
+            ) : [...mediaData];
+            populateMediaItems(filteredMedia);
+            if (filteredMedia.length > 0) {
+                activeMediaIndex = 0;
+                updateMediaCarousel();
+                displayMediaContent(filteredMedia[0]);
+            } else {
+                document.getElementById('avatar-carousel').innerHTML = '';
+                document.getElementById('media-preview').innerHTML = '<div class="media-text">No media found matching your search.</div>';
+            }
+        }
+
+        function exitMediaMode() {
+            document.getElementById('media-btn').classList.remove('active');
+            isMediaMode = false;
+            document.getElementById('media-view').style.display = 'none';
+            document.getElementById('media-view').classList.remove('active');
+            document.querySelector('.viewer-container').classList.add('active');
+            document.getElementById('viewer-canvas').style.display = 'block';
+            document.getElementById('search-input').placeholder = "Search spaces...";
+            document.getElementById('media-preview').innerHTML = '';
+            const bottomSection = document.getElementById('bottom-section');
+            bottomSection.style.bottom = `${CONFIG.sectionPositions.avatarBar.bottom}px`;
+            bottomSection.style.display = 'block';
+            
+            document.getElementById('grid-toggle-button').style.display = 'flex';
+            
+            populateAvatarGrid();
+            toggleGridView(true);
+            
+            const filteredSpaces = activeCollection === 'ALL' ? [...SpaceData] : SpaceData.filter(space => space.collection === activeCollection);
+            if (filteredSpaces.length > 0) {
+                if (!hasSpaceBeenSelected || !activeSpace || !filteredSpaces.find(space => space.id === activeSpace.id)) {
+                    activeSpaceIndex = 0;
+                    activeSpace = filteredSpaces[0];
+                } else {
+                    activeSpaceIndex = filteredSpaces.findIndex(space => space.id === activeSpace.id);
+                    if (activeSpaceIndex === -1) {
+                        activeSpaceIndex = 0;
+                        activeSpace = filteredSpaces[0];
+                    }
+                }
+                updateAvatarDetails(activeSpace);
+                updateActionButtons(activeSpace);
+                updateAvatarCarousel();
+                document.getElementById('avatar-details').style.display = 'none';
+            } else {
+                document.getElementById('avatar-details').style.display = 'none';
+            }
+            
+            clearScene();
+            controls.enabled = true;
+            animate();
+        }
+
+        function handleCollectionClick(button) {
+            const collection = button.textContent;
+            if (activeCollection === collection && !isMediaMode) return;
+            
+            activeCollection = collection;
+            document.querySelectorAll('.collection-btn').forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            
+            if (isMediaMode) {
+                exitMediaMode();
+            }
+            
+            clearScene();
+            cancelAnimationFrame(animate);
+            renderer.render(scene, camera);
+            
+            const filteredSpaces = collection === 'ALL' ? [...SpaceData] : SpaceData.filter(space => space.collection === activeCollection);
+            
+            populateAvatarItems(filteredSpaces);
+            populateAvatarGrid(filteredSpaces);
+            
+            toggleGridView(true);
+            
+            if (filteredSpaces.length > 0) {
+                activeSpaceIndex = 0;
+                activeSpace = filteredSpaces[0];
+                updateAvatarDetails(activeSpace);
+                updateActionButtons(activeSpace);
+                updateAvatarCarousel();
+                document.getElementById('avatar-details').style.display = 'none';
+                document.getElementById('viewer-canvas').style.display = 'none';
+            } else {
+                document.getElementById('avatar-carousel').innerHTML = '<div class="avatar-name">No spaces found in this collection</div>';
+                document.getElementById('avatar-grid').innerHTML = '<div class="no-results">No spaces found in this collection</div>';
+                document.getElementById('avatar-details').style.display = 'none';
+                document.getElementById('viewer-canvas').style.display = 'none';
+            }
+            
+            isModelLoading = false;
+        }
+               // KANKAAAA
+        function loadSpaceData() {
+          SpaceData = [
+    {
+        id: 0,
+        name: "Potbelly Q_Fu",
+        information: "As being the first design ever published by DFW, Potbelly Q-Fu is a pyramid shaped structural experiment.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/dt-thumb/refs/heads/main/A0.jpg",
+        collection: "Gallery",
+        runwayPart: "Pyramide Facility/ Gallery",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/digitaltopographies/main/0-POTBELLYQ_FU-Digital_Topographies_00.glb",
+        date: "29.03.22",
+        buyLink: "https://opensea.io/item/base/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/1",
+        dtNo: "00",
+        chain: "Base"
+    },
+    {
+        id: 1,
+        name: "Xhbtion_Spc",
+        information: "Xhbition_SPC is a futuristic exhibition space with interconnected cubic modules, intricate contour lines, and a polished gray interior, creating a visually dynamic and minimalist environment supported by columns and undulating roof structures.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/dt-thumb/refs/heads/main/A1.jpg",
+        collection: "Gallery",
+        runwayPart: "Pyramide Facility/ Gallery",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/digitaltopographies/main/1-XHBTION_SPC-Digital_Topographies_01.glb",
+        date: "14.02.22",
+        buyLink: "https://opensea.io/item/base/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/2",
+        dtNo: "01",
+        chain: "Base"
+    },
+    {
+        id: 2,
+        name: "Vegancell+Park",
+        information: "VeganCell+Park is a multi-layered, pizza-shaped space designed for hanging out and exhibiting works, featuring an upper terrace with ramp access for skybox experiences, and vegan cells on the ground creating abstract shadows and defining various utilities.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/dt-thumb/refs/heads/main/A2.jpg",
+        collection: "Multi",
+        runwayPart: "Huge Multipurpose Complex",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/digitaltopographies/main/2-VEGANCELL+PARK-Digital_Topographies_02.glb",
+        date: "26.03.22",
+        buyLink: "https://opensea.io/item/base/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/3",
+        dtNo: "02",
+        chain: "Base"
+    },
+    {
+        id: 3,
+        name: "Bureau+Theatre",
+        information: "Bureau + Theatre features a unique 3D void defined by contour pipes that balance direction and service, form action zones, enhance ground perception, and unite concrete and chrome with a sculptural staircase and minimalist materials for a visionary creation.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/dt-thumb/refs/heads/main/A3.jpg",
+        collection: "HQ",
+        runwayPart: "Office Space",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/digitaltopographies/main/3-BUREAU+THEATRE-Digital_Topographies_03.glb",
+        date: "04.04.22",
+        buyLink: "https://opensea.io/item/base/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/4",
+        dtNo: "03",
+        chain: "Base"
+    },
+    {
+        id: 4,
+        name: "Digital Expo Center",
+        information: "D.E.C, a digital island and virtual urban concept, features 18-floor towers, public spaces, 12 exhibition units with five artist slots each, an open concert hall in front of the tower's square, and Chrome Garden below the private area, aiming to serve as a temporary exhibition space that glorifies art, design, and friendship, and can easily fit into any multipurpose use.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/dt-thumb/refs/heads/main/A4.jpg",
+        collection: "Multi",
+        runwayPart: "Urban Scaled Expo Design",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/digitaltopographies/main/4-DIGITALEXPOCENTER-Digital_Topographies_04.glb",
+        date: "08.04.22",
+        buyLink: "https://opensea.io/item/base/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/5",
+        dtNo: "04",
+        chain: "Base"
+    },
+    {
+        id: 5,
+        name: "La Bibliothèque De L'École Polytechnique Fédérale De Metaverse",
+        information: "The open-planned, multi-functional virtual complex (education, exhibition, gathering, office) spans three floors (111x112x33m), is optimized to be platform-agnostic, and now features a v2 design with an additional entrance from ground zero.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/dt-thumb/refs/heads/main/A5.jpg",
+        collection: "Multi",
+        runwayPart: "Open School",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/digitaltopographies/main/5-LA_BIBLIOTHÈQUE_DE_L-ÉCOLE_POLYTECHNIQUE_FÉDÉRALE_DE_METAVERSE-Digital_Topographies_05.glb",
+        date: "01.06.22",
+        buyLink: "https://opensea.io/item/base/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/6",
+        dtNo: "05",
+        chain: "Base"
+    },
+    {
+        id: 6,
+        name: "Deconstructivist Eagle Nest",
+        information: "The 'Deconstructivist Eagle Nest Pavilion' is a metaverse design featuring an intricate network of intersecting contour pipes that create dynamic spaces and action zones, blending minimalist concrete and chrome materials to achieve an elegantly chaotic, high-tech aesthetic.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/dt-thumb/refs/heads/main/A6.jpg",
+        collection: "Spatial",
+        runwayPart: "Sculptural Public Space",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/digitaltopographies/main/6-DECONSTRUCTIVIST_EAGLE_NEST-Digital_Topographies_06.glb",
+        date: "05.06.22",
+        buyLink: "https://opensea.io/item/base/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/7",
+        dtNo: "06",
+        chain: "Base"
+    },
+    {
+        id: 7,
+        name: "Astral Egg Plant",
+        information: "The 46-meter high, 2-by-2 plot complex features two functional levels: a public ground floor and private floating egg-crack areas above, aiming for an elegantly absurd spatial design inspired by a child's crayon drawing and a dystopian world of giant chickens, blending primal forms with raw materials for a unique metaverse experience.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/dt-thumb/refs/heads/main/A7.jpg",
+        collection: "HQ",
+        runwayPart: "HQ / Gathering Space",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/digitaltopographies/main/7-ASTRAL_EGG_PLANT-Digital_Topographies_07.glb",
+        date: "27.07.22",
+        buyLink: "https://opensea.io/item/base/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/8",
+        dtNo: "07",
+        chain: "Base"
+    },
+    {
+        id: 8,
+        name: "The Finger Dome",
+        information: "Finger Dome, the Music Venue Winner of Creatorverse Buildathon by Parcel x PangeaDAO, is a semi-transparent, easily recognizable structure designed for fully open public use, allowing musicians and listeners to meet on equal terms without hierarchical elements, resembling a street performance with its simplicity and non-materialistic form.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/dt-thumb/refs/heads/main/A8.jpg",
+        collection: "Event",
+        runwayPart: "Music Venue",
+        modelUrl:  "https://arweave.net/3EBBjBrYYFuJxAvNPhQYhZJ-QaEqh2kOwwM9d-7FWPE",   //"https://raw.githubusercontent.com/decentralize-dfw/digitaltopographies/main/8-THE_FINGER_DOME-Digital_Topographies_08.glb",
+        date: "30.07.22",
+        buyLink: "https://opensea.io/item/base/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/9",
+        dtNo: "08",
+        chain: "Base"
+    },
+    {
+        id: 9,
+        name: "Ummuse",
+        information: "UMMUSE, designed during the Neon Build_athon for Neon DAO's Clone X Edits, juxtaposes an aggressive, deconstructivist metallic exterior with a minimalist interior, creating a paradoxical relationship between the chaotic facade and the calm, simple inner space.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/dt-thumb/refs/heads/main/A9.jpg",
+        collection: "Gallery",
+        runwayPart: "Museum (Neon Buildathon)",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/digitaltopographies/main/9-UMMUSE-Digital_Topographies_09.glb",
+        date: "08.08.22",
+        buyLink: "https://opensea.io/item/base/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/10",
+        dtNo: "09",
+        chain: "Base"
+    },
+    {
+        id: 10,
+        name: "#Np17658",
+        information: "created for Neon DAO's Buildathon, is a five-floor caged cylinder featuring concentric circular layers, an unconventional vertical circulation system, and a sleek, metallic facade adorned with CryptoPunks, blending abstract and digital aesthetics with a minimalist, flexible interior.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/dt-thumb/refs/heads/main/A10.jpg",
+        collection: "Gallery",
+        runwayPart: "Museum (Neon Buildathon)",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/digitaltopographies/main/10-NP17658-(Digital_Topographies_10.glb",
+        date: "12.08.22",
+        buyLink: "https://opensea.io/item/base/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/11",
+        dtNo: "10",
+        chain: "Base"
+    },
+    {
+        id: 11,
+        name: "Holy Shadow Hq",
+        information: "Holy Shadow HQ, winner of the Landworks Grant Program Sprint 2, is a black vertical pyramid with gothic pillars, designed as a striking antithesis to light architecture, featuring a central layout for gatherings and presentations, blending simple repetitive gestures with a bold geometric attitude using unique materials.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/dt-thumb/refs/heads/main/a11.jpg",
+        collection: "HQ",
+        runwayPart: "HQ / Gathering Space",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/digitaltopographies/main/11-HSHQ-Digital_Topographies_11.glb",
+        date: "29.08.22",
+        buyLink: "https://opensea.io/item/base/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/12",
+        dtNo: "11",
+        chain: "Base"
+    },
+    {
+        id: 12,
+        name: "Techno Brutal Punk Fabrique",
+        information: "TBPF is a bold, geometric structure blending brutalism and high-tech aesthetics with repetitive horizontal slats and a dynamic interplay of light and shadow, embodying a rebellious, avant-garde spirit.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/dt-thumb/refs/heads/main/a12.jpg",
+        collection: "Event",
+        runwayPart: "Music / Gathering Space",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/digitaltopographies/main/12-TBPF-Digital_Topographies_12.glb",
+        date: "29.08.22",
+        buyLink: "https://opensea.io/item/base/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/13",
+        dtNo: "12",
+        chain: "Base"
+    },
+    {
+        id: 13,
+        name: "K-Dociine Hq",
+        information: "The 4-story headquarters building (32x32m / 2x2 DCL) features diverse forms on each floor, defining public and private zones for working or communicating, and showcases various social and professional settings in softwarescape, reflecting a formal yet organic aesthetic while enabling unique gatherings in unconventional environments.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/dt-thumb/refs/heads/main/a13.jpg",
+        collection: "HQ",
+        runwayPart: "HQ",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/digitaltopographies/main/13-K-DOCIINE_HQ-Digital_Topographies_13.glb",
+        date: "03.09.22",
+        buyLink: "https://opensea.io/item/base/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/14",
+        dtNo: "13",
+        chain: "Base"
+    },
+    {
+        id: 14,
+        name: "Poddio Verticale",
+        information: "Poddio Verticale is a vertical fashion runway podium with a looping ramp around its semi-transparent marble skin, featuring flexible spaces for offices, galleries, or leisure within a bright, open architecture.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/dt-thumb/refs/heads/main/a14.jpg",
+        collection: "Event",
+        runwayPart: "Fashion House / Runway Facility",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/digitaltopographies/main/14-PODDIO_VERTICALE_Digital_Topographies_14-v1.glb",
+        date: "08.09.22",
+        buyLink: "https://opensea.io/item/base/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/15",
+        dtNo: "14",
+        chain: "Base"
+    },
+    {
+        id: 15,
+        name: "Poddio Dark Twisted Verticale",
+        information: "Poddio Dark Twisted Verticale is a 40-meter deformed cube with a swerving ramp around its semi-transparent black marble skin, featuring slabs for observation and pausing, creating a dynamic, open, and multifunctional space for offices, leisure, and fashion shows in the metaverse.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/dt-thumb/refs/heads/main/a15.jpg",
+        collection: "Event",
+        runwayPart: "Fashion House / Runway Facility",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/digitaltopographies/main/15-PODDIO_DARK_TWISTED_VERTICALE-Digital_Topographies_15.glb",
+        date: "13.10.22",
+        buyLink: "https://opensea.io/item/base/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/16",
+        dtNo: "15",
+        chain: "Base"
+    },
+    {
+        id: 16,
+        name: "Space Time Rooms",
+        information: "The Moca Space Time Rooms are conceptual spaces that deconstruct traditional room boundaries, featuring flexible, paper-light floors that blend into each other, creating a dynamic and experimental form inspired by space-time relativity.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/dt-thumb/refs/heads/main/a16.jpg",
+        collection: "Gallery",
+        runwayPart: "MOCA ROOMS",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/digitaltopographies/main/16-SPACE_TIME_ROOMS-(Digital_Topographies_16.glb",
+        date: "08.11.22",
+        buyLink: "https://opensea.io/item/base/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/17",
+        dtNo: "16",
+        chain: "Base"
+    },
+    {
+        id: 17,
+        name: "Matisse Time ChaipeL",
+        information: "Mid-scale Renaissance religious typologies are reimagined using modern technology, creating a nebulous chapel with a machinated ceiling for gatherings, concerts, or exhibitions, inspired by various artistic styles and time periods.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/dt-thumb/refs/heads/main/a17.jpg",
+        collection: "Spatial",
+        runwayPart: "Gathering Space",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/digitaltopographies/main/17-MATISSE_TIME_CHAIPEL_Digital_Topographies_17_.glb",
+        date: "22.10.22",
+        buyLink: "https://opensea.io/item/base/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/18",
+        dtNo: "17",
+        chain: "Base"
+    },
+    {
+        id: 18,
+        name: "Matsouka Hills Mansion",
+        information: "Matsuoka Hills Mansion, reflecting late 21st-century architecture with its muscular, digital aesthetic, features a three-layered geometry with free-plan sub-spaces for specific functions, a central hill-like rise, and a skeleton-like three-tiered ladder for upper-floor access, blending domestic elements with a museum-like layout to explore privacy in open virtual environments.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/dt-thumb/refs/heads/main/a18.jpg",
+        collection: "HQ",
+        runwayPart: "House",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/digitaltopographies/main/18-MATSOUKA_HILLS_MANSION_Digital_Topographies_18_.glb",
+        date: "19.10.22",
+        buyLink: "https://opensea.io/item/base/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/19",
+        dtNo: "18",
+        chain: "Base"
+    },
+    {
+        id: 19,
+        name: "Museum Of Unlimited Growth 2",
+        information: "Reimagination of Le Corbusier's sketch with transparent spiral corridors to test redefining spatial boundaries, by investigating a new concept that combines modernist dynamics with virtuality.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/dt-thumb/refs/heads/main/a19.jpg",
+        collection: "Gallery",
+        runwayPart: "MOCA ROOMS",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/digitaltopographies/main/19-MUOG2_Digital_Topographies_19.glb",
+        date: "18.11.22",
+        buyLink: "https://opensea.io/item/base/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/20",
+        dtNo: "19",
+        chain: "Base"
+    },
+    {
+        id: 20,
+        name: "Spyder Mosk",
+        information: "An experimental museum design features a glass ramp that generates a spiral corridor, surrounded by a flexible network resembling a spider web, arranging artworks in a maze-like structure between columns, with volumes and arches derived from mosque typology, to frame dramatic openings.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/dt-thumb/refs/heads/main/a20.jpg",
+        collection: "Gallery",
+        runwayPart: "MOCA ROOMS",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/digitaltopographies/main/20-SPYDER_MOSK_Digital_Topographies_20_.glb",
+        date: "18.11.22",
+        buyLink: "https://opensea.io/item/base/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/21",
+        dtNo: "20",
+        chain: "Base"
+    },
+    {
+        id: 21,
+        name: "Spyder Mosk Piccolo",
+        information: "'Spyder' represents a flexible network akin to a spider's craftsmanship, while the artwork placement creates a maze-like structure between villainous columns, defining walls with a nihilistic quality. The abstract system derived from mosque typology blossoms arches that frame dramatic openings.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/dt-thumb/refs/heads/main/a21.jpg",
+        collection: "Gallery",
+        runwayPart: "MOCA ROOMS",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/digitaltopographies/main/21-SPYDER_MOSK_PICCOLO_Digital_Topographies_21_.glb",
+        date: "18.11.22",
+        buyLink: "https://opensea.io/item/base/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/22",
+        dtNo: "21",
+        chain: "Base"
+    },
+    {
+        id: 22,
+        name: "The Fly Club",
+        information: "Museum design that creatively combines arch-based structures inspired by Salvator Dali's elephants with a transparent vertical reproduction of Le Corbusier's Museum of Unlimited Growth, incorporating the use of pipes as a deliberate design choice.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/dt-thumb/refs/heads/main/a22.jpg",
+        collection: "Gallery",
+        runwayPart: "MOCA ROOMS",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/digitaltopographies/main/22-THE_FLY_CLUB_Digital_Topographies_22_.glb",
+        date: "18.11.22",
+        buyLink: "https://opensea.io/item/base/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/23",
+        dtNo: "22",
+        chain: "Base"
+    },
+    {
+        id: 23,
+        name: "Beyond The Infinity",
+        information: "A tribute to 'Beyond the Infinity' reproduces a famous scene, reflecting Kubrick's precision and fake French architecture to evoke an artificial human feeling, influencing the design and exploring themes of space, creativity, and existential anxiety.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/dt-thumb/refs/heads/main/a23.jpg",
+        collection: "Spatial",
+        runwayPart: "Remake from 2001: A Space Odyssey",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/digitaltopographies/main/23-BEYOND%20THE%20INFINITY%20-cutt(Digital_Topographies_23).glb",
+        date: "08.12.22",
+        buyLink: "https://opensea.io/item/base/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/24",
+        dtNo: "23",
+        chain: "Base"
+    },
+    {
+        id: 24,
+        name: "Atonal Veins",
+        information: "A pavilion created by six different pipelines twisting together, mimicking sound frequencies.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/dt-thumb/refs/heads/main/a24.jpg",
+        collection: "Event",
+        runwayPart: "Music Venue Pavillion",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/digitaltopographies/main/24.glb",
+        date: "14.12.22",
+        buyLink: "https://opensea.io/item/base/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/25",
+        dtNo: "24",
+        chain: "Base"
+    },
+    {
+        id: 25,
+        name: "C2W R-V3-Rust",
+        information: "-",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/dt-thumb/refs/heads/main/a25-1.jpg",
+         collection: "Retail",
+        runwayPart: "Virtual Fashion Retail Store",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/digitaltopographies/main/25-1.glb",
+        date: "16.01.24",
+        buyLink: "https://opensea.io/item/base/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/26",
+        dtNo: "25_1",
+        chain: "Base"
+    },
+    {
+        id: 26,
+        name: "C2W R-V3-Bauhouse",
+        information: "-",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/dt-thumb/refs/heads/main/a25-2.jpg",
+         collection: "Retail",
+        runwayPart: "Virtual Fashion Retail Store",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/digitaltopographies/main/25-2.glb",
+        date: "16.01.24",
+        buyLink: "https://opensea.io/item/base/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/27",
+        dtNo: "25_2",
+        chain: "Base"
+    },
+    {
+        id: 27,
+        name: "C2W R-V3-Rabbit",
+        information: "-",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/dt-thumb/refs/heads/main/a25-3.jpg",
+        collection: "Retail",
+        runwayPart: "Virtual Fashion Retail Store",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/digitaltopographies/main/25-3.glb",
+        date: "16.01.24",
+        buyLink: "https://opensea.io/item/base/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/28",
+        dtNo: "25_3",
+        chain: "Base"
+    },
+    {
+        id: 28,
+        name: "C2W R-V3-Nietzsc.",
+        information: "-",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/dt-thumb/refs/heads/main/a25-4.jpg",
+         collection: "Retail",
+        runwayPart: "Virtual Fashion Retail Store",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/digitaltopographies/main/25-4.glb",
+        date: "16.01.24",
+        buyLink: "https://opensea.io/item/base/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/29",
+        dtNo: "25_4",
+        chain: "Base"
+    },
+    {
+        id: 29,
+        name: "Neue²Dojo",
+        information: "The virtual native gallerys design, rooted in Mies van der Rohe's minimalist principles, evolves from two-dimensional simplicity to three-dimensional complexity, using digital technology to transform structural lines into imaginative and immersive spaces, balancing order and creativity to create a pioneering digital architectural experience.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/dt-thumb/refs/heads/main/a26.jpg",
+        collection: "Gallery",
+        runwayPart: "Museum for decentralize* retrospective",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/digitaltopographies/main/26.glb",
+        date: "22.01.23",
+        buyLink: "https://opensea.io/item/base/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/30",
+        dtNo: "26",
+        chain: "Base"
+    },
+    {
+        id: 30,
+        name: "DFWAM",
+        information: "Digital Forgery Workshop Architecture Museum",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/dt-thumb/refs/heads/main/a27.jpg",
+        collection: "Multi",
+        runwayPart: "Open Plan Museum",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/digitaltopographies/main/27.glb",
+        date: "17.11.23",
+        buyLink: "https://opensea.io/item/base/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/31",
+        dtNo: "27",
+        chain: "Base"
+    },
+    {
+        id: 31,
+        name: "Promethade",
+        information: "Design features flowing, continuous forms with semi-transparent layers supported by slender columns, creating an airy, dynamic space that blends minimalism with a sense of infinite depth.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/dt-thumb/refs/heads/main/a28.jpg",
+        collection: "Gallery",
+        runwayPart: "Museum",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/digitaltopographies/main/28.glb",
+        date: "06.02.23",
+        buyLink: "https://opensea.io/item/base/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/32",
+        dtNo: "28",
+        chain: "Base"
+    },
+    {
+        id: 32,
+        name: "Cave Design Store",
+        information: "The Cave Design Store combines organic and futuristic elements in a multi-level, stone-like structure with smooth forms, open interconnected chambers, and a striking blend of raw cave-like walls and sleek modern fixtures.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/dt-thumb/refs/heads/main/a29.jpg",
+        collection: "Retail",
+        runwayPart: "Pop-up Store",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/digitaltopographies/main/29.glb",
+        date: "15.02.23",
+        buyLink: "https://opensea.io/item/base/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/33",
+        dtNo: "29",
+        chain: "Base"
+    },
+    {
+        id: 33,
+        name: "Pop-Yp",
+        information: "A small retail store to house virtual events, inspired by HOR Berlin.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/dt-thumb/refs/heads/main/a30.jpg",
+        collection: "Retail",
+        runwayPart: "Pop-up Store",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/digitaltopographies/main/30.glb",
+        date: "18.02.23",
+        buyLink: "https://opensea.io/item/base/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/34",
+        dtNo: "30",
+        chain: "Base"
+    },
+    {
+        id: 34,
+        name: "C1Ty_V2",
+        information: "City Design for Context in Metaverse Worlds under 1 mb.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/dt-thumb/refs/heads/main/a31.jpg",
+        collection: "Multi",
+        runwayPart: "Urban Context for Metaverse Worlds",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/digitaltopographies/main/31.glb",
+        date: "21.02.23",
+        buyLink: "https://opensea.io/item/base/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/35",
+        dtNo: "31",
+        chain: "Base"
+    },
+    {
+        id: 35,
+        name: "Museborough Pavs",
+        information: "A pavillion, designed for Moca ROOMS, exists as a compact small gallery with pop-culture inspirations, with an aim to discuss what are the galleries/museums in our life",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/dt-thumb/refs/heads/main/a32.jpg",
+        collection: "Gallery",
+        runwayPart: "MOCA ROOMS",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/digitaltopographies/main/32.glb",
+        date: "05.01.23",
+        buyLink: "https://opensea.io/item/base/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/36",
+        dtNo: "32",
+        chain: "Base"
+    },
+    {
+        id: 36,
+        name: "Fight Arena",
+        information: "DFW Boxing Arena is a dynamic structure designed to host intense virtual fighting matches, blending sports and gaming with a facade that captures the sport's energy, defined by two different axes—x and y—that contour and playfully define the cage in the z-axis.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/dt-thumb/refs/heads/main/a33.jpg",
+        collection: "Event",
+        runwayPart: "Sports Facility",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/digitaltopographies/main/33.glb",
+        date: "15.01.23",
+        buyLink: "https://opensea.io/item/base/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/37",
+        dtNo: "33",
+        chain: "Base"
+    },
+    {
+        id: 37,
+        name: "Mikado",
+        information: "-",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/dt-thumb/refs/heads/main/a34.jpg",
+        collection: "Spatial",
+        runwayPart: "Urban Interior",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/digitaltopographies/main/34.glb",
+        date: "06.10.23",
+        buyLink: "https://opensea.io/item/base/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/38",
+        dtNo: "34",
+        chain: "Base"
+    },
+    {
+        id: 38,
+        name: "Potbelly QQ_Fu_V2",
+        information: "Potbelly QQ-Fuu [v2] features layered concentric circles and fluid curvilinear lines, creating a dynamic, organic structure with weathered textures and semi-transparent materials, supported by slender columns for an immersive architectural experience.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/dt-thumb/refs/heads/main/a35.jpg",
+        collection: "Multi",
+        runwayPart: "Deconstructed Pyramide Facility",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/digitaltopographies/main/35.glb",
+        date: "28.02.23",
+        buyLink: "https://opensea.io/item/base/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/39",
+        dtNo: "35",
+        chain: "Base"
+    },
+    {
+        id: 39,
+        name: "Concept Furniture Store",
+        information: "A minimalist, transparent grid structure creates an open, airy space to showcase innovative furniture designs conceptualized with a uniform material.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/dt-thumb/refs/heads/main/a36.jpg",
+        collection: "Retail",
+        runwayPart: "Retail",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/digitaltopographies/main/36.glb",
+        date: "08.03.23",
+        buyLink: "https://opensea.io/item/base/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/40",
+        dtNo: "36",
+        chain: "Base"
+    },
+    {
+        id: 40,
+        name: "Pokemuseum",
+        information: "A referential pop-up dedicated to children born in the '90s who fell in love with the Gameboy in the early 2000s, representing the first collectibles for some.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/dt-thumb/refs/heads/main/a37.jpg",
+        collection: "Gallery",
+        runwayPart: "Curated Conceptual Pop-up",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/digitaltopographies/main/37.glb",
+        date: "11.03.23",
+        buyLink: "https://opensea.io/item/base/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/41",
+        dtNo: "37",
+        chain: "Base"
+    },
+    {
+        id: 41,
+        name: "The Constro",
+        information: "The design features three interconnected, rotating toruses with metallic surfaces and cyan lighting, creating a futuristic, dynamic space for Endangered Labs that combines exhibition areas, meeting zones, and interactive spaces, all connected by a central circulation axis",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/dt-thumb/refs/heads/main/a38.jpg",
+        collection: "HQ",
+        runwayPart: "Endangered Labs",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/digitaltopographies/main/38.glb",
+        date: "15.05.23",
+        buyLink: "https://opensea.io/item/base/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/42",
+        dtNo: "38",
+        chain: "Base"
+    },
+    {
+        id: 42,
+        name: "Metaboilerism",
+        information: "The Music Collection (Metaboilerism), introduces a new tower, blending elements of the NY Guggenheim and Nagakin Capsule Tower, with modular listening hubs and vertical ramps guiding artwork visits. To avoid spatial audio interference, artworks are hosted via Webviewer, isolating music for individual users.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/dt-thumb/refs/heads/main/a39.jpg",
+        collection: "Gallery",
+        runwayPart: "Music NFT Museum, Noise DAO",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/digitaltopographies/main/39.glb",
+        date: "25.05.23",
+        buyLink: "https://opensea.io/item/base/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/43",
+        dtNo: "39",
+        chain: "Base"
+    },
+    {
+        id: 43,
+        name: "Pxl Duomo",
+        information: "A cross-planned space with frosted glass skin designed to house virtual interactions.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/dt-thumb/refs/heads/main/a40.jpg",
+        collection: "Gallery",
+        runwayPart: "Exhibition / Gathering Space",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/digitaltopographies/main/40.glb",
+        date: "01.06.23",
+        buyLink: "https://opensea.io/item/base/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/44",
+        dtNo: "40",
+        chain: "Base"
+    },
+    {
+        id: 44,
+        name: "Rotas Virgil",
+        information: "This futuristic design features a dynamic, semi-transparent mesh facade, fluid curved forms, and a lightweight metal framework; the interior balances solid and void spaces with intersecting planes, enhanced by an undulating roof and grand entrance.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/dt-thumb/refs/heads/main/a41.jpg",
+        collection: "Event",
+        runwayPart: "Concert Hall",
+        modelUrl:  'https://arweave.net/wvA7KwQkBl9WLl-foRFwoHHghhTbOYtcF58YsnOWkBY',    //"https://raw.githubusercontent.com/decentralize-dfw/digitaltopographies/main/41.glb",
+        date: "08.06.23",
+        buyLink: "https://opensea.io/item/base/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/45",
+        dtNo: "41",
+        chain: "Base"
+    },
+    {
+        id: 45,
+        name: "Boxmate",
+        information: "A single corridor divided into 16 promenades features a complex lattice structure with staggered, intersecting planes and exposed framework, creating an intricate, multi-layered facade that combines open, dynamic spaces with geometric precision.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/dt-thumb/refs/heads/main/a42.jpg",
+        collection: "Spatial",
+        runwayPart: "Deconstructed Stair Pavillion",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/digitaltopographies/main/42.glb",
+        date: "16.06.23",
+        buyLink: "https://opensea.io/item/base/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/46",
+        dtNo: "42",
+        chain: "Base"
+    },
+    {
+        id: 46,
+        name: "Carbine Wick",
+        information: "A futuristic transformation of a bare village square and seven village houses on different floors, with an exterior protected by bars, artificially providing a sense of security.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/dt-thumb/refs/heads/main/a43.jpg",
+        collection: "Multi",
+        runwayPart: "Vertical Village",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/digitaltopographies/main/43.glb",
+        date: "05.07.23",
+        buyLink: "https://opensea.io/item/base/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/47",
+        dtNo: "43",
+        chain: "Base"
+    },
+    {
+        id: 47,
+        name: "0PP13",
+        information: "The Experimental Audio Museum (0PP13) adopts a metaversal approach, utilizing spheres to represent museum rooms, interconnected to a larger central sphere serving as the entrance and patio. This futuristic design, inspired by basic chemical shapes, accommodates ten sections of experimental audio.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/dt-thumb/refs/heads/main/a44.jpg",
+        collection: "Gallery",
+        runwayPart: "Experimental Audio Musuem",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/digitaltopographies/main/44.glb",
+        date: "06.09.23",
+        buyLink: "https://opensea.io/item/base/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/48",
+        dtNo: "44",
+        chain: "Base"
+    },
+    {
+        id: 48,
+        name: "Stardem",
+        information: "Four intertwined structures rise from four different points, creating a dynamic central space that, with the help of the structures, is subdivided into hierarchical sub-space.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/dt-thumb/refs/heads/main/a45.jpg",
+        collection: "Spatial",
+        runwayPart: "Spatial Structure",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/digitaltopographies/main/45.glb",
+        date: "17.09.23",
+        buyLink: "https://opensea.io/item/base/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/49",
+        dtNo: "45",
+        chain: "Base"
+    },
+    {
+        id: 49,
+        name: "Isola",
+        information: "A building designed with proper proportions bends and twists to create new forms and interesting interstitial spaces.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/dt-thumb/refs/heads/main/a46.jpg",
+        collection: "HQ",
+        runwayPart: "HQ",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/digitaltopographies/main/46.glb",
+        date: "19.09.23",
+        buyLink: "https://opensea.io/item/base/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/50",
+        dtNo: "46",
+        chain: "Base"
+    },
+    {
+        id: 50,
+        name: "Alien Earthquake",
+        information: "A structural experiment with unlogical forms and meshes that implies a feeling of accident.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/dt-thumb/refs/heads/main/a47.jpg",
+        collection: "Spatial",
+        runwayPart: "Spatial Sculpture",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/digitaltopographies/main/47.glb",
+        date: "24.09.23",
+        buyLink: "https://opensea.io/item/base/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/51",
+        dtNo: "47",
+        chain: "Base"
+    },
+    {
+        id: 51,
+        name: "Centipede",
+        information: "The High-Frequency Building (Centipede), features 16 listening hubs within a single structure, with potential expansion based on future publications. The design incorporates floating techno bungalows linked to a horizontally flowing structure, with hubs distinguished by frosted glass floors reflecting interior lighting.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/dt-thumb/refs/heads/main/a48.jpg",
+        collection: "Gallery",
+        runwayPart: "High Frequency Collection Display",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/digitaltopographies/main/48.glb",
+        date: "29.09.23",
+        buyLink: "https://opensea.io/item/base/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/52",
+        dtNo: "48",
+        chain: "Base"
+    },
+    {
+        id: 52,
+        name: "Vertical Candy Bungalows",
+        information: "Abstract bungalows where adults can virtually play house.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/dt-thumb/refs/heads/main/a49.jpg",
+        collection: "Spatial",
+        runwayPart: "Spatial Sculpture",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/digitaltopographies/main/49.glb",
+        date: "09.12.23",
+        buyLink: "https://opensea.io/item/base/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/53",
+        dtNo: "49",
+        chain: "Base"
+    },
+    {
+        id: 53,
+        name: "Mynhttnware",
+        information: "A distorted gathering/meeting space that blends various historical typologies, re-examining the sense of place and pure materiality in digital reality.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/dt-thumb/refs/heads/main/a50.jpg",
+        collection: "Spatial",
+        runwayPart: "Gathering / Public Space",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/digitaltopographies/main/50.glb",
+        date: "19.12.23",
+        buyLink: "https://opensea.io/item/base/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/54",
+        dtNo: "50",
+        chain: "Base"
+    },
+    {
+        id: 54,
+        name: "JJ8",
+        information: "Retail in the metaverse bridges the gap between fashion and daily life, offering a unique platform for connection and innovation. The concept of retail extends beyond mere transactions; it serves as a vital link that introduces individuals to new cultures and innovations through fashion. As the digital and physical realms converge, especially in the metaverse, this connection evolves, presenting untapped potential for immersive brand experiences. The challenge lies in reimagining retail in a space where traditional physical interactions are absent, yet the opportunity to engage and educate remains paramount.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/dt-thumb/refs/heads/main/a51.jpg",
+        collection: "Retail",
+        runwayPart: "Virtual Fashion Retail Store",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/digitaltopographies/main/51.glb",
+        date: "10.04.24",
+        buyLink: "https://opensea.io/item/base/55",
+        dtNo: "51",
+        chain: "Base"
+    }
+];
+// bitti
+
+            collections = [...new Set(SpaceData.map(space => space.collection))];
+            activeCollection = "ALL";
+            populateCollections();
+            populateAvatarItems(SpaceData);
+            populateAvatarGrid(SpaceData);
+            
+            toggleGridView(true);
+        }
+
+        function populateCollections() {
+            const collectionsContainer = document.getElementById('collections');
+            collectionsContainer.innerHTML = '';
+            const allButton = document.createElement('button');
+            allButton.className = 'collection-btn all-btn' + (activeCollection === 'ALL' ? ' active' : '');
+            allButton.textContent = 'ALL';
+            allButton.style.fontWeight = 'bold';
+            collectionsContainer.appendChild(allButton);
+            collections.forEach(collection => {
+                const button = document.createElement('button');
+                button.className = 'collection-btn' + (collection === activeCollection ? ' active' : '');
+                button.textContent = collection;
+                collectionsContainer.appendChild(button);
+            });
+        }
+
+        function filterSpaces(searchTerm) {
+            searchTerm = searchTerm.toLowerCase().trim();
+            let filteredSpaces;
+            if (!searchTerm) {
+                filteredSpaces = activeCollection === 'ALL' ? [...SpaceData] : SpaceData.filter(space => space.collection === activeCollection);
+            } else {
+                filteredSpaces = (activeCollection === 'ALL' ? SpaceData : SpaceData.filter(space => space.collection === activeCollection))
+                    .filter(space => 
+                        (space.name && space.name.toLowerCase().includes(searchTerm)) ||
+                        (space.collection && space.collection.toLowerCase().includes(searchTerm)) ||
+                        (space.dtNo && space.dtNo.toLowerCase().includes(searchTerm)) ||
+                        (space.runwayPart && space.runwayPart.toLowerCase().includes(searchTerm)) ||
+                        (space.information && space.information.toLowerCase().includes(searchTerm))
+                    );
+            }
+            populateAvatarItems(filteredSpaces);
+            populateAvatarGrid(filteredSpaces);
+            
+            if (filteredSpaces.length > 0) {
+                activeSpaceIndex = 0;
+                updateAvatarCarousel();
+                toggleGridView(true);
+            } else {
+                document.getElementById('avatar-carousel').innerHTML = '<div class="avatar-name">No results found</div>';
+                document.getElementById('avatar-grid').innerHTML = '<div class="no-results">No spaces found matching your search.</div>';
+                if (!isGridView) {
+                    clearScene();
+                }
+            }
+        }
+
+        function populateAvatarGrid(spacesToShow) {
+            if (!spacesToShow) spacesToShow = activeCollection === 'ALL' ? [...SpaceData] : SpaceData.filter(space => space.collection === activeCollection);
+            const gridContainer = document.getElementById('avatar-grid');
+            gridContainer.innerHTML = '';
+            
+            if (spacesToShow.length === 0) {
+                gridContainer.innerHTML = '<div class="no-results">No spaces found</div>';
+                return;
+            }
+            
+            spacesToShow.forEach((space, index) => {
+                const gridItem = document.createElement('div');
+                gridItem.className = 'grid-item';
+                gridItem.dataset.id = space.id;
+                gridItem.dataset.index = index;
+                
+                const thumbnailUrl = space.thumbnailUrl || 'https://via.placeholder.com/120x120';
+                gridItem.innerHTML = `
+                    <img src="${thumbnailUrl}" alt="${space.name}" loading="lazy">
+                    <div class="grid-item-name">${space.name}</div>
+                `;
+                
+                gridItem.addEventListener('click', () => {
+                    hasSpaceBeenSelected = true;
+                    activeSpaceIndex = index;
+                    toggleGridView(false);
+                    updateAvatarCarousel();
+                    loadAndDisplaySpace(space);
+                });
+                
+                gridContainer.appendChild(gridItem);
+            });
+        }
+
+        function toggleGridView(show) {
+            const gridContainer = document.getElementById('avatar-grid-container');
+            const viewerContainer = document.getElementById('viewer-container');
+            const avatarDetails = document.getElementById('avatar-details');
+            const bottomSection = document.getElementById('bottom-section');
+            const toggleButton = document.getElementById('grid-toggle-button');
+            
+            isGridView = show;
+            
+            if (show) {
+                wasAutoRotateEnabled = controls.autoRotate;
+                if (controls) controls.autoRotate = false;
+                
+                gridContainer.style.display = 'block';
+                viewerContainer.style.opacity = '0.3';
+                avatarDetails.style.opacity = '0';
+                avatarDetails.style.display = 'none';
+                bottomSection.style.opacity = '0.3';
+                toggleButton.innerHTML = '<i class="fas fa-arrow-down"></i>';
+                clearScene();
+                
+                document.getElementById('viewer-canvas').style.display = 'none';
+                cancelAnimationFrame(animate);
+                
+                document.getElementById('loading-overlay').style.display = 'none';
+            } else {
+                gridContainer.style.display = 'none';
+                viewerContainer.style.opacity = '1';
+                
+                if (hasSpaceBeenSelected || activeSpace) {
+                    avatarDetails.style.opacity = '1';
+                    avatarDetails.style.display = 'block';
+                } else {
+                    const filteredSpaces = activeCollection === 'ALL' ? 
+                        [...SpaceData] : 
+                        SpaceData.filter(space => space.collection === activeCollection);
+                    if (filteredSpaces.length > 0) {
+                        activeSpaceIndex = 0;
+                        activeSpace = filteredSpaces[0];
+                        updateAvatarDetails(activeSpace);
+                        updateActionButtons(activeSpace);
+                        avatarDetails.style.opacity = '1';
+                        avatarDetails.style.display = 'block';
+                    }
+                }
+                
+                bottomSection.style.opacity = '1';
+                toggleButton.innerHTML = '<i class="fas fa-th-large"></i>';
+                
+                if (controls) controls.autoRotate = wasAutoRotateEnabled;
+                
+                document.getElementById('viewer-canvas').style.display = 'block';
+                viewerContainer.classList.add('active');
+                
+                if (activeSpaceIndex >= 0) {
+                    const filteredSpaces = activeCollection === 'ALL' ? 
+                        [...SpaceData] : 
+                        SpaceData.filter(space => space.collection === activeCollection);
+                    
+                    if (filteredSpaces.length > 0) {
+                        if (activeSpaceIndex >= filteredSpaces.length) {
+                            activeSpaceIndex = 0;
+                        }
+                        
+                        loadAndDisplaySpace(filteredSpaces[activeSpaceIndex]);
+                    }
+                }
+                
+                if (!isMediaMode) {
+                    animate();
+                }
+            }
+        }
+
+        function populateAvatarItems(spacesToShow) {
+            if (!spacesToShow) spacesToShow = activeCollection === 'ALL' ? [...SpaceData] : SpaceData.filter(space => space.collection === activeCollection);
+            const carouselContainer = document.getElementById('avatar-carousel');
+            carouselContainer.innerHTML = '';
+            spacesToShow.forEach((space, index) => {
+                const avatarItem = document.createElement('div');
+                avatarItem.className = 'avatar-item';
+                avatarItem.dataset.id = space.id;
+                avatarItem.dataset.index = index;
+                const thumbnailUrl = space.thumbnailUrl || 'https://via.placeholder.com/60x60';
+                avatarItem.innerHTML = `<img src="${thumbnailUrl}" class="avatar-thumbnail" alt="${space.name}"><div class="avatar-name">${space.name}</div>`;
+                avatarItem.addEventListener('click', () => {
+                    hasSpaceBeenSelected = true;
+                    activeSpaceIndex = index;
+                    updateAvatarCarousel();
+                    
+                    if (isGridView) {
+                        toggleGridView(false);
+                    }
+                    
+                    loadAndDisplaySpace(space);
+                });
+                carouselContainer.appendChild(avatarItem);
+            });
+            updateAvatarCarousel();
+        }
+
+        function changeActiveSpace(direction) {
+            const filteredSpaces = activeCollection === 'ALL' ? [...SpaceData] : SpaceData.filter(space => space.collection === activeCollection);
+            const numSpaces = filteredSpaces.length;
+            if (numSpaces === 0) return;
+            
+            if (isGridView) {
+                toggleGridView(false);
+            }
+            
+            activeSpaceIndex = (activeSpaceIndex + direction + numSpaces) % numSpaces;
+            updateAvatarCarousel();
+            hasSpaceBeenSelected = true;
+            loadAndDisplaySpace(filteredSpaces[activeSpaceIndex]);
+        }
+
+        function updateAvatarCarousel() {
+            const avatarItems = document.querySelectorAll('.avatar-item');
+            const numItems = avatarItems.length;
+            if (numItems === 0) return;
+            avatarItems.forEach(item => {
+                item.classList.remove('active');
+                item.style.display = 'none';
+            });
+            const windowWidth = window.innerWidth;
+            const itemWidth = CONFIG.thumbnails.size;
+            const spacing = CONFIG.thumbnails.spacing;
+            const minSideOffset = CONFIG.thumbnails.minSideOffset;
+            const availableWidth = windowWidth - (2 * minSideOffset);
+            const maxItemsVisible = Math.floor(availableWidth / (itemWidth + spacing));
+            const itemsPerSide = Math.floor(maxItemsVisible / 2);
+            const centerX = windowWidth / 2;
+            for (let i = 0; i < numItems; i++) {
+                let relativePos = ((i - activeSpaceIndex) + numItems) % numItems;
+                if (relativePos > numItems / 2) relativePos -= numItems;
+                if (Math.abs(relativePos) <= itemsPerSide) {
+                    const item = avatarItems[i];
+                    item.style.display = '';
+                    const xPos = centerX - (itemWidth / 2) + (relativePos * (itemWidth + spacing));
+                    item.style.left = `${xPos}px`;
+                    item.style.top = '0px';
+                    item.style.opacity = relativePos === 0 ? '1' : '0.7';
+                    item.style.zIndex = 100 - Math.abs(relativePos);
+                    if (i === activeSpaceIndex) item.classList.add('active');
+                }
+            }
+        }
+
+      function loadAndDisplaySpace(space) {
+    if (!space) return;
+
+    document.getElementById('avatar-details').style.display = 'block';
+    document.getElementById('viewer-canvas').style.display = 'block';
+    document.querySelector('.viewer-container').classList.add('active');
+
+    isModelLoading = true;
+    updateLoadingProgress(0, 'Forging...');
+    clearScene();
+    controls.enabled = true;
+    activeSpace = space;
+    updateAvatarDetails(space);
+    updateActionButtons(space);
+
+    // Reset camera before loading new model
+    resetCameraPosition();
+
+    if (!isMediaMode) {
+        animate();
+    }
+
+    setTimeout(() => loadModelForDisplay(space.modelUrl, space.id), 50);
+}
+
+        function updateAvatarDetails(space) {
+            const titleElement = document.getElementById('avatar-title');
+            const detailsInfo = document.getElementById('details-info');
+            const descriptionText = document.getElementById('description-text');
+            const collectionText = document.getElementById('collection-text');
+            titleElement.textContent = space.name;
+            let compactInfoHTML = '<div class="compact-info">';
+            if (space.runwayPart && space.runwayPart !== "null") compactInfoHTML += `<div class="info-pill">${space.runwayPart}</div>`;
+            if (space.date && space.date !== "null") compactInfoHTML += `<div class="info-pill">${space.date}</div>`;
+            if (space.dtNo && space.dtNo !== "null") compactInfoHTML += `<div class="info-pill">DT ${space.dtNo}</div>`;
+            if (space.chain && space.chain !== "null") compactInfoHTML += `<div class="info-pill">🔗 ${space.chain}</div>`;
+            compactInfoHTML += '</div>';
+            detailsInfo.innerHTML = compactInfoHTML;
+            descriptionText.textContent = space.information || `This is ${space.name}, a unique digital space from the ${space.collection} collection.`;
+            collectionText.textContent = collectionDescriptions[space.collection] || `The ${space.collection} collection represents innovative digital spaces.`;
+        }
+
+        function updateActionButtons(space) {
+            document.getElementById('buy-btn').style.display = (space.buyLink && space.buyLink !== "null") ? 'block' : 'none';
+        }
+
+        let currentLoadToken = 0;
+
+        function loadModelForDisplay(modelUrl, spaceId) {
+            if (!modelUrl) {
+                isModelLoading = false;
+                updateLoadingProgress(100, 'Complete!');
+                return;
+            }
+            updateLoadingProgress(0, 'Loading model...');
+            mixer = null;
+            controls.enabled = true;
+
+            const loadToken = ++currentLoadToken;
+
+            const gltfLoader = new THREE.GLTFLoader();
+            const dracoLoader = new THREE.DRACOLoader();
+            dracoLoader.setDecoderPath('https://www.gstatic.com/draco/v1/decoders/');
+            gltfLoader.setDRACOLoader(dracoLoader);
+            if (typeof MeshoptDecoder !== 'undefined') gltfLoader.setMeshoptDecoder(MeshoptDecoder);
+            gltfLoader.load(
+                modelUrl,
+                gltf => {
+                    if (loadToken !== currentLoadToken) {
+                        console.log('Loading cancelled, new loading operation started.');
+                        return;
+                    }
+                    currentModel = gltf.scene;
+                    currentModel.userData.spaceId = spaceId;
+                    modelAnimations = gltf.animations || [];
+                    centerAndScaleModel(currentModel);
+                    setupAnimations(modelAnimations);
+                    scene.add(currentModel);
+                    resetCameraPosition();
+                    updateLoadingProgress(100, 'Complete!');
+                    setTimeout(() => isModelLoading = false, 500);
+                },
+                xhr => {
+                    if (loadToken !== currentLoadToken) return;
+                    if (xhr.lengthComputable) updateLoadingProgress(Math.min(95, (xhr.loaded / xhr.total) * 95), 'Loading model...');
+                },
+                error => {
+                    if (loadToken !== currentLoadToken) return;
+                    console.error('Error loading model:', error);
+                    updateLoadingProgress(100, 'Error loading model');
+                    isModelLoading = false;
+                }
+            );
+        }
+
+        function clearScene() {
+            if (mixer) {
+                mixer.stopAllAction();
+                mixer.uncacheRoot(mixer.getRoot());
+                mixer = null;
+            }
+
+            while (scene.children.length > 0) {
+                const object = scene.children[0];
+                scene.remove(object);
+                disposeObject(object);
+            }
+
+            currentModel = null;
+            addBasicLighting();
+            clock = new THREE.Clock();
+            if (controls) controls.enabled = true;
+            if (renderer) renderer.render(scene, camera);
+        }
+
+        function disposeObject(obj) {
+            if (!obj) return;
+            if (obj.geometry) obj.geometry.dispose();
+            if (obj.material) {
+                if (Array.isArray(obj.material)) obj.material.forEach(material => disposeMaterial(material));
+                else disposeMaterial(obj.material);
+            }
+            if (obj.children && obj.children.length > 0) {
+                for (let i = obj.children.length - 1; i >= 0; i--) disposeObject(obj.children[i]);
+            }
+        }
+
+        function disposeMaterial(material) {
+            if (!material) return;
+            for (const prop in material) {
+                if (material[prop] && typeof material[prop].dispose === 'function') material[prop].dispose();
+            }
+            material.dispose();
+        }
+
+        function centerAndScaleModel(model) {
+            if (!model) return;
+            const bbox = new THREE.Box3().setFromObject(model);
+            const size = bbox.getSize(new THREE.Vector3());
+            const center = bbox.getCenter(new THREE.Vector3());
+            model.position.x = -center.x;
+            model.position.z = -center.z;
+            model.position.y = -center.y;
+            
+            // Adjust model scale to fit 25% of the screen
+            const modelWidth = size.x;
+            const targetScreenWidth = 0.25; // 25% of screen
+            const canvasContainer = document.querySelector('.viewer-container');
+            const screenWidth = canvasContainer.clientWidth;
+            const screenHeight = canvasContainer.clientHeight;
+            const aspect = screenWidth / screenHeight;
+            const orthoSize = CONFIG.viewer.camera.orthoSize;
+            const orthoWidth = orthoSize * aspect * 2; // Full width in world units
+            const targetWidthInWorldUnits = orthoWidth * targetScreenWidth;
+            const scaleFactor = targetWidthInWorldUnits / modelWidth;
+            model.scale.set(scaleFactor, scaleFactor, scaleFactor);
+            
+            return { size, center, scale: scaleFactor };
+        }
+
+       function resetCameraPosition() {
+    // Reset camera position
+    camera.position.set(
+        CONFIG.viewer.camera.position.x,
+        CONFIG.viewer.camera.position.y,
+        CONFIG.viewer.camera.position.z
+    );
+    
+    // Reset camera zoom (for orthographic camera, adjust zoom level)
+    camera.zoom = 1; // Reset to default zoom level
+    camera.updateProjectionMatrix();
+
+    // Reset camera look-at target
+    camera.lookAt(
+        CONFIG.viewer.camera.target.x,
+        CONFIG.viewer.camera.target.y,
+        CONFIG.viewer.camera.target.z
+    );
+
+    if (controls) {
+        // Reset OrbitControls target
+        controls.target.set(
+            CONFIG.viewer.camera.target.x,
+            CONFIG.viewer.camera.target.y,
+            CONFIG.viewer.camera.target.z
+        );
+
+        // Reset zoom and rotation in controls
+        controls.zoom = 1;
+        controls.reset(); // Reset controls to initial state
+        controls.update();
+    }
+}
+        function setupAnimations(animations) {
+            if (!animations || animations.length === 0 || !currentModel) return;
+            mixer = new THREE.AnimationMixer(currentModel);
+            clock = new THREE.Clock();
+            clock.start();
+            animations.forEach(clip => {
+                const action = mixer.clipAction(clip);
+                action.setLoop(THREE.LoopRepeat);
+                action.play();
+            });
+            mixer.update(0);
+        }
+
+        function updateLoadingProgress(percent, message = 'Forging...') {
+            const progressBar = document.getElementById('progress-bar');
+            const loadingPercentage = document.getElementById('loading-percentage');
+            const loadingOverlay = document.getElementById('loading-overlay');
+            if (progressBar && loadingPercentage) {
+                progressBar.style.width = `${percent}%`;
+                loadingPercentage.textContent = `${Math.round(percent)}%`;
+                loadingOverlay.style.display = percent >= 100 ? 'none' : 'flex';
+            }
+        }
+    </script>
+</body>
+</html>
