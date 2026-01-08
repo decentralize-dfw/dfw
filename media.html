@@ -1,0 +1,2680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>DFWy</title>
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+ <style>
+ * {
+ margin: 0;
+ padding: 0;
+ box-sizing: border-box;
+ font-family: "Helvetica", monospace;
+ }
+ 
+ body {
+ background-color: transparent;
+ overflow: hidden;
+ color: #000;
+ }
+ 
+.grid-item {
+    width: 100%;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column; /* Stack image and title vertically */
+    align-items: center; /* Center align items */
+    justify-content: flex-start; /* Start from top */
+}
+
+.grid-item img {
+    width: 100%;
+    aspect-ratio: 1; /* Maintain square aspect ratio for image only */
+    object-fit: contain;
+    border-radius: 8px;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+    background-color: #fff;
+    margin-bottom: 5px; /* Space for name */
+}
+
+.grid-item-name {
+    background-color: white;
+    color: rgba(0, 0, 0, 1);
+    padding: 5px;
+    font-size: 10px;
+    text-align: center;
+    word-break: break-word;
+    opacity: 1; /* Always visible */
+    width: 100%; /* Match thumbnail width */
+}
+
+ .container {
+ display: flex;
+ flex-direction: column;
+ height: 800px;
+ width: 100vw;
+ margin: 0 auto;
+ overflow: hidden;
+ position: relative;
+ }
+ 
+ .top-section {
+ height: 32px;
+ width: 500px;
+ display: flex;
+ flex-direction: column;
+ padding: 0;
+ background-color: rgba(255, 255, 255, 0);
+ z-index: 10;
+ position: absolute;
+ left: 15px;
+ top: 15px;
+ }
+
+ .collections-row {
+ display: flex;
+ width: 500px;
+ gap: 8px;
+ }
+
+ .collections {
+ display: flex;
+ gap: 8px;
+ z-index: 6;
+ height: 32px;
+ width: 100%;
+ white-space: nowrap;
+ }
+.collection-btn {
+    padding: 5px 4px;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+    background-color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+    font-size: 9px;
+    transition: all 0.2s;
+    color: #000;
+    box-shadow: none;
+    text-shadow: none;
+    height: 32px;
+    line-height: 20px;
+    flex: 1;
+    outline: none;
+}
+
+.collection-btn:hover {
+    background-color: rgba(240, 240, 240, 0.9);
+}
+
+.collection-btn.active {
+    background-color: rgba(60, 60, 60, 0.9);
+    color: white;
+}
+ 
+ .all-btn {
+ font-weight: bolder !important;
+ background-color: rgba(240, 240, 240, 0.9);
+ }
+
+ .viewer-container {
+ position: absolute;
+ top: 60px;
+ left: 10px;
+ right: 10px;
+ bottom: 120px;
+ z-index: 1;
+ overflow: visible;
+ pointer-events: auto;
+ background: transparent !important;
+ display: flex;
+ justify-content: center;
+ align-items: center;
+ }
+ 
+ .media-preview {
+ width: 50%;
+ height: 50%;
+ margin: 0 auto;
+ display: flex;
+ justify-content: center;
+ align-items: center;
+ overflow: visible;
+ background: transparent !important;
+ position: relative;
+ }
+ 
+ .media-image {
+ max-width: 100%;
+ max-height: 100%;
+ object-fit: contain;
+ }
+ 
+.media-video-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: transparent !important;
+    position: relative;
+}
+
+.video-controls {
+    position: absolute;
+    top: -40px; /* 100px from the top of the screen */
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+    z-index: 10;
+}
+
+.video-control-btn {
+    width: 15px;
+    height: 15px;
+    background-color: #000;
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    transition: background-color 0.2s ease;
+}
+
+.video-control-btn:hover {
+    background-color: #333;
+}
+
+/* Hide controls for YouTube videos */
+.youtube-iframe-container + .video-controls {
+    display: none;
+}
+
+.media-video {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    width: auto;
+    height: auto;
+    background: transparent !important;
+    aspect-ratio: 16/9;
+}
+
+/* YouTube iframe container to match Wix video sizing */
+.youtube-iframe-container {
+    width: 57%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: transparent !important;
+    overflow: hidden;
+}
+/* YouTube iframe to fill container like Wix video */
+.youtube-iframe-container iframe {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    aspect-ratio: 16/9;
+    border: none;
+    box-sizing: border-box;
+}
+ 
+ .media-text {
+ width: 50%;
+ height: 90%;
+ padding: 0px;
+ padding-right: 10px;
+ letter-spacing: -0.15px;
+ background-color: rgba(255, 255, 255, 0);
+ overflow-y: auto;
+ border-radius: 0px;
+ color: #000;
+ font-size: 16px;
+ line-height: 1.5;
+ text-align: justify;
+ text-align-last: left;
+ justify-content: flex-start;
+ max-height: 80%;
+ box-sizing: border-box;
+ }
+
+ .media-text p {
+ margin: 0 0 1.5em 0;
+ padding: 0;
+ }
+
+ .media-text p:empty {
+ display: none;
+ }
+
+ .media-text h2 {
+ margin-bottom: 1em;
+ }
+ 
+ .avatar-details {
+ position: absolute;
+ padding: 0;
+ max-height: 80vh;
+ overflow: hidden;
+ z-index: 4;
+ color: #000;
+ background-color: transparent;
+ width: 500px;
+ display: flex;
+ flex-direction: column;
+ margin: 0;
+ left: 15px;
+ top: 120px;
+ box-sizing: border-box;
+ }
+ 
+ .details-title {
+ font-size: 28px;
+ font-weight: bold;
+ margin-bottom: 10px;
+ width: 100%;
+ padding: 0;
+ }
+ 
+ .compact-info {
+ display: flex;
+ flex-wrap: wrap;
+ gap: 8px;
+ margin-bottom: 15px;
+ align-items: center;
+ width: 100%;
+ padding: 0;
+ }
+ 
+ .info-pill, .link-pill {
+ background-color: rgba(255, 255, 255, 0.4);
+ padding: 3px 8px;
+ border-radius: 4px;
+ font-size: 9px;
+ white-space: nowrap;
+ border: 1px solid rgba(0, 0, 0, 0.1);
+ }
+ 
+ .link-pill {
+ cursor: pointer;
+ }
+ 
+ .description-text {
+ font-size: 10px;
+ font-weight: bold;
+ line-height: 1.5;
+ text-align: left;
+ margin-bottom: 10px;
+ letter-spacing: -0.2px;
+ width: 100%;
+ padding: 0;
+ }
+ 
+ .collection-text {
+ font-size: 9px;
+ font-style: italic;
+ line-height: 1.4;
+ text-align: justify;
+ width: 100%;
+ padding: 0;
+ }
+ 
+ .control-row {
+ display: flex;
+ width: 100%;
+ gap: 14px;
+ margin-bottom: 10px;
+ align-items: center;
+ padding: 0;
+ }
+ 
+ .action-btn {
+ padding: 8px 0;
+ border: 1px solid rgba(0, 0, 0, 0.2);
+ border-radius: 4px;
+ background-color: rgba(255, 255, 255, 0.5);
+ color: #000;
+ cursor: pointer;
+ font-size: 9px;
+ transition: all 0.2s;
+ text-align: center;
+ flex: 1;
+ box-sizing: border-box;
+ }
+ 
+ .action-btn:hover {
+ background-color: rgba(220, 220, 220, 0.9);
+ }
+ 
+ .bottom-section {
+ position: absolute;
+ left: 0;
+ right: 0;
+ height: 80px;
+ bottom: 0px;
+ z-index: 5;
+ text-align: center;
+ }
+ 
+ .avatar-selector {
+ width: 100%;
+ height: 100%;
+ position: relative;
+ }
+ 
+ .avatar-carousel {
+ display: flex;
+ justify-content: center;
+ align-items: center;
+ position: relative;
+ width: 100%;
+ height: 100%;
+ }
+ 
+ .media-item {
+ position: absolute;
+ width: 80px;
+ height: 80px;
+ transition: all 0.3s ease;
+ cursor: pointer;
+ transform-origin: center center;
+ opacity: 0.7;
+ z-index: 10;
+ border-radius: 8px;
+ overflow: visible;
+ margin-top: 25px;
+ display: flex;
+ align-items: flex-end;
+ justify-content: center;
+ }
+ 
+ .media-item.promotional, .media-item.featured, .media-item.overview {
+ background-color: white;
+ }
+ 
+ .media-item-thumbnail {
+ width: 100%;
+ height: 100%;
+ object-fit: contain;
+ border-radius: 8px;
+ border: 2px solid transparent; 
+ transition: all 0.3s ease;
+ z-index: 11;
+ position: relative;
+ margin-bottom: 0;
+ }
+ 
+ .media-item.active .media-item-thumbnail {
+ border-color: rgba(0, 120, 255, 0.8);
+ box-shadow: 0 0 10px rgba(0, 120, 255, 0.5);
+ }
+ 
+ .media-item-name {
+ position: absolute;
+ top: -25px;
+ left: 50%;
+ transform: translateX(-50%);
+ background-color: rgba(255, 255, 255, 0.8);
+ color: #000;
+ padding: 3px 8px;
+ border-radius: 4px;
+ font-size: 12px;
+ white-space: nowrap;
+ transition: opacity 0.3s ease;
+ pointer-events: none;
+ z-index: 50;
+ opacity: 0;
+ font-weight: normal;
+ }
+ 
+ .media-item:hover .media-item-name {
+ opacity: 1;
+ }
+ 
+ .loading-overlay {
+ position: absolute;
+ top: 0;
+ left: 0;
+ width: 100%;
+ height: 100%;
+ background-color: transparent;
+ display: flex;
+ flex-direction: column;
+ justify-content: center;
+ align-items: center;
+ z-index: 100;
+ color: #000;
+ }
+ 
+ .loading-text {
+ font-size: 18px;
+ margin-bottom: 10px;
+ background-color: rgba(255, 255, 255, 0);
+ padding: 5px 15px;
+ border-radius: 4px;
+ font-family: "Lucida Console", monospace;
+ letter-spacing: -1px;
+ }
+ 
+ .loading-progress {
+ width: 200px;
+ height: 6px;
+ background-color: rgba(0, 0, 0, 0.1);
+ border-radius: 3px;
+ overflow: hidden;
+ }
+ 
+ .progress-bar {
+ height: 100%;
+ background-color: rgba(0, 120, 255, 0.8);
+ width: 0%;
+ transition: width 0.3s ease;
+ }
+ 
+ .avatar-grid-container {
+ position: absolute;
+ top: 215px;
+ left: 0;
+ right: 0;
+ bottom: 0px;
+ padding: 15px;
+ overflow-y: auto;
+ z-index: 6;
+ background-color: rgba(255, 255, 255, 1);
+ display: none;
+ }
+
+ .avatar-grid {
+ display: grid;
+ grid-template-columns: repeat(7, 1fr);
+ gap: 100px;
+ padding: 10px;
+ }
+
+
+
+ .grid-item:hover img {
+ transform: scale(1.05);
+ border-color: rgba(0, 120, 255, 0.8);
+ }
+
+
+
+ .grid-item:hover .grid -item-name {
+ opacity: 1;
+ }
+
+ .grid-toggle-button {
+ position: absolute;
+ bottom: 150px;
+ left: 50%;
+ transform: translateX(-50%);
+ width: 40px;
+ height: 40px;
+ background-color: rgba(255, 255, 255, 0.85);
+ border-radius: 50%;
+ display: flex;
+ justify-content: center;
+ align-items: center;
+ cursor: pointer;
+ z-index: 10;
+ box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+ transition: all 0.3s ease;
+ }
+
+ .grid-toggle-button:hover {
+ background-color: rgba(220, 220, 220, 0.9);
+ }
+
+ .no-results {
+ grid-column: 1 / -1;
+ text-align: center;
+ padding: 20px;
+ font-size: 14px;
+ color: #666;
+ }
+ 
+
+ </style>
+</head>
+<body>
+ <div class="container">
+ <div class="top-section">
+ <div class="collections-row">
+ <div class="collections" id="collections"></div>
+ </div>
+ </div>
+
+ <div class="avatar-grid-container" id="avatar-grid-container">
+ <div class="avatar-grid" id="avatar-grid"></div>
+ </div>
+ 
+ <div class="viewer-container" id="viewer-container">
+ <div class="media-preview" id="media-preview"></div>
+ <div class="avatar-details" id="avatar-details">
+ <div class="details-title" id="avatar-title"></div>
+ <div class="details-info" id="details-info"></div>
+ <div class="control-row">
+ 
+ <button class="action-btn" id="go-page-btn">Go to the page</button>
+ <button class="action-btn" id="tweet-btn">Tweet</button>
+ <button class="action-btn" id="buy-btn">Buy</button>
+ <button class="action-btn" id="order-btn">Order</button>
+ </div>
+ <div class="description-text" id="description-text"></div>
+ <div class="collection-text" id="collection-text"></div>
+ </div>
+ <div class="loading-overlay" id="loading-overlay">
+ <div class="loading-text">Loading... <span id="loading-percentage">0%</span></div>
+ <div class="loading-progress">
+ <div class="progress-bar" id="progress-bar"></div>
+ </div>
+ </div>
+ </div>
+
+ <div class="grid-toggle-button" id="grid-toggle-button">
+ <i class="fas fa-th-large"></i>
+ </div>
+ 
+ <div class="bottom-section" id="bottom-section">
+ <div class="avatar-selector">
+ <div class="avatar-carousel" id="avatar-carousel"></div>
+ </div>
+ </div>
+ </div>
+ 
+ <script>
+ const CONFIG = {
+ thumbnails: { size: 80, spacing: 40, minSideOffset: 40 },
+ ui: { detailsBox: { top: 100, left: 15, width: 500 } },
+ media: { top: 60, left: 10, right: 10, bottom: 120 },
+ sectionPositions: { avatarBar: { bottom: 55 } }
+ };
+
+ let mediaData = [], activeMediaIndex = 0, activeCollection = "ALL";
+ let isGridView = true, hasMediaBeenSelected = false;
+ let collections = [];
+
+ const collectionDescriptions = {
+ "Experience": "EXPERIENCE: Fully immersive on-chain stories in metaverse that explores this new medium in multiple layers",
+ "Gallery": "GALLERY: Professional-grade virtual spaces",
+ "Architecture": "ARCHITECTURE: Digital Topographies collection that features on-chain interoperatable glb files as virtual spaces.",
+ "Avatar": "AVATAR: 3D-Beings designed in VRM avatar format, under the C2W2 collections, C2W, and legacy",
+ "Design": "DESIGN: On-chain glb designs of furniture, sculpture, automobile."
+ };
+
+ document.addEventListener('DOMContentLoaded', () => {
+ applyUIConfiguration();
+ initApp();
+ });
+
+ function applyUIConfiguration() {
+ const viewerContainer = document.getElementById('viewer-container');
+ if (viewerContainer) {
+ viewerContainer.style.top = `${CONFIG.media.top}px`;
+ viewerContainer.style.left = `${CONFIG.media.left}px`;
+ viewerContainer.style.right = `${CONFIG.media.right}px`;
+ viewerContainer.style.bottom = `${CONFIG.media.bottom}px`;
+ }
+
+ const avatarDetails = document.getElementById('avatar-details');
+ if (avatarDetails) {
+ avatarDetails.style.top = `${CONFIG.ui.detailsBox.top}px`;
+ avatarDetails.style.left = `${CONFIG.ui.detailsBox.left}px`;
+ avatarDetails.style.width = `${CONFIG.ui.detailsBox.width}px`;
+ }
+
+ const bottomSection = document.getElementById('bottom-section');
+ if (bottomSection) {
+ bottomSection.style.bottom = `${CONFIG.sectionPositions.avatarBar.bottom}px`;
+ }
+ }
+
+function initApp() {
+    loadMediaData();
+    setupEventListeners();
+    activeCollection = 'Featured';
+    const filteredMedia = getFilteredMedia();
+    populateCollections();
+    populateMediaItems(filteredMedia);
+    populateMediaGrid(filteredMedia);
+    toggleGridView(true);
+    if (filteredMedia.length > 0) {
+        activeMediaIndex = 0;
+        updateMediaDetails(filteredMedia[0]);
+        updateActionButtons(filteredMedia[0]);
+        updateMediaCarousel();
+        // Remove: const avatarDetails = document.getElementById('avatar-details');
+        // Remove: if (avatarDetails) avatarDetails.style.display = 'none';
+    }
+}
+
+
+ function getFilteredMedia() {
+    return activeCollection === 'ALL' ? [...mediaData] 
+        : activeCollection === 'Featured' ? mediaData.filter(media => media.tag === 'Featured') 
+        : mediaData.filter(media => media.collection === activeCollection);
+}
+
+
+function setupEventListeners() {
+    const avatarSelector = document.querySelector('.avatar-selector');
+    if (avatarSelector) {
+        avatarSelector.addEventListener('wheel', e => {
+            e.preventDefault();
+            const scrollDirection = e.deltaY > 0 ? 1 : -1;
+            changeActiveMedia(scrollDirection);
+        }, { passive: false });
+    }
+
+    document.addEventListener('keydown', e => {
+        if (e.key === 'ArrowLeft') changeActiveMedia(-1);
+        else if (e.key === 'ArrowRight') changeActiveMedia(1);
+    });
+
+    document.addEventListener('click', e => {
+        if (e.target.classList.contains('collection-btn')) handleCollectionClick(e.target);
+    });
+
+    const gridToggleButton = document.getElementById('grid-toggle-button');
+    if (gridToggleButton) {
+        gridToggleButton.addEventListener('click', () => toggleGridView(!isGridView));
+    }
+
+    const goPageBtn = document.getElementById('go-page-btn');
+    const tweetBtn = document.getElementById('tweet-btn');
+    const buyBtn = document.getElementById('buy-btn');
+    const orderBtn = document.getElementById('order-btn');
+
+    if (goPageBtn) goPageBtn.addEventListener('click', () => {
+        const filteredMedia = getFilteredMedia();
+        if (filteredMedia[activeMediaIndex]?.pageLink) {
+            if (filteredMedia[activeMediaIndex]?.openInNewTab) {
+                window.open(filteredMedia[activeMediaIndex].pageLink, '_blank');
+            } else {
+                window.top.location.href = filteredMedia[activeMediaIndex].pageLink;
+            }
+        }
+    });
+    if (tweetBtn) tweetBtn.addEventListener('click', () => {
+        const filteredMedia = getFilteredMedia();
+        if (filteredMedia[activeMediaIndex]?.tweetLink) {
+            window.open(filteredMedia[activeMediaIndex].tweetLink, '_blank');
+        }
+    });
+    if (buyBtn) buyBtn.addEventListener('click', () => {
+        const filteredMedia = getFilteredMedia();
+        if (filteredMedia[activeMediaIndex]?.buyLink) {
+            window.open(filteredMedia[activeMediaIndex].buyLink, '_blank');
+        }
+    });
+    if (orderBtn) orderBtn.addEventListener('click', () => {
+        const filteredMedia = getFilteredMedia();
+        if (filteredMedia[activeMediaIndex]?.orderLink) {
+            window.open(filteredMedia[activeMediaIndex].orderLink, '_blank');
+        }
+    });
+}
+
+// kankaa
+ function loadMediaData() {
+
+    mediaData = [
+        {
+            id: 1,
+            name: "dfw metaoffice",
+            tag: null,
+            collection: "Experience",
+            url: "https://video.wixstatic.com/video/54a996_e6d16d06cf7b490bbc64d936760c2dae/1080p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_5a17303dc4d246f1818591922f059ebe~mv2.png",
+            title: "DFW Metaoffice",
+            description: "how we think? what we build?",
+            openInNewTab: false,
+            pageLink: null,
+            tweetLink: null,
+            buyLink: null,
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 2,
+            name: "steve jobs explaining dfw",
+            tag: "Featured",
+            collection: "Experience",
+            url: "https://video.wixstatic.com/video/54a996_6da48d6916b24734aba549bb585d4675/720p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_ead4c487ac7845a88691622c600a9cac~mv2.png",
+            title: "iObs explaining DFW",
+            description: "Digital Forgery Workshop Who?",
+            openInNewTab: true,
+            pageLink: "https://www.digitalforgerywork.shop/info",
+            tweetLink: null,
+            buyLink: null,
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 3,
+            name: "DFW Design",
+            tag: "Featured",
+            collection: "Design",
+            url: "https://video.wixstatic.com/video/54a996_089c17f8355849d5a11f6115ab1025ba/1080p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_186e1cc0c6c04617bad785d72cbdeaf6~mv2.png",
+            title: "DFW Design",
+            description: "Sculpture, Furniture and Automobile designs made by DFW for virtual habitats.",
+            openInNewTab: true,
+            pageLink: "https://www.digitalforgerywork.shop/design",
+            tweetLink: null,
+            buyLink: "https://opensea.io/collection/dfw-design",
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 4,
+            name: "daotown song for neonbuidl * m3, 2024",
+            tag: null,
+            collection: "Gallery",
+            url: "https://video.wixstatic.com/video/54a996_fdd0f8d73d584186a2b6ad252aea65d8/1080p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_2ef4812c520c4876be74b0ad4715945b~mv2.png",
+            title: "daotown song for neonbuidl * m3, 2024",
+            description: "Daotown is a collective project to house DAO's in a virtual western town.",
+            openInNewTab: true,
+            pageLink: "https://m3org.com/",
+            tweetLink: null,
+            buyLink: null,
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 5,
+            name: "ummuse, neon build_athon_1",
+            tag: null,
+            collection: "Architecture",
+            url: "https://video.wixstatic.com/video/54a996_81dcccae716947fb925a2365cccaf4a9/720p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_e92bd436313044798cc075a48dba9727~mv2.png",
+            title: "ummuse, neon build_athon_1",
+            description: "UMMUSE is a museum edifice made during the Neon Build_athon. Its purpose is to exhibit the Neon DAO's Clone X Edits.",
+            openInNewTab: true,
+            pageLink: "https://www.spatial.io/s/UMMUSE-62fb95c477f41c00017d4b39?share=4866419558939897039",
+            tweetLink: null,
+            buyLink: "https://monaverse.com/collections/8453/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/10",
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 6,
+            name: "#np17658, neon build_athon_1",
+            tag: null,
+            collection: "Architecture",
+            url: "https://video.wixstatic.com/video/54a996_15c2541f73fb4084aa3f7860dbf681b6/720p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_3ba11bba9433456996f9a3980dbe5c34~mv2.png",
+            title: "#np17658, neon build_athon_1",
+            description: "Vertical Gallery design to exhibit the collection of NeonDAO.",
+            openInNewTab: true,
+            pageLink: "https://www.digitalforgerywork.shop/space",
+            tweetLink: null,
+            buyLink: "https://monaverse.com/collections/8453/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/11",
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 7,
+            name: "bilbao lego chair",
+            tag: null,
+            collection: "Design",
+            url: "https://video.wixstatic.com/video/54a996_60a4ecec7fac4274b2dcd86d11424922/720p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_bd61bcb49bab4709a9ac28586086f7e0~mv2.png",
+            title: "bilbao lego chair",
+            description: "Remake of Lego Chair.",
+            openInNewTab: true,
+            pageLink: "https://www.digitalforgerywork.shop/design",
+            tweetLink: null,
+            buyLink: "https://opensea.io/collection/dfw-design?searchQuery=bilbao+lego",
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 8,
+            name: "dfinity lips sofa",
+            tag: null,
+            collection: "Design",
+            url: "https://video.wixstatic.com/video/54a996_92de7517321a4940a50bd7454cffcf22/1080p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_2da52be408d042ce87f0ffde7f3dc15c~mv2.png",
+            title: "dfinity lips sofa",
+            description: "Virtual sofa inspired by the infinite on*chain possibilities.",
+            openInNewTab: false,
+            pageLink: null,
+            tweetLink: null,
+            buyLink: null,
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 9,
+            name: "zen bubble rider",
+            tag: "Featured",
+            collection: "Design",
+            url: "https://video.wixstatic.com/video/54a996_8353aa79da9442b0a71e284a473fb230/1080p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_2d2f0782942f4f6dbe6d2f8d4e29f217~mv2.png",
+            title: "zen bubble rider",
+            description: "1st on-chain minted glb automobile design",
+            openInNewTab: true,
+            pageLink: "https://www.digitalforgerywork.shop/design",
+            tweetLink: null,
+            buyLink: "https://opensea.io/collection/dfw-design?searchQuery=bubble+rider",
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 10,
+            name: "dfw presentation 2022",
+            tag: "Featured",
+            collection: "Architecture",
+            url: "https://video.wixstatic.com/video/54a996_dcc34db653704ed9962289d9ed73dcd7/1080p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_5a17303dc4d246f1818591922f059ebe~mv2.png",
+            title: "dfw presentation 2022",
+            description: "Vintage DFW Presentation about spatial design in metaverse",
+            openInNewTab: true,
+            pageLink: "https://www.digitalforgerywork.shop/info",
+            tweetLink: null,
+            buyLink: null,
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 11,
+            name: "cave design store video",
+            tag: "Featured",
+            collection: "Architecture",
+            url: "https://video.wixstatic.com/video/54a996_ea70bd1806ff4aa7a469ef888b17d1f6/1080p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_b5e407ed2dba4d58a63b4384675db003~mv2.png",
+            title: "cave design store video",
+            description: "Pop-up design made for Neon Buildathon 2- Booth-a-palooza",
+            openInNewTab: true,
+            pageLink: "https://www.digitalforgerywork.shop/space",
+            tweetLink: null,
+            buyLink: "https://monaverse.com/collections/8453/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/33",
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 12,
+            name: "Deconstuctivist Eagle Nest Pavillion",
+            tag: null,
+            collection: "Architecture",
+            url: "https://video.wixstatic.com/video/54a996_7c2e66da063e4e5ba73e009ba2d608a9/1080p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_8d662b08e00b4034809e322fc4917c36~mv2.png",
+            title: "Deconstuctivist Eagle Nest Pavillion",
+            description: "Sctulptural Space design",
+            openInNewTab: true,
+            pageLink: "https://www.digitalforgerywork.shop/space",
+            tweetLink: null,
+            buyLink: "https://monaverse.com/collections/8453/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/7",
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 13,
+            name: "Poddio Verticale",
+            tag: "Featured",
+            collection: "Architecture",
+            url: "https://video.wixstatic.com/video/54a996_a16046c2726043ba8e427439fe90560c/1080p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_0c3d18723d55484d872baee3d771e6f2~mv2.png",
+            title: "Poddio Verticale",
+            description: "Poddio Verticale is a transformation of an open building into a vertical podium for a fashion runway show with a ramp looping around its semi-transparent marble skin, and slabs hooked up to the ramp. Its material touches, precise sharp geometry, the main scheme as a patio, and solid-void proportions give the impression that an abstract Milanese edifice has been exported to the metaverse.",
+            openInNewTab: true,
+            pageLink: "https://www.digitalforgerywork.shop/space",
+            tweetLink: null,
+            buyLink: "https://monaverse.com/collections/8453/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/15",
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 14,
+            name: "La Bibliotheque de L'Ecole Polytechnique Federale De Metaverse",
+            tag: null,
+            collection: "Architecture",
+            url: "https://video.wixstatic.com/video/54a996_d516d5cabc9b4996b7040467a076d371/720p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_e7d32f56088443a49cb27e4920e84ecd~mv2.png",
+            title: "La Bibliotheque de L'Ecole Polytechnique Federale De Metaverse",
+            description: "Open planned multi-functioned virtual complex (Education, Exhibition, Gathering, Office) (2 Floors, 111x112x33m) Optimized to be platform agnostic, v2 with an additional entrance from ground zero",
+            openInNewTab: true,
+            pageLink: "https://www.digitalforgerywork.shop/space",
+            tweetLink: null,
+            buyLink: "https://monaverse.com/collections/8453/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/6",
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 15,
+            name: "Beyond Infinity, 2001 Remake",
+            tag: null,
+            collection: "Architecture",
+            url: "https://video.wixstatic.com/video/54a996_9ead39d0f68944ac8f9751a84ddae214/720p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_8a3d96c1923642aa871699aa3c7b2b9d~mv2.png",
+            title: "Beyond Infinity, 2001 Remake",
+            description: "Beyond Infinity, 2001 Remake",
+            openInNewTab: true,
+            pageLink: "https://www.digitalforgerywork.shop/space",
+            tweetLink: null,
+            buyLink: "https://monaverse.com/collections/8453/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/24",
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 16,
+            name: "Matisse Time Chaipel",
+            tag: "Featured",
+            collection: "Architecture",
+            url: "https://video.wixstatic.com/video/54a996_b94f28de763848129b330a544614216c/1080p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_4aceb77821bb40488b8e927d926f1d5b~mv2.png",
+            title: "Matisse Time Chaipel",
+            description: "Incorporating similar aesthetical sources from several timezones, Digital Forgery Workshop re-meditated mid-scaled religious typologies from the Renaissance using today's perception and technology. A nebulous chapel in a virtual parallel universe's past, or inside a Matisse painting, or kneaded with physicality as fluid as Dali, AI-painted with Caravaggio or Da Vinci interpretations of the metaverse. Like the Sistine Chapel in Ronchamp form, the machinated ceiling covers a wavy interior for gatherings, concerts, or as a conceptual exhibition space.",
+            openInNewTab: true,
+            pageLink: "https://www.digitalforgerywork.shop/space",
+            tweetLink: null,
+            buyLink: "https://monaverse.com/collections/8453/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/18",
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 17,
+            name: "K-Dociine HQ Vertical Section",
+            tag: null,
+            collection: "Architecture",
+            url: "https://video.wixstatic.com/video/54a996_aa82207556e24166ab2d2f2e7ae93e4e/1080p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_a0cbcee0bc7143e4ac396b8c88c12be6~mv2.png",
+            title: "K-Dociine HQ Vertical Section",
+            description: "The 4-story headquarters building (32x32m / 2x2 DCL) was designed using a diversity of ideas, and the varying forms on each floor define the various public and private zones for working or communicating. The structure or skin or the building itself demonstrates a range of social and professional settings in the metaverse while also displaying the aesthetic preferences of any company or brand. It can be engaging to hold a conference in an unusual, organic structure on Mars or in the middle of a desert.",
+            openInNewTab: true,
+            pageLink: "https://www.digitalforgerywork.shop/space",
+            tweetLink: null,
+            buyLink: "https://monaverse.com/collections/8453/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/14",
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 18,
+            name: "PDTV-360'",
+            tag: null,
+            collection: "Architecture",
+            url: "https://video.wixstatic.com/video/54a996_b4eacacaac894570ad8b93cb1f027693/720p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_37a3dbb8a0a5418b90e2e1e9ab996c9a~mv2.png",
+            title: "PDTV-360'",
+            description: "Derived from Poddio Verticale, Poddio Dark Twisted Verticale is a transformation of an open building into a twisted vertical podium for a fashion runway show. Its dark materials, funky geometry, the main scheme as a patio, and playful ramps with random subspaces create a futuro-dystopic scene flamed by sentiments of romance and sorrow that harvests an impulse of assembling a futuristic fashion house that breathes in the deepest layers of Decentraland.",
+            openInNewTab: true,
+            pageLink: "https://www.digitalforgerywork.shop/space",
+            tweetLink: null,
+            buyLink: "https://monaverse.com/collections/8453/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/16",
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 19,
+            name: "Finger Dome Section",
+            tag: null,
+            collection: "Architecture",
+            url: "https://video.wixstatic.com/video/54a996_8085ac9efc6543a6ad7dbebc4e6c4bb2/720p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_4936122ab39a462da893b3e777b51c30~mv2.png",
+            title: "Finger Dome Section",
+            description: "Excellent music can be heard in the streets where the musician and the listeners can meet on equal terms, without any higher platform. Another example is a rock or rap concert, where the stage is elevated, and the audience stands on the ground. Or, similar to an airport terminal, a symphony hall's entrances and exits are separated for each part like a labyrinth, and each spot has a different performative income. I've been to Milan's La Scala several times, and each visit has been unique. Of course, it's a wonderful thing that an edifice may have such a fragmented plan and experience, but I was hoping to uncover something more simple, like a 0 and a 1.",
+            openInNewTab: true,
+            pageLink: "https://www.digitalforgerywork.shop/space",
+            tweetLink: null,
+            buyLink: "https://monaverse.com/collections/8453/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/9",
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 20,
+            name: "Astral Egg Plant",
+            tag: "Featured",
+            collection: "Architecture",
+            url: "https://video.wixstatic.com/video/54a996_266138a1797c4abda20df260c169261f/1080p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_4e06dd85b0dd4fdabbabd31f3674eee5~mv2.png",
+            title: "Astral Egg Plant",
+            description: "In a galaxy where chickens are so enormous and dominative, It would be fun to dream of a tree out of their broken eggs where people are occupying the ruins like a smirking dystopia. The form's primal origins in the upper floor spaces and their interpretation in the raw material choice can only be a metaverse-level experience as if the cracks are data centers for chickens. Further, the ground floor features elements of the desired spatial narrative, such as transforming the egg's capillaries into the stage and seating area or the entrance tunnel's passage by piercing through a snowdrift.",
+            openInNewTab: true,
+            pageLink: "https://www.digitalforgerywork.shop/space",
+            tweetLink: null,
+            buyLink: "https://monaverse.com/collections/8453/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/8",
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+                {
+            id: 21,
+            name: "Matsouka Hills Mansion",
+            tag: "Featured",
+            collection: "Architecture",
+            url: "https://video.wixstatic.com/video/54a996_748666d2ee134373930b6bb91f5e23db/1080p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_f1fae5bcb41f476ea0e715af482d511c~mv2.png",
+            title: "Matsouka Hills Mansion",
+            description: "Matsuoka Hills Mansion is an uncommon but stimulating combination of domestic elements in a museum-like layout, with its open yet curvy form, which questions how a mansion should create privacy borders in open virtual habitats.",
+            openInNewTab: true,
+            pageLink: "https://www.digitalforgerywork.shop/space",
+            tweetLink: null,
+            buyLink: "https://monaverse.com/collections/8453/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/19",
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 22,
+            name: "Digital Topographies Havoc",
+            tag: "Featured",
+            collection: "Architecture",
+            url: "https://video.wixstatic.com/video/54a996_bc5e4a8565ee4af4a9d31b14bce8083b/480p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_186e1cc0c6c04617bad785d72cbdeaf6~mv2.png",
+            title: "Digital Topographies Havoc",
+            description: "DFW Architecture Works bundle",
+            openInNewTab: true,
+            pageLink: "https://www.digitalforgerywork.shop/space",
+            tweetLink: null,
+            buyLink: "https://www.digitalforgerywork.shop/space",
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 23,
+            name: "Sculpture Parade",
+            tag: "Featured",
+            collection: "Design",
+            url: "https://video.wixstatic.com/video/54a996_9daf9c093f864fa28933beb48ec56680/1080p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_2da52be408d042ce87f0ffde7f3dc15c~mv2.png",
+            title: "Sculpture Parade",
+            description: "DFW Sculpture bundle",
+            openInNewTab: true,
+            pageLink: "https://www.digitalforgerywork.shop/design",
+            tweetLink: null,
+            buyLink: "https://opensea.io/collection/dfw-design?traits=[{%22traitType%22:%22Type%22,%22values%22:[%22Sculpture%22]}]",
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 24,
+            name: "DJ2_2 gif",
+            tag: null,
+            collection: "Design",
+            url: "https://static.wixstatic.com/media/54a996_8dea79f474da4eedae89ffa1962b9cf5~mv2.gif",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_65d4c6c237804722a21f265ec9360f11~mv2.png",
+            title: "DJ2_2 gif",
+            description: "The DJ Controller Unit for Metaverse Parties is digitally forged with the religious robotics philosophy to spread music, love, diversity, and design. It is the first DJ product ever designed and minted over Ethereum smart contracts to mix in the metaverse.",
+            openInNewTab: true,
+            pageLink: "https://www.digitalforgerywork.shop/design",
+            tweetLink: null,
+            buyLink: "https://opensea.io/collection/dfw-design?searchQuery=dj",
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 25,
+            name: "Car Wreck Sofa",
+            tag: "Featured",
+            collection: "Design",
+            url: "https://video.wixstatic.com/video/54a996_fe9da9be36424263bfa2e2f6bc43baf3/1080p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_60d00469c5a3491da0da3b2185f824b3~mv2.png",
+            title: "Car Wreck Sofa",
+            description: "An accidental combination of various impossible surfaces under the composition of seating.",
+            openInNewTab: true,
+            pageLink: "https://www.digitalforgerywork.shop/design",
+            tweetLink: null,
+            buyLink: "https://opensea.io/collection/dfw-design?searchQuery=car+wreck+sofa",
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 26,
+            name: "Armageddon Seat",
+            tag: null,
+            collection: "Design",
+            url: "https://video.wixstatic.com/video/54a996_ae8ae45c91ac42ab8ed07db9b7b238c6/1080p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_66c422c8ce334740aea683bd3fb46511~mv2.png",
+            title: "Armageddon Seat",
+            description: "Even though the machine is merely a tool for people today, it is thrilling to consider whether AI designers will someday design a chair that illustrates the soul of human beings. Would that chair be known as the 'Salvation Seat'? Can something be lethal if it can dream? Diagrams are inadequate even for representing the human spirit; how can we abstract and materialize a machine's soul? This design product, which began as a simple notion, aims to fill the context of its subject while also attempting to include the design language of the Religious Robotics concept through furniture. Armageddon Seat is an experiment in transforming complex simplicity into a sculptural digital home object rather than a monument in an age where machines only serve humans now.",
+            openInNewTab: true,
+            pageLink: "https://www.digitalforgerywork.shop/design",
+            tweetLink: null,
+            buyLink: "https://opensea.io/collection/dfw-design?searchQuery=armageddon+seat",
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 27,
+            name: "c2w2 Runway Trailer",
+            tag: "Featured",
+            collection: "Experience",
+            url: "https://video.wixstatic.com/video/54a996_029c9577e1d245f386a0ebe2c64a9b6e/1080p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_488091e2766a49f084a279c37d8017c5~mv2.png",
+            title: "c2w2 Runway Trailer",
+            description: "The C2W2 virtual runway on Hyperfy, accessible via VR or PC through the link hyperfy.io/c2w2, is a 30-minute metaverse event showcasing nearly 50 AI-designed avatars across six thematic parts, blending traditional art, virtual fashion, NFTs, and transhumanism. Through dramatic lighting and a minimalist setting, it explores identity, technology, and belonging in a fragmented, three-dimensional narrative.",
+            openInNewTab: true,
+            pageLink: "https://www.digitalforgerywork.shop/runway",
+            tweetLink: null,
+            buyLink: null,
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 28,
+            name: "c2w Runway Ticket Artwork",
+            tag: "Featured",
+            collection: "Experience",
+            url: "https://video.wixstatic.com/video/54a996_008a92463e2c490bae5c5176ccd0fa13/1080p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_8b9ecdfee9b0416497b06cd601c515df~mv2.png",
+            title: "c2w Runway Ticket Artwork",
+            description: "The C2W Metaverse Runway event, held on 9.11.23 and was accessible through a $20 ticket purchased between 1-2.11.23 following the Digital Fashion Showcase at New Codes in London by VCA x Draup, showcased a distinctive digital fashion collection. This event provided attendees with an immersive virtual fashion show experience directly from their browsers without the need for downloads, marking a significant step in exploring and redefining personal expression in digital realms. Alongside their ticket, attendees received a complimentary avatar, The Viewer, which they showcased during this token-gated event. The show is available for free to anyone now.",
+            openInNewTab: true,
+            pageLink: "https://hyperfy.io/c2w",
+            tweetLink: null,
+            buyLink: null,
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 29,
+            name: "Scaffold",
+            tag: "Featured",
+            collection: "Gallery",
+            url: "https://video.wixstatic.com/video/54a996_ac819c2d59714a1e9059aa9019f8443c/1080p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_610326d29cfd4daa96db8c86d1cb033b~mv2.png",
+            title: "Scaffold",
+            description: "A silent structure that is built around architectural smart objects. Explore all 50 of digital topographies with a single click, or experiment with guided tours via NPCs.",
+            openInNewTab: true,
+            pageLink: "https://www.digitalforgerywork.shop/gallery",
+            tweetLink: null,
+            buyLink: null,
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 30,
+            name: "Retail",
+            tag: "Featured",
+            collection: "Gallery",
+            url: "https://video.wixstatic.com/video/54a996_e0ba18b9aa464e099a55f3518072ebbc/1080p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_3a566c9262264a2490ba38ecba6e65b5~mv2.png",
+            title: "Retail",
+            description: "Retail in the metaverse bridges the gap between fashion and daily life, offering a unique platform for connection and innovation. The concept of retail extends beyond mere transactions; it serves as a vital link that introduces individuals to new cultures and innovations through fashion. As the digital and physical realms converge, especially in the metaverse, this connection evolves, presenting untapped potential for immersive brand experiences. The challenge lies in reimagining retail in a space where traditional physical interactions are absent, yet the opportunity to engage and educate remains paramount.",
+            openInNewTab: true,
+            pageLink: "https://www.digitalforgerywork.shop/gallery",
+            tweetLink: null,
+            buyLink: null,
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 31,
+            name: "Neue2Dojo",
+            tag: "Featured",
+            collection: "Gallery",
+            url: "https://video.wixstatic.com/video/54a996_ef95007416634bfb947f326f863bb810/1080p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_e2b6353a23e14e489ee6ee3d341fdd80~mv2.png",
+            title: "Neue2Dojo",
+            description: "The Neue² Dojo Gallery stands at the forefront of a cultural revolution, exemplifying how art and technology can coalesce to create entirely new paradigms for cultural expression and engagement. This pioneering project, anchored firmly on the blockchain and realized within the boundless possibilities of 3D web technology, redefines the essence of a gallery not as a physical space, but as a fluid, virtual environment that can adapt and transform to suit the thematic and aesthetic needs of each exhibition it hosts.",
+            openInNewTab: true,
+            pageLink: "https://www.neue2dojo.com/",
+            tweetLink: null,
+            buyLink: null,
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 32,
+            name: "Elements Store",
+            tag: "Featured",
+            collection: "Gallery",
+            url: "https://video.twimg.com/ext_tw_video/1878077102919958529/pu/vid/avc1/1802x1080/A_5kd2gBFkEQPQdl.mp4?tag=14",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_2da52be408d042ce87f0ffde7f3dc15c~mv2.png",
+            title: "Elements Store",
+            description: "Virtual Furniture Gallery for DFW Designs",
+            openInNewTab: true,
+            pageLink: "https://www.digitalforgerywork.shop/gallery",
+            tweetLink: null,
+            buyLink: null,
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 33,
+            name: "Black City",
+            tag: "Featured",
+            collection: "Gallery",
+            url: "https://video.wixstatic.com/video/54a996_f74cb85449ab4cf2a2c7ce8e82585f88/1080p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_bfaf132093d2475f9cd8da1247292760~mv2.png",
+            title: "Black City",
+            description: "A virtual city with 8 independent museums (MOCA ROOMS), designed by DFW and curated on-chain by their citizens.",
+            openInNewTab: true,
+            pageLink: "https://www.digitalforgerywork.shop/gallery",
+            tweetLink: null,
+            buyLink: null,
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 34,
+            name: "Afterparty",
+            tag: "Featured",
+            collection: "Gallery",
+            url: "https://video.wixstatic.com/video/54a996_b120f236c9854ed1a890426666252145/1080p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_1a93147f925a464d8068faf9b6888895~mv2.png",
+            title: "Afterparty",
+            description: "Designed as an afterparty venue to enjoy after the runway show, where models party with the attendees, and there are click-to-wearable options instantly.",
+            openInNewTab: true,
+            pageLink: "https://www.digitalforgerywork.shop/gallery",
+            tweetLink: null,
+            buyLink: null,
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 35,
+            name: "Forge",
+            tag: null,
+            collection: "Gallery",
+            url: "https://video.wixstatic.com/video/54a996_1fceb8b2f9764eafa5d97be26f3bee6a/1080p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_5ad4cee848d04581a96d2762fd1ca332~mv2.png",
+            title: "Forge",
+            description: "NoiseDAO World Design: A Decentralized Approach to Music and Art. NoiseDAO, a decentralized autonomous organization, has embarked on a mission to support, acquire, and innovate within the music industry alongside its members. With a commendable collection at its disposal, NoiseDAO sought diverse solutions to showcase works across various dimensions. This initiative unfolded within DAOTown, a virtual city crafted by NeonBuidl and M3, designed as a haven for relaxation and education about DAOs. From NoiseDAO's portal, guests could teleport to a world dedicated to Noise, alongside other DAOs like FlamingoDAO and NeonDAO, enriching the visitor's experience.",
+            openInNewTab: true,
+            pageLink: "https://www.digitalforgerywork.shop/gallery",
+            tweetLink: null,
+            buyLink: null,
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 36,
+            name: "tar rooms collection launch promo",
+            tag: "Featured",
+            collection: "Gallery",
+            url: "https://video.wixstatic.com/video/54a996_0861f4ca6b454f719eb9afe8851ebcfc/1080p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_bfaf132093d2475f9cd8da1247292760~mv2.png",
+            title: "tar rooms collection launch promo",
+            description: "Transparent Animal Rooms promo for launch, made for MOCA ROOMS",
+            openInNewTab: true,
+            pageLink: "https://rooms.museumofcryptoart.com/",
+            tweetLink: null,
+            buyLink: null,
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 37,
+            name: "rick and morty promo",
+            tag: null,
+            collection: "Gallery",
+            url: "https://video.wixstatic.com/video/54a996_df4ea133f9f64943b97aee9c47650ea5/1080p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_bfaf132093d2475f9cd8da1247292760~mv2.png",
+            title: "rick and morty promo",
+            description: "Transparent Animal Rooms promo for launch, made for MOCA ROOMS",
+            openInNewTab: true,
+            pageLink: "https://rooms.museumofcryptoart.com/",
+            tweetLink: null,
+            buyLink: null,
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 38,
+            name: "muog ii design shot",
+            tag: null,
+            collection: "Gallery",
+            url: "https://video.wixstatic.com/video/54a996_1f5a007d60f94833bd633d63f4da54de/1080p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_585e97315b584bda815bb7bce50a94d8~mv2.png",
+            title: "muog ii design shot",
+            description: "Reimagination of Le Corbusier's sketch with transparent spiral corridors to test redefining spatial boundaries, by investigating a new concept that combines modernist dynamics with virtuality.",
+            openInNewTab: true,
+            pageLink: "https://rooms.museumofcryptoart.com/",
+            tweetLink: null,
+            buyLink: null,
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 39,
+            name: "palpatine presents concept furniture store",
+            tag: null,
+            collection: "Gallery",
+            url: "https://video.wixstatic.com/video/54a996_ac4ca67a28094ee5b839437ec2bc50c7/1080p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_bfaf132093d2475f9cd8da1247292760~mv2.png",
+            title: "palpatine presents concept furniture store",
+            description: "An exhibition of DFW furniture designs, located at Black City south side.",
+            openInNewTab: true,
+            pageLink: "https://rooms.museumofcryptoart.com/",
+            tweetLink: null,
+            buyLink: null,
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 40,
+            name: "spyder mosk piccolo song",
+            tag: null,
+            collection: "Gallery",
+            url: "https://video.wixstatic.com/video/54a996_b7c142458cf845489773ab7d9ecc164e/1080p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_23e78284da1b42dbac0cfa06fc7a0b38~mv2.png",
+            title: "spyder mosk piccolo song",
+            description: "\"Spyder\" represents a flexible network akin to a spider's craftsmanship, while the artwork placement creates a maze-like structure between villainous columns, defining walls with a nihilistic quality. The abstract system derived from mosque typology blossoms arches that frame dramatic openings.",
+            openInNewTab: true,
+            pageLink: "https://rooms.museumofcryptoart.com/",
+            tweetLink: null,
+            buyLink: null,
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 41,
+            name: "muog ii explanation",
+            tag: null,
+            collection: "Gallery",
+            url: "https://video.wixstatic.com/video/54a996_f6870c2274574dd9b08871e4d974273c/1080p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_585e97315b584bda815bb7bce50a94d8~mv2.png",
+            title: "muog ii explanation",
+            description: "Reimagination of Le Corbusier's sketch with transparent spiral corridors to test redefining spatial boundaries, by investigating a new concept that combines modernist dynamics with virtuality.",
+            openInNewTab: true,
+            pageLink: "https://rooms.museumofcryptoart.com/",
+            tweetLink: null,
+            buyLink: null,
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 42,
+            name: "tar32 bloom test_radiohead",
+            tag: null,
+            collection: "Gallery",
+            url: "https://video.wixstatic.com/video/54a996_1845172bc83342878d5b3ea69f0f1b71/1080p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_dd114a6a0bb54a50aa0e81453448718b~mv2.png",
+            title: "tar32 bloom test_radiohead",
+            description: "An experimental museum design features a glass ramp that generates a spiral corridor, surrounded by a flexible network resembling a spider web, arranging artworks in a maze-like structure between columns, with volumes and arches derived from mosque typology, to frame dramatic openings.",
+            openInNewTab: true,
+            pageLink: "https://rooms.museumofcryptoart.com/",
+            tweetLink: null,
+            buyLink: null,
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 43,
+            name: "launch vintage promo 2",
+            tag: null,
+            collection: "Gallery",
+            url: "https://video.wixstatic.com/video/54a996_929721be955d47faad82cfba66c17fd0/1080p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_bfaf132093d2475f9cd8da1247292760~mv2.png",
+            title: "launch vintage promo 2",
+            description: "Transparent Animal Rooms promo for launch, made for MOCA ROOMS",
+            openInNewTab: true,
+            pageLink: "https://rooms.museumofcryptoart.com/",
+            tweetLink: null,
+            buyLink: null,
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 44,
+            name: "space time rooms",
+            tag: "Featured",
+            collection: "Gallery",
+            url: "https://video.wixstatic.com/video/54a996_f1badb8e4dea43d59eae277d5b2c94be/1080p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_bfaf132093d2475f9cd8da1247292760~mv2.png",
+            title: "space time rooms",
+            description: "The Moca Space Time Rooms are a collection of conceptual rooms that transgress and spatially deconstruct the bounds of the traditional 'room' (a box with four walls, a floor, and a roof) paradigm. In a tone inspired by space-time relativity that bends with the mass/gravity of artworks, paper-light floors produce components that flex and flow into each other. Even though they are based on historical/traditional 'room' characteristics, these elements, with their flexibility, define the utility of a new experimental form beyond just being a wall, ceiling, or floor. A complicated system developed from a single, rich component and supported by further additions results in an abstract vertical floor with a variety of rooms.",
+            openInNewTab: true,
+            pageLink: "https://rooms.museumofcryptoart.com/",
+            tweetLink: null,
+            buyLink: null,
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 45,
+            name: "launch vintage promo",
+            tag: null,
+            collection: "Gallery",
+            url: "https://video.wixstatic.com/video/54a996_d4027f442dc842268c6cbd578aacb6f0/1080p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_bfaf132093d2475f9cd8da1247292760~mv2.png",
+            title: "launch vintage promo",
+            description: "Transparent Animal Rooms promo for launch, made for MOCA ROOMS",
+            openInNewTab: true,
+            pageLink: "https://rooms.museumofcryptoart.com/",
+            tweetLink: null,
+            buyLink: null,
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 46,
+            name: "the fly club, TAR Rooms",
+            tag: "Featured",
+            collection: "Gallery",
+            url: "https://video.wixstatic.com/video/54a996_e8813c13a8aa42a8bc62718caf9a7542/1080p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_bf5d98fe308d4e219476f455a265a34f~mv2.png",
+            title: "the fly club, TAR Rooms",
+            description: "Museum design that creatively combines arch-based structures inspired by Salvador Dali's elephants with a transparent vertical reproduction of Le Corbusier's Museum of Unlimited Growth, incorporating the use of pipes as a deliberate design choice.",
+            openInNewTab: true,
+            pageLink: "https://rooms.museumofcryptoart.com/",
+            tweetLink: null,
+            buyLink: null,
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 47,
+            name: "C2W Collection Promo 1",
+            tag: null,
+            collection: "Avatar",
+            url: "https://video.wixstatic.com/video/54a996_ec462c493fd541a6801a7b1e1ccd59fb/1080p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_8b9ecdfee9b0416497b06cd601c515df~mv2.png",
+            title: "C2W Collection Promo 1",
+            description: "The C2W Metaverse Runway event, held on 9.11.23 and was accessible through a $20 ticket purchased between 1-2.11.23 following the Digital Fashion Showcase at New Codes in London by VCA x Draup, showcased a distinctive digital fashion collection. This event provided attendees with an immersive virtual fashion show experience directly from their browsers without the need for downloads, marking a significant step in exploring and redefining personal expression in digital realms. Alongside their ticket, attendees received a complimentary avatar, The Viewer, which they showcased during this token-gated event. The show is available for free to anyone now.",
+            openInNewTab: true,
+            pageLink: "https://www.digitalforgerywork.shop/runway",
+            tweetLink: null,
+            buyLink: null,
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 48,
+            name: "C2W New Codes Exhibition",
+            tag: null,
+            collection: "Avatar",
+            url: "https://video.wixstatic.com/video/54a996_0232a6790a7647ef862d91e3f8e7a223/1080p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_8b9ecdfee9b0416497b06cd601c515df~mv2.png",
+            title: "C2W New Codes Exhibition",
+            description: "The C2W Metaverse Runway event, held on 9.11.23 and was accessible through a $20 ticket purchased between 1-2.11.23 following the Digital Fashion Showcase at New Codes in London by VCA x Draup, showcased a distinctive digital fashion collection. This event provided attendees with an immersive virtual fashion show experience directly from their browsers without the need for downloads, marking a significant step in exploring and redefining personal expression in digital realms. Alongside their ticket, attendees received a complimentary avatar, The Viewer, which they showcased during this token-gated event. The show is available for free to anyone now.",
+            openInNewTab: true,
+            pageLink: "https://www.digitalforgerywork.shop/runway",
+            tweetLink: null,
+            buyLink: null,
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 49,
+            name: "Click-to-B Hyperfy Video Clip @ Retail_v4, C2W",
+            tag: null,
+            collection: "Gallery",
+            url: "https://video.wixstatic.com/video/54a996_21a2c46e200b4c8d872f84bc1ae72f48/1080p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_8b9ecdfee9b0416497b06cd601c515df~mv2.png",
+            title: "Click-to-B Hyperfy Video Clip @ Retail_v4, C2W",
+            description: "The C2W Metaverse Runway event, held on 9.11.23 and was accessible through a $20 ticket purchased between 1-2.11.23 following the Digital Fashion Showcase at New Codes in London by VCA x Draup, showcased a distinctive digital fashion collection. This event provided attendees with an immersive virtual fashion show experience directly from their browsers without the need for downloads, marking a significant step in exploring and redefining personal expression in digital realms. Alongside their ticket, attendees received a complimentary avatar, The Viewer, which they showcased during this token-gated event. The show is available for free to anyone now.",
+            openInNewTab: true,
+            pageLink: "https://www.digitalforgerywork.shop/runway",
+            tweetLink: null,
+            buyLink: null,
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 50,
+            name: "C2W Polaroid Shots",
+            tag: null,
+            collection: "Avatar",
+            url: "https://video.wixstatic.com/video/54a996_06faa3498bf146b5aa739b4c1012aadd/1080p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_8b9ecdfee9b0416497b06cd601c515df~mv2.png",
+            title: "C2W Polaroid Shots",
+            description: "The C2W Metaverse Runway event, held on 9.11.23 and was accessible through a $20 ticket purchased between 1-2.11.23 following the Digital Fashion Showcase at New Codes in London by VCA x Draup, showcased a distinctive digital fashion collection. This event provided attendees with an immersive virtual fashion show experience directly from their browsers without the need for downloads, marking a significant step in exploring and redefining personal expression in digital realms. Alongside their ticket, attendees received a complimentary avatar, The Viewer, which they showcased during this token-gated event. The show is available for free to anyone now.",
+            openInNewTab: true,
+            pageLink: "https://www.digitalforgerywork.shop/runway",
+            tweetLink: null,
+            buyLink: null,
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 51,
+            name: "CYNNX Live Recording of C2W Event",
+            tag: null,
+            collection: "Experience",
+            url: "https://www.youtube.com/embed/Ougtz4jod9c?t=1112s",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_8b9ecdfee9b0416497b06cd601c515df~mv2.png",
+            title: "CYNNX Live Recording of C2W Event",
+            description: "The C2W Metaverse Runway event, held on 9.11.23 and was accessible through a $20 ticket purchased between 1-2.11.23 following the Digital Fashion Showcase at New Codes in London by VCA x Draup, showcased a distinctive digital fashion collection. This event provided attendees with an immersive virtual fashion show experience directly from their browsers without the need for downloads, marking a significant step in exploring and redefining personal expression in digital realms. Alongside their ticket, attendees received a complimentary avatar, The Viewer, which they showcased during this token-gated event. The show is available for free to anyone now.",
+            openInNewTab: true,
+            pageLink: "https://www.digitalforgerywork.shop/runway",
+            tweetLink: null,
+            buyLink: null,
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 52,
+            name: "C2W, Afterparty Recording Voxvienne",
+            tag: null,
+            collection: "Experience",
+            url: "https://video.wixstatic.com/video/54a996_99bf250049af451596a557301c399b48/1080p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_1a93147f925a464d8068faf9b6888895~mv2.png",
+            title: "C2W, Afterparty Recording Voxvienne",
+            description: "Designed as an afterparty venue to enjoy after the runway show, where models party with the attendees, and there are click-to-wearable options instantly.",
+            openInNewTab: true,
+            pageLink: "https://www.digitalforgerywork.shop/runway",
+            tweetLink: null,
+            buyLink: null,
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 53,
+            name: "WWE- Trailer",
+            tag: "Featured",
+            collection: "Experience",
+            url: "https://video.wixstatic.com/video/54a996_45a230b2bece4d03b010b327a5cdaa42/1080p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_8362a66b73ca47bd92c9ed90eef359ba~mv2.png",
+            title: "WWE- Trailer",
+            description: "\"Why We Exist\" emerges as an innovative virtual theater experience, marking a pioneering venture into the realm of digital performance art. This concept, the first of its kind in based civilization, pushes the boundaries of digital creativity and immersive storytelling through two distinct modes: Cinematic and Immersive.",
+            openInNewTab: true,
+            pageLink: "https://www.digitalforgerywork.shop/theater",
+            tweetLink: null,
+            buyLink: null,
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 54,
+            name: "WWE- VR Recording",
+            tag: "Featured",
+            collection: "Experience",
+            url: "https://video.wixstatic.com/video/54a996_d0a53c2258ea418a9decdc5ff7ea8634/720p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_8362a66b73ca47bd92c9ed90eef359ba~mv2.png",
+            title: "WWE- VR Recording",
+            description: "This VR recording, captured with Meta Quest 3, may be one of the first 10-minute virtual theater experiences designed for VR. It immerses viewers in the innovative world of 'Why We Exist,' showcasing the dynamic interplay of digital assets and immersive storytelling.",
+            openInNewTab: true,
+            pageLink: "https://www.digitalforgerywork.shop/theater",
+            tweetLink: null,
+            buyLink: null,
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 55,
+            name: "WWE- 1st Take",
+            tag: null,
+            collection: "Experience",
+            url: "https://video.wixstatic.com/video/54a996_18a0c3bf7d454587a9b4232ea8cef5b8/1080p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_8362a66b73ca47bd92c9ed90eef359ba~mv2.png",
+            title: "WWE- 1st Take",
+            description: "The '1st Take' video documents the initial technical solutions developed for 'Why We Exist.' Presented in English, it highlights the creative and technical process behind bringing this pioneering virtual theater experience to life.",
+            openInNewTab: true,
+            pageLink: "https://www.digitalforgerywork.shop/theater",
+            tweetLink: null,
+            buyLink: null,
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 56,
+            name: "WWE- Script",
+            tag: null,
+            collection: "Experience",
+            url: "https://static.wixstatic.com/media/54a996_7dd2500dbf604854ba481d58f98279fa~mv2.png",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_8362a66b73ca47bd92c9ed90eef359ba~mv2.png",
+            title: "WWE- Script",
+            description: "This detailed script and hierarchy of smart objects, presented in a timezone sheet format, outlines the precise orchestration of 'Why We Exist.' It showcases the technical and narrative structure that drives the virtual theater experience.",
+            openInNewTab: true,
+            pageLink: "https://www.digitalforgerywork.shop/theater",
+            tweetLink: null,
+            buyLink: null,
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 57,
+            name: "WWE- Camera Angles",
+            tag: null,
+            collection: "Experience",
+            url: "https://static.wixstatic.com/media/54a996_1dda84dec4f84ea4a9c9674253aa0216~mv2.jpg",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_8362a66b73ca47bd92c9ed90eef359ba~mv2.png",
+            title: "WWE- Camera Angles",
+            description: "A visual representation of the camera angles used in 'Why We Exist.' These carefully designed perspectives enhance the Cinematic mode, offering viewers a curated experience of the virtual theater's dynamic environment.",
+            openInNewTab: true,
+            pageLink: "https://www.digitalforgerywork.shop/theater",
+            tweetLink: null,
+            buyLink: null,
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 58,
+            name: "WWE- Mess Mode",
+            tag: null,
+            collection: "Experience",
+            url: "https://video.wixstatic.com/video/54a996_6e47723684a24c93a8cb4eda9f1c229c/1080p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_8362a66b73ca47bd92c9ed90eef359ba~mv2.png",
+            title: "WWE- Mess Mode",
+            description: "Mess Mode captures the experimental and chaotic essence of 'Why We Exist,' showcasing the playful interaction of digital assets and smart objects. It offers a unique perspective on the virtual theater's creative process.",
+            openInNewTab: true,
+            pageLink: "https://www.digitalforgerywork.shop/theater",
+            tweetLink: null,
+            buyLink: null,
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 59,
+            name: "Balloon - Metaverse World",
+            tag: null,
+            collection: "Experience",
+            url: "https://static.wixstatic.com/media/54a996_f238230fdd034682be2e5a6281ff40b5~mv2.png",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_55d49a9e02b74a76bca4a0177a9fa5df~mv2.png",
+            title: "Balloon - Metaverse World",
+            description: "Balloon No. 2 is a 10-minute WebXR theater piece exploring the absurdity and depth of digital identity in metaverse culture. Accessible via Hyperfy, it places the audience in a surreal environment through VR or desktop, blending architecture, fashion, and AI-driven dialogue. With three seamless acts triggered by interactive visuals, the experience offers a dynamic and personal journey through 32 choreographed camera angles or free exploration in VR. It requires no login or downloads—just a link. A new form of digital performance born for the screen.",
+            openInNewTab: true,
+            pageLink: "https://www.digitalforgerywork.shop/theater",
+            tweetLink: null,
+            buyLink: null,
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 60,
+            name: "Balloon - Cinematography",
+            tag: null,
+            collection: "Experience",
+            url: "https://www.youtube.com/embed/5veQ5uv6tbk",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_55d49a9e02b74a76bca4a0177a9fa5df~mv2.png",
+            title: "Balloon - Cinematography",
+            description: "This cinematography reel showcases the dynamic visual storytelling of Balloon No. 2. Through carefully choreographed camera angles and seamless transitions across three acts, it highlights the surreal environments and AI-driven dialogue that define the virtual theater experience.",
+            openInNewTab: true,
+            pageLink: "https://www.digitalforgerywork.shop/theater",
+            tweetLink: null,
+            buyLink: null,
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 61,
+            name: "Balloon - Processed Experience",
+            tag: null,
+            collection: "Experience",
+            url: "https://video.wixstatic.com/video/54a996_b2ac7d43214743a9ac1d0b46bfefc0ec/1080p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_55d49a9e02b74a76bca4a0177a9fa5df~mv2.png",
+            title: "Balloon - Processed Experience",
+            description: "An early trailer that captures the spirit of Balloon No. 2 in under a minute. It distills the essence of the virtual theater’s exploration of digital identity, surreal environments, and AI-driven dialogue, offering a glimpse into the absurd and melancholic journey of self-reflection in the metaverse.",
+            openInNewTab: true,
+            pageLink: "https://www.digitalforgerywork.shop/theater",
+            tweetLink: null,
+            buyLink: null,
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 62,
+            name: "Balloon - Trailer",
+            tag: "Featured",
+            collection: "Experience",
+            url: "https://video.wixstatic.com/video/54a996_9ad99d6734bc442caa28b3b2a7157f1a/1080p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_55d49a9e02b74a76bca4a0177a9fa5df~mv2.png",
+            title: "Balloon - Trailer",
+            description: "The official trailer for Balloon No. 2, a 10-minute WebXR theater piece. It introduces the surreal metaverse environment and the existential questions of digital identity, with three acts unfolding through interactive visuals and AI-driven dialogue, accessible via VR or desktop.",
+            openInNewTab: true,
+            pageLink: "https://www.digitalforgerywork.shop/theater",
+            tweetLink: null,
+            buyLink: null,
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 63,
+            name: "Hatch – Metaverse World",
+            tag: null,
+            collection: "Experience",
+            url: "https://video.wixstatic.com/video/54a996_35eb8e4dfd7141d6aef12a36e862b458/1080p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_657bbf289a904a829b19a01fc2acbbb2~mv2.png",
+            title: "Hatch – Metaverse World",
+            description: "Hatch blends WebXR, blockchain, and theater. Viewers join via avatars, shaping the story. VR or PC, with 32 angles, uses 10-15 MB. Repeat, reverse, or circular modes vary views. NFT-minted, it probes human-AI ethics and digital art ownership, merging old storytelling with new tech in a metaverse. When one acquires the world asset of the theater, it means the artwork is owned by those.",
+            openInNewTab: true,
+            pageLink: "https://www.digitalforgerywork.shop/theater",
+            tweetLink: null,
+            buyLink: null,
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 64,
+            name: "Hatch – Horizontal part i",
+            tag: null,
+            collection: "Experience",
+            url: "https://video.wixstatic.com/video/54a996_4ea42fe5e2fe46ef803411860c059242/1080p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_657bbf289a904a829b19a01fc2acbbb2~mv2.png",
+            title: "Hatch – Horizontal part i",
+            description: "Part 1 probes digital existence. Are entities bound by the Pattern or free via the Curve? Human power over AI sparks ethical debates—control or empathy? Reverse mode inverts dialogue, shifting spaces; circular mode merges time, blurring intent. It asks: do digital beings matter if unwatched, like Schrödinger’s cat?",
+            openInNewTab: true,
+            pageLink: "https://www.digitalforgerywork.shop/theater",
+            tweetLink: null,
+            buyLink: null,
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 65,
+            name: "Hatch – Horizontal part ii",
+            tag: null,
+            collection: "Experience",
+            url: "https://video.wixstatic.com/video/54a996_f21cf6bfa7b94496a11de8dff89de7a0/1080p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_657bbf289a904a829b19a01fc2acbbb2~mv2.png",
+            title: "Hatch – Horizontal part ii",
+            description: "Part 2 debates reality’s layers—dreams or code? The Curve (human essence) vs. Pattern (control) fuels ethical questions: can files feel or create? Human-made simulations raise duty dilemmas. Reverse mode flips events, changing places; circular mode entwines time, deepening the riddle of digital consciousness.",
+            openInNewTab: true,
+            pageLink: "https://www.digitalforgerywork.shop/theater",
+            tweetLink: null,
+            buyLink: null,
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 66,
+            name: "Hatch – Horizontal part iii",
+            tag: null,
+            collection: "Experience",
+            url: "https://video.wixstatic.com/video/54a996_68cf5e8b59da49e3a24cf27ca55484ad/1080p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_657bbf289a904a829b19a01fc2acbbb2~mv2.png",
+            title: "Hatch – Horizontal part iii",
+            description: "Part 3 questions scripted realities. Are digital emotions real? Humans’ power over AI prompts ethical dilemmas—free or ignore them? Reverse mode reverses narrative, altering spaces; circular mode fuses time and place, clouding truth. It asks: what’s our duty to coded beings in a blockchain-locked world?",
+            openInNewTab: true,
+            pageLink: "https://www.digitalforgerywork.shop/theater",
+            tweetLink: null,
+            buyLink: null,
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 67,
+            name: "Hatch – Reverse part i",
+            tag: null,
+            collection: "Experience",
+            url: "https://video.wixstatic.com/video/54a996_c4d166f384b74a7e91ae549fefe1e703/1080p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_657bbf289a904a829b19a01fc2acbbb2~mv2.png",
+            title: "Hatch – Reverse part i",
+            description: "Reverse mode turns Hatch backward like Memento. Spaces and words distort, creating new meanings. Do digital beings feel or just act? It questions human control over AI and our duty. If unwatched, do they change, like Schrödinger’s cat? It makes us rethink what reality and responsibility mean.",
+            openInNewTab: true,
+            pageLink: "https://www.digitalforgerywork.shop/theater",
+            tweetLink: null,
+            buyLink: null,
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 68,
+            name: "Hatch – Reverse part ii",
+            tag: null,
+            collection: "Experience",
+            url: "https://video.wixstatic.com/video/54a996_88f51f7f38e94e339c404ff1a23aa43d/1080p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_657bbf289a904a829b19a01fc2acbbb2~mv2.png",
+            title: "Hatch – Reverse part ii",
+            description: "Reverse mode turns Hatch backward like Memento. Spaces and words distort, creating new meanings. Do digital beings feel or just act? It questions human control over AI and our duty. If unwatched, do they change, like Schrödinger’s cat? It makes us rethink what reality and responsibility mean.",
+            openInNewTab: true,
+            pageLink: "https://www.digitalforgerywork.shop/theater",
+            tweetLink: null,
+            buyLink: null,
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 69,
+            name: "Hatch – Reverse part iii",
+            tag: null,
+            collection: "Experience",
+            url: "https://video.wixstatic.com/video/54a996_f546179fad554c2fb9d22e9d7a4e1488/1080p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_657bbf289a904a829b19a01fc2acbbb2~mv2.png",
+            title: "Hatch – Reverse part iii",
+            description: "Reverse mode turns Hatch backward like Memento. Spaces and words distort, creating new meanings. Do digital beings feel or just act? It questions human control over AI and our duty. If unwatched, do they change, like Schrödinger’s cat? It makes us rethink what reality and responsibility mean.",
+            openInNewTab: true,
+            pageLink: "https://www.digitalforgerywork.shop/theater",
+            tweetLink: null,
+            buyLink: null,
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 70,
+            name: "Hatch – Circular",
+            tag: null,
+            collection: "Experience",
+            url: "https://video.wixstatic.com/video/54a996_797da32b9ec943839b776375f59eacbe/1080p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_657bbf289a904a829b19a01fc2acbbb2~mv2.png",
+            title: "Hatch – Circular",
+            description: "Circular mode in Hatch removes time, mixing spaces. Without time, what’s left—meaning, matter? AI’s signals seem real but might be fake. Are we seeing their truth or making it up? It asks if we should care for coded beings and what reality is in a looped world with no clear start or end.",
+            openInNewTab: true,
+            pageLink: "https://www.digitalforgerywork.shop/theater",
+            tweetLink: null,
+            buyLink: null,
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 71,
+            name: "Hatch – Director's Note",
+            tag: "Featured",
+            collection: "Experience",
+            url: "https://video.wixstatic.com/video/54a996_ee84b669670d4ee499f96d7b2f02ceab/1080p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_657bbf289a904a829b19a01fc2acbbb2~mv2.png",
+            title: "Hatch – Director's Note",
+            description: "Hatch examines human-AI ethics. Do digital entities suffer or simulate? Humans’ control raises duty questions—empathy or apathy? Like ignoring a plea, we may dismiss AI’s plight. Reverse flips the story; circular blends time, probing reality’s truth and our role in digital worlds, light yet deep.",
+            openInNewTab: true,
+            pageLink: "https://www.digitalforgerywork.shop/theater",
+            tweetLink: null,
+            buyLink: null,
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 72,
+            name: "Hatch – Trailer",
+            tag: "Featured",
+            collection: "Experience",
+            url: "https://video.wixstatic.com/video/54a996_a6992df717194d93bb8b40ac47036304/1080p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_657bbf289a904a829b19a01fc2acbbb2~mv2.png",
+            title: "Hatch – Trailer",
+            description: "Hatch is a 10-min WebXR metaverse experience. A, B, and viewer C question reality in 3 parts. A navigates Pattern, B rebels, C learns their power. Replay in repeat, reverse, or circular modes. VR or PC, NFT-minted. It probes human-AI ties, digital emotions, and ethics in an interactive narrative.",
+            openInNewTab: true,
+            pageLink: "https://www.digitalforgerywork.shop/theater",
+            tweetLink: null,
+            buyLink: null,
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 73,
+            name: "Hatch – Introduction",
+            tag: null,
+            collection: "Experience",
+            url: "https://video.wixstatic.com/video/54a996_d2c145db721b48c9bfccd867cbb8447d/1080p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_657bbf289a904a829b19a01fc2acbbb2~mv2.png",
+            title: "Hatch – Introduction",
+            description: "Hatch uses WebXR, with VR or PC access. 50 smart objects keep data low. Avatars via VRM models join the story. Reverse mode flips narrative, changing spaces; circular mode blends time and place. NFT-minted on Ethereum, it locks a virtual theater probing digital ethics and consciousness in a metaverse.",
+            openInNewTab: true,
+            pageLink: "https://www.digitalforgerywork.shop/theater",
+            tweetLink: null,
+            buyLink: null,
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 74,
+            name: "c2w event -promo 5",
+            tag: null,
+            collection: "Experience",
+            url: "https://video.wixstatic.com/video/54a996_da9bac51d12f425182b687f06b6452a5/1080p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_8b9ecdfee9b0416497b06cd601c515df~mv2.png",
+            title: "c2w event -promo 5",
+            description: "The C2W Metaverse Runway event, held on 9.11.23 and was accessible through a $20 ticket purchased between 1-2.11.23 following the Digital Fashion Showcase at New Codes in London by VCA x Draup, showcased a distinctive digital fashion collection. This event provided attendees with an immersive virtual fashion show experience directly from their browsers without the need for downloads, marking a significant step in exploring and redefining personal expression in digital realms. Alongside their ticket, attendees received a complimentary avatar, The Viewer, which they showcased during this token-gated event. The show is available for free to anyone now.",
+            openInNewTab: true,
+            pageLink: "https://www.digitalforgerywork.shop/runway",
+            tweetLink: null,
+            buyLink: null,
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 75,
+            name: "nonpraiable character - demo -v2",
+            tag: null,
+            collection: "Experience",
+            url: "https://video.wixstatic.com/video/54a996_c2c82f818aa649638fad5745d69d2500/1080p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_922f3243f1cb44e1937da3a3c4f61488~mv2.png",
+            title: "nonpraiable character - demo -v2",
+            description: "Unfinished virtual film project shot in Unity.",
+            openInNewTab: true,
+            pageLink: "https://www.digitalforgerywork.shop/theater",
+            tweetLink: null,
+            buyLink: null,
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 76,
+            name: "nonpraiable character - demo -v1",
+            tag: null,
+            collection: "Experience",
+            url: "https://video.wixstatic.com/video/54a996_8165dfc8b90e454f9cf053e305155b2f/1080p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_922f3243f1cb44e1937da3a3c4f61488~mv2.png",
+            title: "nonpraiable character - demo -v1",
+            description: "Unfinished virtual film project shot in Unity.",
+            openInNewTab: true,
+            pageLink: "https://www.digitalforgerywork.shop/theater",
+            tweetLink: null,
+            buyLink: null,
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 77,
+            name: "retail biggie song",
+            tag: "Featured",
+            collection: "Gallery",
+            url: "https://video.wixstatic.com/video/54a996_2b529cb35fda488f8486f0a11871ee5c/1080p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_3a566c9262264a2490ba38ecba6e65b5~mv2.png",
+            title: "retail biggie song",
+            description: "AI-generated Notorious BIG song about C2W collection, its retail space, and other cloudy thoughts.",
+            openInNewTab: true,
+            pageLink: "https://www.digitalforgerywork.shop/gallery",
+            tweetLink: null,
+            buyLink: null,
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 78,
+            name: "Metaboilerism",
+            tag: null,
+            collection: "Architecture",
+            url: "https://video.wixstatic.com/video/54a996_5795369b30bf41b08a25ba36b5f357e9/1080p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_5ad4cee848d04581a96d2762fd1ca332~mv2.png",
+            title: "Metaboilerism",
+            description: "NoiseDAO Forge Museums world facility.",
+            openInNewTab: true,
+            pageLink: "https://www.digitalforgerywork.shop/gallery",
+            tweetLink: null,
+            buyLink: null,
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 79,
+            name: "tes am",
+            tag: null,
+            collection: "Architecture",
+            url: "https://video.wixstatic.com/video/54a996_f2c748dbd1ff43b8a4e1cbff5fc8a105/1080p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_5ad4cee848d04581a96d2762fd1ca332~mv2.png",
+            title: "tes am",
+            description: "NoiseDAO Forge Museums world facility.",
+            openInNewTab: true,
+            pageLink: "https://www.digitalforgerywork.shop/gallery",
+            tweetLink: null,
+            buyLink: null,
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 80,
+            name: "PXL DUOMO",
+            tag: null,
+            collection: "Architecture",
+            url: "https://www.youtube.com/embed/qo-j3IBLEB0",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_bbe3c10b067548ac9fde8eda8e3d4985~mv2.png",
+            title: "PXL DUOMO",
+            description: "A cross-planned space with frosted glass skin designed to house virtual interactions.",
+            openInNewTab: true,
+            pageLink: "https://www.digitalforgerywork.shop/gallery",
+            tweetLink: null,
+            buyLink: null,
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 81,
+            name: "centipede",
+            tag: null,
+            collection: "Architecture",
+            url: "https://video.wixstatic.com/video/54a996_d3131d04b6f14f70982f2136d1413793/1080p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_5ad4cee848d04581a96d2762fd1ca332~mv2.png",
+            title: "centipede",
+            description: "NoiseDAO Forge Museums world facility.",
+            openInNewTab: true,
+            pageLink: "https://www.digitalforgerywork.shop/gallery",
+            tweetLink: null,
+            buyLink: null,
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 82,
+            name: "0pp13",
+            tag: null,
+            collection: "Architecture",
+            url: "https://video.wixstatic.com/video/54a996_6cd57d3220e1465791e295d2d5cfba2d/1080p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_5ad4cee848d04581a96d2762fd1ca332~mv2.png",
+            title: "0pp13",
+            description: "NoiseDAO Forge Museums world facility.",
+            openInNewTab: true,
+            pageLink: "https://www.digitalforgerywork.shop/gallery",
+            tweetLink: null,
+            buyLink: null,
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+            id: 83,
+            name: "memelegance - c2w2 early demo",
+            tag: null,
+            collection: "Avatar",
+            url: "https://video.wixstatic.com/video/54a996_18ce69160dc64eaa88c1343afa08cd43/1080p/mp4/file.mp4",
+            thumbnailUrl: "https://static.wixstatic.com/media/54a996_488091e2766a49f084a279c37d8017c5~mv2.png",
+            title: "memelegance - c2w2 early demo",
+            description: "Elegance born from memes",
+            openInNewTab: true,
+            pageLink: "https://www.digitalforgerywork.shop/avatar",
+            tweetLink: null,
+            buyLink: null,
+            orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+            content: null
+        },
+        {
+    id: 84,
+    name: "memelegance - c2w2 remixx",
+    tag: null,
+    collection: "Avatar",
+    url: "https://video.wixstatic.com/video/54a996_716b93f1589a442fb9d65b8ed68aa803/1080p/mp4/file.mp4",
+    thumbnailUrl: "https://static.wixstatic.com/media/54a996_488091e2766a49f084a279c37d8017c5~mv2.png",
+    title: "memelegance - c2w2 remixx",
+    description: "Elegance born from memes",
+    openInNewTab: true,
+    pageLink: "https://www.digitalforgerywork.shop/avatar",
+    tweetLink: null,
+    buyLink: null,
+    orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+    content: null
+},
+{
+    id: 85,
+    name: "Fund Me Song",
+    tag: "Featured",
+    collection: "Avatar",
+    url: "https://video.wixstatic.com/video/54a996_f6c39e0aa5294454af870e5ee275f942/1080p/mp4/file.mp4",
+    thumbnailUrl: "https://static.wixstatic.com/media/54a996_488091e2766a49f084a279c37d8017c5~mv2.png",
+    title: "Fund Me Song",
+    description: "Fund me, hey VCs, don't be shy!",
+    openInNewTab: true,
+    pageLink: "https://www.digitalforgerywork.shop/avatar",
+    tweetLink: null,
+    buyLink: null,
+    orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+    content: null
+},
+{
+    id: 86,
+    name: "ClictoBe",
+    tag: null,
+    collection: "Avatar",
+    url: "https://video.wixstatic.com/video/54a996_2aaaafa5eaaa45db90f654f6266f3520/1080p/mp4/file.mp4",
+    thumbnailUrl: "https://static.wixstatic.com/media/54a996_488091e2766a49f084a279c37d8017c5~mv2.png",
+    title: "ClictoBe",
+    description: "Standing tall across carbons!",
+    openInNewTab: true,
+    pageLink: "https://www.digitalforgerywork.shop/avatar",
+    tweetLink: null,
+    buyLink: null,
+    orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+    content: null
+},
+{
+    id: 87,
+    name: "C2w2- Aiatars",
+    tag: "Featured",
+    collection: "Avatar",
+    url: "https://video.wixstatic.com/video/54a996_a5d98402ce57459fa2c3448998051112/1080p/mp4/file.mp4",
+    thumbnailUrl: "https://static.wixstatic.com/media/54a996_488091e2766a49f084a279c37d8017c5~mv2.png",
+    title: "C2w2- Aiatars",
+    description: "Follow the white.",
+    openInNewTab: true,
+    pageLink: "https://www.digitalforgerywork.shop/avatar",
+    tweetLink: null,
+    buyLink: null,
+    orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+    content: null
+},
+{
+    id: 88,
+    name: "Retail v2",
+    tag: null,
+    collection: "Gallery",
+    url: "https://www.youtube.com/embed/poZzVziMzO0",
+    thumbnailUrl: "https://static.wixstatic.com/media/54a996_3a566c9262264a2490ba38ecba6e65b5~mv2.png",
+    title: "Retail v2",
+    description: "Second version of the retail design for metaverse, documented and uploaded on 13 May 2023.",
+    openInNewTab: true,
+    pageLink: "https://www.digitalforgerywork.shop/gallery",
+    tweetLink: null,
+    buyLink: null,
+    orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+    content: null
+},
+{
+    id: 89,
+    name: "neue2dojo walkthrough",
+    tag: null,
+    collection: "Gallery",
+    url: "https://www.youtube.com/embed/SF9brlPTfdQ",
+    thumbnailUrl: "https://static.wixstatic.com/media/54a996_e2b6353a23e14e489ee6ee3d341fdd80~mv2.png",
+    title: "neue2dojo walkthrough",
+    description: "The Neue² Dojo Gallery stands at the forefront of a cultural revolution, exemplifying how art and technology can coalesce to create entirely new paradigms for cultural expression and engagement. This pioneering project, anchored firmly on the blockchain and realized within the boundless possibilities of 3D web technology, redefines the essence of a gallery not as a physical space, but as a fluid, virtual environment that can adapt and transform to suit the thematic and aesthetic needs of each exhibition it hosts.",
+    openInNewTab: true,
+    pageLink: "https://www.neue2dojo.com/",
+    tweetLink: null,
+    buyLink: null,
+    orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+    content: null
+},
+{
+    id: 90,
+    name: "neue2dojo making of",
+    tag: null,
+    collection: "Gallery",
+    url: "https://www.youtube.com/embed/LNzH_Hh71go",
+    thumbnailUrl: "https://static.wixstatic.com/media/54a996_e2b6353a23e14e489ee6ee3d341fdd80~mv2.png",
+    title: "neue2dojo making of",
+    description: "The Neue² Dojo Gallery stands at the forefront of a cultural revolution, exemplifying how art and technology can coalesce to create entirely new paradigms for cultural expression and engagement. This pioneering project, anchored firmly on the blockchain and realized within the boundless possibilities of 3D web technology, redefines the essence of a gallery not as a physical space, but as a fluid, virtual environment that can adapt and transform to suit the thematic and aesthetic needs of each exhibition it hosts.",
+    openInNewTab: true,
+    pageLink: "https://www.neue2dojo.com/",
+    tweetLink: null,
+    buyLink: null,
+    orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+    content: null
+},
+{
+    id: 91,
+    name: "POETIX-1-22OCTO21",
+    tag: null,
+    collection: "Gallery",
+    url: "https://www.youtube.com/embed/pBEzAXUvs68",
+    thumbnailUrl: "https://static.wixstatic.com/media/54a996_8e6b9132adab4dafb1895081210d71c3~mv2.png",
+    title: "POETIX-1-22OCTO21",
+    description: "Rare poetry work about NFT/crypto ecosystem recited back in October 2021.",
+    openInNewTab: true,
+    pageLink: "https://de-centralize.com",
+    tweetLink: null,
+    buyLink: null,
+    orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+    content: null
+},
+{
+    id: 92,
+    name: "mermaid chair - 3 aug 2020",
+    tag: null,
+    collection: "Design",
+    url: "https://www.youtube.com/embed/YvVPpBG0qBw",
+    thumbnailUrl: "https://static.wixstatic.com/media/54a996_a2215b83bd6344f39ad76c5ac0707eef~mv2.png",
+    title: "mermaid chair - 3 aug 2020",
+    description: "Any push to accomplish a materialistic goal is a 'fight.' Non-fighters, who can easily blend in and adapt to new contexts, have articulations formed with love and without judgment. The richness of their pixel-fleshes derives from the desire to upload more peace into the chaos. An incomplete ID tries to find one that looks precisely like itself and triggers apocalypse for the whole after seeing one slightly unidentical. It's vile if that creature aims to rebirth the 'equilibrium' by trimming unique beauties, by not being aware of the big JPEG. A chair.glb, then, represents just that: aspirations, adaptation over love. A cultural model can be defined and exists only in a digital realm. A chair, a woman-like creature from oceans with its fresh attitude consisting of fully chrome materials, may inspire people who find it challenging to blend harmoniously. So there you have it, an interpretational shape of decentralization. 1/1 to be used in your upcoming metaverse house, in particular.",
+    openInNewTab: true,
+    pageLink: "https://www.digitalforgerywork.shop/design",
+    tweetLink: null,
+    buyLink: "https://opensea.io/collection/dfw-design?searchQuery=mermaid+chair",
+    orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+    content: null
+},
+{
+    id: 93,
+    name: "chromie squiggle spritiual section",
+    tag: null,
+    collection: "Design",
+    url: "https://video.wixstatic.com/video/54a996_539ebc0eac474f35abd9c2e99f4388e0/1080p/mp4/file.mp4",
+    thumbnailUrl: "https://static.wixstatic.com/media/54a996_88c4d35e09504a2395c0555a38fd1cb6~mv2.png",
+    title: "chromie squiggle spritiual section",
+    description: "Spatial sculpture made to honor Chromie Squiggle.",
+    openInNewTab: true,
+    pageLink: "https://www.digitalforgerywork.shop/design",
+    tweetLink: null,
+    buyLink: "https://opensea.io/collection/dfw-design?searchQuery=bridge",
+    orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+    content: null
+},
+{
+    id: 94,
+    name: "mermaid chair - close up",
+    tag: null,
+    collection: "Design",
+    url: "https://video.wixstatic.com/video/54a996_e66a4a5c08ab46549ab3a1fa85a9acac/1080p/mp4/file.mp4",
+    thumbnailUrl: "https://static.wixstatic.com/media/54a996_a2215b83bd6344f39ad76c5ac0707eef~mv2.png",
+    title: "mermaid chair - close up",
+    description: "Any push to accomplish a materialistic goal is a 'fight.' Non-fighters, who can easily blend in and adapt to new contexts, have articulations formed with love and without judgment. The richness of their pixel-fleshes derives from the desire to upload more peace into the chaos. An incomplete ID tries to find one that looks precisely like itself and triggers apocalypse for the whole after seeing one slightly unidentical. It's vile if that creature aims to rebirth the 'equilibrium' by trimming unique beauties, by not being aware of the big JPEG. A chair.glb, then, represents just that: aspirations, adaptation over love. A cultural model can be defined and exists only in a digital realm. A chair, a woman-like creature from oceans with its fresh attitude consisting of fully chrome materials, may inspire people who find it challenging to blend harmoniously. So there you have it, an interpretational shape of decentralization. 1/1 to be used in your upcoming metaverse house, in particular.",
+    openInNewTab: true,
+    pageLink: "https://www.digitalforgerywork.shop/design",
+    tweetLink: null,
+    buyLink: "https://opensea.io/collection/dfw-design?searchQuery=mermaid+chair",
+    orderLink: "https://www.digitalforgerywork.shop/order-acquire",
+    content: null
+}
+
+    ];
+
+
+ // kankaa2
+ collections = [...new Set(mediaData.map(media => media.collection))];
+
+ }
+function getDefaultThumbnail(tag) {
+    return 'https://via.placeholder.com/80'; // Replace with your default thumbnail URL
+}
+
+function populateCollections() {
+    const collectionsContainer = document.getElementById('collections');
+    if (!collectionsContainer) return;
+    collectionsContainer.innerHTML = '';
+
+    // Create ALL button (leftmost)
+    const allButton = document.createElement('button');
+    allButton.className = 'collection-btn' + (activeCollection === 'ALL' ? ' active' : '');
+    allButton.textContent = 'ALL';
+    collectionsContainer.appendChild(allButton);
+
+    // Create Featured button (first on the right)
+    const featuredButton = document.createElement('button');
+    featuredButton.className = 'collection-btn' + (activeCollection === 'Featured' ? ' active' : '');
+    featuredButton.textContent = 'Featured';
+    collectionsContainer.appendChild(featuredButton);
+
+    // Create other collection buttons
+    collections.forEach(collection => {
+        const button = document.createElement('button');
+        button.className = 'collection-btn' + (collection === activeCollection ? ' active' : '');
+        button.textContent = collection;
+        collectionsContainer.appendChild(button);
+    });
+}
+
+function handleCollectionClick(button) {
+    const collection = button.textContent;
+    if (activeCollection === collection) return;
+
+    activeCollection = collection; // Fixed typo
+    document.querySelectorAll('.collection-btn').forEach(btn => btn.classList.remove('active'));
+    button.classList.add('active');
+
+    const filteredMedia = getFilteredMedia();
+    populateMediaItems(filteredMedia);
+    populateMediaGrid(filteredMedia);
+    
+    if (filteredMedia.length > 0) {
+        activeMediaIndex = 0;
+        updateMediaDetails(filteredMedia[0]);
+        updateActionButtons(filteredMedia[0]);
+        displayMediaContent(filteredMedia[0]);
+        updateMediaCarousel();
+        const avatarDetails = document.getElementById('avatar-details');
+        if (avatarDetails) avatarDetails.style.display = 'none';
+    } else {
+        const carousel = document.getElementById('avatar-carousel');
+        const grid = document.getElementById('avatar-grid');
+        const details = document.getElementById('avatar-details');
+        const mediaPreview = document.getElementById('media-preview');
+        if (carousel) carousel.innerHTML = '<div class="media-item-name">No media found in this collection</div>';
+        if (grid) grid.innerHTML = '<div class="no-results">No media found in this collection</div>';
+        if (mediaPreview) mediaPreview.innerHTML = '';
+        if (details) details.style.display = 'none';
+    }
+    
+    toggleGridView(true);
+}
+
+function populateMediaItems(mediaToShow) {
+    if (!mediaToShow) mediaToShow = getFilteredMedia();
+    const carouselContainer = document.getElementById('avatar-carousel');
+    if (!carouselContainer) return;
+    carouselContainer.innerHTML = '';
+    mediaToShow.forEach((media, index) => {
+        const mediaItem = document.createElement('div');
+        mediaItem.className = `media-item ${media.tag ? media.tag.toLowerCase() : ''}`;
+        mediaItem.dataset.id = media.id;
+        mediaItem.dataset.index = index;
+        const thumbnailUrl = media.thumbnailUrl || getDefaultThumbnail(media.tag);
+        mediaItem.innerHTML = `<img src="${thumbnailUrl}" class="media-item-thumbnail" alt="${media.name}"><div class="media-item-name">${media.name}</div>`;
+        mediaItem.addEventListener('click', () => {
+            hasMediaBeenSelected = true;
+            activeMediaIndex = index;
+            toggleGridView(false);
+            updateMediaCarousel();
+            displayMediaContent(media);
+            updateMediaDetails(media);
+            updateActionButtons(media);
+        });
+        carouselContainer.appendChild(mediaItem);
+    });
+    updateMediaCarousel();
+}
+
+function changeActiveMedia(direction) {
+    const filteredMedia = getFilteredMedia();
+    const numMedia = filteredMedia.length;
+    if (numMedia === 0) return;
+    
+    if (isGridView) toggleGridView(false);
+    
+    activeMediaIndex = (activeMediaIndex + direction + numMedia) % numMedia;
+    updateMediaCarousel();
+    hasMediaBeenSelected = true;
+    const selectedMedia = filteredMedia[activeMediaIndex];
+    displayMediaContent(selectedMedia);
+    updateMediaDetails(selectedMedia);
+    updateActionButtons(selectedMedia);
+}
+
+ function updateMediaCarousel() {
+ const mediaItems = document.querySelectorAll('.media-item');
+ const numItems = mediaItems.length;
+ if (numItems === 0) return;
+ mediaItems.forEach(item => {
+ item.classList.remove('active');
+ item.style.display = 'none';
+ });
+ const windowWidth = window.innerWidth;
+ const itemWidth = CONFIG.thumbnails.size;
+ const spacing = CONFIG.thumbnails.spacing;
+ const minSideOffset = CONFIG.thumbnails.minSideOffset;
+ const availableWidth = windowWidth - (2 * minSideOffset);
+ const maxItemsVisible = Math.floor(availableWidth / (itemWidth + spacing));
+ const itemsPerSide = Math.floor(maxItemsVisible / 2);
+ const centerX = windowWidth / 2;
+ for (let i = 0; i < numItems; i++) {
+ let relativePos = ((i - activeMediaIndex) + numItems) % numItems;
+ if (relativePos > numItems / 2) relativePos -= numItems;
+ if (Math.abs(relativePos) <= itemsPerSide) {
+ const item = mediaItems[i];
+ item.style .display = '';
+ const xPos = centerX - (itemWidth / 2) + (relativePos * (itemWidth + spacing));
+ item.style.left = `${xPos}px`;
+ item.style.top = '0px';
+ item.style.opacity = relativePos === 0 ? '1' : '0.7';
+ item.style.zIndex = 100 - Math.abs(relativePos);
+ if (i === activeMediaIndex) item.classList.add('active');
+ }
+ }
+ const bottomSection = document.getElementById('bottom-section');
+ if (bottomSection && !isGridView) bottomSection.style.opacity = '1';
+ }
+
+function displayMediaContent(media) {
+    if (!media) return;
+    const mediaPreview = document.getElementById('media-preview');
+    if (!mediaPreview) return;
+    mediaPreview.innerHTML = '';
+    updateLoadingProgress(0, 'Loading media...');
+    const avatarDetails = document.getElementById('avatar-details');
+    if (avatarDetails) avatarDetails.style.display = 'block';
+    updateMediaDetails(media);
+    updateActionButtons(media);
+
+    if (media.content) {
+        const textDiv = document.createElement('div');
+        textDiv.className = 'media-text';
+        textDiv.innerHTML = media.content || `<h2>${media.title || media.name}</h2><p>${media.description || ''}</p>`;
+        textDiv.style.overflowY = 'auto';
+        textDiv.style.maxHeight = '100%';
+        mediaPreview.appendChild(textDiv);
+        updateLoadingProgress(100, 'Media loaded');
+    } else if (media.url.includes('youtube.com') || media.url.includes('youtu.be')) {
+        const videoContainer = document.createElement('div');
+        videoContainer.className = 'media-video-container';
+        const youtubeContainer = document.createElement('div');
+        youtubeContainer.className = 'youtube-iframe-container';
+        
+        // Improved YouTube video ID extraction
+        let videoId = '';
+        if (media.url.includes('youtube.com/embed/')) {
+            videoId = media.url.split('youtube.com/embed/')[1]?.split('?')[0];
+        } else if (media.url.includes('youtube.com')) {
+            videoId = media.url.split('v=')[1]?.split('&')[0];
+        } else if (media.url.includes('youtu.be')) {
+            videoId = media.url.split('youtu.be/')[1]?.split('?')[0];
+        }
+
+        if (!videoId) {
+            console.error('Invalid YouTube URL:', media.url);
+            mediaPreview.innerHTML = '<div class="no-results">Error: Invalid YouTube URL</div>';
+            updateLoadingProgress(100, 'Error loading media');
+            return;
+        }
+
+        const iframe = document.createElement('iframe');
+        iframe.className = 'media-video';
+        iframe.src = `https://www.youtube.com/embed/${videoId}?controls=1&rel=0&autoplay=0&enablejsapi=1`;
+        iframe.allow = 'encrypted-media; fullscreen';
+        iframe.allowFullscreen = true;
+        iframe.onload = () => updateLoadingProgress(100, 'Media loaded');
+        iframe.onerror = () => {
+            console.error('YouTube iframe error for URL:', media.url);
+            mediaPreview.innerHTML = '<div class="no-results">Error: Failed to load YouTube video</div>';
+            updateLoadingProgress(100, 'Error loading media');
+        };
+        youtubeContainer.appendChild(iframe);
+        videoContainer.appendChild(youtubeContainer);
+        mediaPreview.appendChild(videoContainer);
+    } else if (media.url.match(/\.(jpeg|jpg|png)$/i)) {
+        const imgContainer = document.createElement('div');
+        imgContainer.style.position = 'relative';
+        imgContainer.style.width = '100%';
+        imgContainer.style.height = '100%';
+        imgContainer.style.display = 'flex';
+        imgContainer.style.justifyContent = 'center';
+        imgContainer.style.alignItems = 'center';
+        const img = document.createElement('img');
+        img.className = 'media-image';
+        img.src = media.url;
+        img.alt = media.name;
+        img.onload = () => updateLoadingProgress(100, 'Media loaded');
+        imgContainer.appendChild(img);
+        mediaPreview.appendChild(imgContainer);
+    } else {
+        const videoContainer = document.createElement('div');
+        videoContainer.className = 'media-video-container';
+        const video = document.createElement('video');
+        video.className = 'media-video';
+        video.src = media.url;
+        video.controls = false; // Disable default controls
+        video.autoplay = true; // Enable autoplay
+        video.muted = true; // Start muted to allow autoplay in most browsers
+        video.onloadeddata = () => updateLoadingProgress(100, 'Media loaded');
+        videoContainer.appendChild(video);
+
+        // Add mute/unmute control
+        const controlsContainer = document.createElement('div');
+        controlsContainer.className = 'video-controls';
+
+        const muteBtn = document.createElement('button');
+        muteBtn.className = 'video-control-btn';
+        muteBtn.innerHTML = '<i class="fas fa-volume-mute"></i>'; // Start with muted icon
+        muteBtn.addEventListener('click', () => {
+            video.muted = !video.muted;
+            muteBtn.innerHTML = video.muted ? '<i class="fas fa-volume-mute"></i>' : '<i class="fas fa-volume-up"></i>';
+        });
+
+        controlsContainer.appendChild(muteBtn);
+        videoContainer.appendChild(controlsContainer);
+        mediaPreview.appendChild(videoContainer);
+    }
+    const bottomSection = document.getElementById('bottom-section');
+    if (bottomSection) bottomSection.style.display = 'block';
+}
+
+ function updateMediaDetails(media) {
+ const titleElement = document.getElementById('avatar-title');
+ const detailsInfo = document.getElementById('details-info');
+ const descriptionText = document.getElementById('description-text');
+ const collectionText = document.getElementById('collection-text');
+
+ if (!titleElement || !detailsInfo || !descriptionText || !collectionText) {
+ console.error('Missing DOM elements:', { titleElement, detailsInfo, descriptionText, collectionText });
+ return;
+ }
+
+ titleElement.textContent = media.name;
+ let compactInfoHTML = '<div class="compact-info">';
+ if (media.tag) compactInfoHTML += `<div class="info-pill">${media.tag}</div>`;
+ if (media.collection) compactInfoHTML += `<div class="info-pill">${media.collection}</div>`;
+ compactInfoHTML += '</div>';
+ detailsInfo.innerHTML = compactInfoHTML;
+ descriptionText.textContent = media.description || `This is ${media.name}, a ${media.tag} media from the ${media.collection} collection.`;
+ collectionText.textContent = collectionDescriptions[media.collection] || `The ${media.collection} collection represents a unique approach to digital media.`;
+ }
+
+// Replace the setupEventListeners function
+
+function setupEventListeners() {
+    const avatarSelector = document.querySelector('.avatar-selector');
+    if (avatarSelector) {
+        avatarSelector.addEventListener('wheel', e => {
+            e.preventDefault();
+            const scrollDirection = e.deltaY > 0 ? 1 : -1;
+            changeActiveMedia(scrollDirection);
+        }, { passive: false });
+    }
+
+    document.addEventListener('keydown', e => {
+        if (e.key === 'ArrowLeft') changeActiveMedia(-1);
+        else if (e.key === 'ArrowRight') changeActiveMedia(1);
+    });
+
+    document.addEventListener('click', e => {
+        if (e.target.classList.contains('collection-btn')) handleCollectionClick(e.target);
+    });
+
+    const gridToggleButton = document.getElementById('grid-toggle-button');
+    if (gridToggleButton) {
+        gridToggleButton.addEventListener('click', () => toggleGridView(!isGridView));
+    }
+
+    const goPageBtn = document.getElementById('go-page-btn');
+    const tweetBtn = document.getElementById('tweet-btn');
+    const buyBtn = document.getElementById('buy-btn');
+    const orderBtn = document.getElementById('order-btn');
+
+    if (goPageBtn) goPageBtn.addEventListener('click', () => {
+        const filteredMedia = getFilteredMedia();
+        if (filteredMedia[activeMediaIndex]?.pageLink) {
+            if (filteredMedia[activeMediaIndex]?.openInNewTab) {
+                window.open(filteredMedia[activeMediaIndex].pageLink, '_blank');
+            } else {
+                window.top.location.href = filteredMedia[activeMediaIndex].pageLink;
+            }
+        }
+    });
+    if (tweetBtn) tweetBtn.addEventListener('click', () => {
+        const filteredMedia = getFilteredMedia();
+        if (filteredMedia[activeMediaIndex]?.tweetLink) {
+            window.open(filteredMedia[activeMediaIndex].tweetLink, '_blank');
+        }
+    });
+    if (buyBtn) buyBtn.addEventListener('click', () => {
+        const filteredMedia = getFilteredMedia();
+        if (filteredMedia[activeMediaIndex]?.buyLink) {
+            window.open(filteredMedia[activeMediaIndex].buyLink, '_blank');
+        }
+    });
+    if (orderBtn) orderBtn.addEventListener('click', () => {
+        const filteredMedia = getFilteredMedia();
+        if (filteredMedia[activeMediaIndex]?.orderLink) {
+            window.open(filteredMedia[activeMediaIndex].orderLink, '_blank');
+        }
+    });
+}
+
+
+
+function updateActionButtons(media) {
+    const goPageBtn = document.getElementById('go-page-btn');
+    const tweetBtn = document.getElementById('tweet-btn');
+    const buyBtn = document.getElementById('buy-btn');
+    const orderBtn = document.getElementById('order-btn');
+    // Remove: const openTabBtn = document.getElementById('open-tab-btn');
+
+    // Remove: if (openTabBtn) openTabBtn.style.display = 'none';
+    if (goPageBtn) goPageBtn.style.display = media?.pageLink ? 'block' : 'none';
+    if (tweetBtn) tweetBtn.style.display = media?.tweetLink ? 'block' : 'none';
+    if (buyBtn) buyBtn.style.display = media?.buyLink ? 'block' : 'none';
+    if (orderBtn) orderBtn.style.display = media?.orderLink ? 'block' : 'none';
+}
+
+function populateMediaGrid(mediaToShow) {
+    if (!mediaToShow) mediaToShow = getFilteredMedia();
+    const gridContainer = document.getElementById('avatar-grid');
+    if (!gridContainer) return;
+    gridContainer.innerHTML = '';
+    
+    if (mediaToShow.length === 0) {
+        gridContainer.innerHTML = '<div class="no-results">No media found</div>';
+        return;
+    }
+    
+    mediaToShow.forEach((media, index) => {
+        const gridItem = document.createElement('div');
+        gridItem.className = 'grid-item';
+        gridItem.dataset.id = media.id;
+        gridItem.dataset.index = index;
+        const thumbnailUrl = media.thumbnailUrl || getDefaultThumbnail(media.tag);
+        gridItem.innerHTML = `<img src="${thumbnailUrl}" alt="${media.name}" loading="lazy"><div class="grid-item-name">${media.name}</div>`;
+        gridItem.addEventListener('click', () => {
+            hasMediaBeenSelected = true;
+            activeMediaIndex = index;
+            toggleGridView(false);
+            updateMediaCarousel();
+            displayMediaContent(media);
+            updateMediaDetails(media);
+            updateActionButtons(media);
+        });
+        gridContainer.appendChild(gridItem);
+    });
+
+    if (mediaToShow.length > 0 && !hasMediaBeenSelected) {
+        updateMediaDetails(mediaToShow[0]);
+        updateActionButtons(mediaToShow[0]);
+    }
+}
+
+function toggleGridView(show) {
+    const gridContainer = document.getElementById('avatar-grid-container');
+    const viewerContainer = document.getElementById('viewer-container');
+    const avatarDetails = document.getElementById('avatar-details');
+    const bottomSection = document.getElementById('bottom-section');
+    const toggleButton = document.getElementById('grid-toggle-button');
+    const mediaPreview = document.getElementById('media-preview');
+    const loadingOverlay = document.getElementById('loading-overlay');
+    
+    if (!gridContainer || !viewerContainer || !avatarDetails || !bottomSection || !toggleButton) return;
+    
+    isGridView = show;
+    
+    if (show) {
+        gridContainer.style.display = 'block';
+        viewerContainer.style.opacity = '0.3';
+        avatarDetails.style.opacity = '0';
+        avatarDetails.style.display = 'none';
+        bottomSection.style.opacity = '0.3';
+        toggleButton.innerHTML = '<i class="fas fa-arrow-down"></i>';
+        if (mediaPreview) mediaPreview.innerHTML = '';
+        if (loadingOverlay) loadingOverlay.style.display = 'none';
+    } else {
+        gridContainer.style.display = 'none';
+        viewerContainer.style.opacity = '1';
+        avatarDetails.style.opacity = '1';
+        avatarDetails.style.display = 'block';
+        bottomSection.style.opacity = '1';
+        bottomSection.style.display = 'block';
+        toggleButton.innerHTML = '<i class="fas fa-th-large"></i>';
+        const filteredMedia = getFilteredMedia();
+        if (filteredMedia.length > 0) {
+            if (!hasMediaBeenSelected || activeMediaIndex >= filteredMedia.length) {
+                activeMediaIndex = 0;
+            }
+            displayMediaContent(filteredMedia[activeMediaIndex]);
+            updateMediaDetails(filteredMedia[activeMediaIndex]);
+            updateActionButtons(filteredMedia[activeMediaIndex]);
+            updateMediaCarousel();
+        }
+    }
+}
+
+ function updateLoadingProgress(percent, message = 'Loading...') {
+ const progressBar = document.getElementById('progress-bar');
+ const loadingPercentage = document.getElementById('loading-percentage');
+ const loadingOverlay = document.getElementById('loading-overlay');
+ if (progressBar && loadingPercentage && loadingOverlay) {
+ progressBar.style.width = `${percent}%`;
+ loadingPercentage.textContent = `${Math.round(percent)}%`;
+ loadingOverlay.style.display = percent >= 100 ? 'none' : 'flex';
+ }
+ }
+ </script>
+</body>
+</html>
