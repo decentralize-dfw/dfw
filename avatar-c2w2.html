@@ -1,0 +1,3046 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>C2W2 Open Source Avatars</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+          /* Global styles */
+          * {
+              margin: 0;
+              padding: 0;
+              box-sizing: border-box;
+              font-family: "Helvetica", monospace;
+          }
+
+          body {
+              background-color: transparent;
+              overflow: hidden;
+              color: #000;
+          }
+
+          /* Main container */
+          .container {
+              display: flex;
+              flex-direction: column;
+              height: 800px;
+              width: 100%;
+              margin: 0 auto;
+              overflow: hidden;
+              position: relative;
+          }
+
+          /* Top section with filters and search */
+          .top-section {
+              height: auto;
+              width: 100%;
+              display: flex;
+              flex-direction: column;
+              padding: 15px; /* Aligns content from 15px to 415px */
+              background-color: rgba(255, 255, 255, 0);
+              z-index: 10;
+              gap: 10px;
+
+               margin-top: 14px; /* Adds 35px space above the section */
+          }
+
+          
+
+          .top-controls {
+              display: flex;
+              flex-direction: column;
+              align-items: flex-start;
+              width: 400px;
+              gap: 10px;
+          }
+
+          .title {
+              font-size: px;
+              color: white;
+              font-weight: 1000;
+              margin-left: 0;
+              -webkit-text-stroke: 0.5px white;
+              width: 100%;
+          }
+
+          .media-btn-container {
+              z-index: 6;
+              height: 32px;
+              display: flex;
+              gap: 8px;
+              width: 400px;
+              padding-left: 0;
+              padding-right: 0;
+          }
+
+          .collections-row {
+              display: flex;
+              width: 400px;
+              padding-left: 0;
+              padding-right: 0;
+              gap: 6px;
+          }
+
+          .collections {
+              display: flex;
+              gap: 6px;
+              z-index: 6;
+              height: 32px;
+              width: 100%;
+              white-space: nowrap;
+          }
+
+          .search-row {
+              display: flex;
+              width: 400px;
+              padding-left: 0;
+              padding-right: 0;
+          }
+
+          .search-container {
+              z-index: 6;
+              width: 100%;
+          }
+
+          .search-input {
+              padding: 5px 10px;
+              border: 1px solid rgba(0, 0, 0, 0.2);
+              border-radius: 4px;
+              background-color: rgba(255, 255, 255, 0.7);
+              font-size: 14px;
+              width: 100%;
+              font-family: "Helvetica", monospace;
+              height: 32px;
+              line-height: 20px;
+              box-sizing: border-box;
+          }
+
+          .media-btn, .collection-btn {
+              padding: 5px 6px;
+              border: 1px solid rgba(0, 0, 0, 0.2);
+              border-radius: 4px;
+              background-color: rgba(255, 255, 255, 0.7);
+              cursor: pointer;
+              font-size: 10px;
+              transition: all 0.2s;
+              color: #000;
+              box-shadow: none;
+              text-shadow: none;
+              height: 32px;
+              line-height: 20px;
+              flex: 1;
+              outline: none;
+          }
+
+          .collection-btn {
+              padding: 5px 4px;
+              font-size: 9px;
+              letter-spacing: 0px;
+          }
+
+          .media-btn {
+              font-style: italic;
+              font-weight: bold;
+              letter-spacing: 0.1px;
+          }
+
+          .all-btn {
+              font-weight: bolder !important;
+              background-color: rgba(240, 240, 240, 0.9);
+          }
+
+          .collection-btn:hover, .media-btn:hover {
+              background-color: rgba(240, 240, 240, 0.9);
+          }
+
+          .collection-btn.active, .media-btn.active {
+              background-color: rgba(100, 100, 100, 0.8);
+              color: white;
+          }
+
+          .viewer-container {
+              position: absolute;
+              top: 0;
+              left: 0;
+              right: 0;
+              bottom: 0;
+              z-index: 1;
+              overflow: visible;
+              pointer-events: auto;
+          }
+
+          #viewer-canvas {
+              width: 100%;
+              height: 100%;
+              pointer-events: auto;
+              position: absolute;
+              top: 0;
+              left: 0;
+          }
+
+          .viewer-container.active {
+              pointer-events: auto;
+              z-index: 1;
+          }
+
+          .avatar-details {
+              position: absolute;
+              padding: 0;
+              max-height: 80vh;
+              overflow: hidden;
+              z-index: 4;
+              color: #000;
+              background-color: transparent;
+              width: 400px; /* Match top section content width */
+              display: flex;
+              flex-direction: column;
+              margin: 0;
+              left: 15px; /* Align with top section */
+              top: 50px; /* Position below top section */
+              box-sizing: border-box;
+          }
+
+          .details-title {
+              font-size: 28px;
+              font-weight: bold;
+              margin-bottom: 10px;
+              width: 100%;
+              padding: 0;
+          }
+
+          .compact-info {
+              display: flex;
+              flex-wrap: wrap;
+              gap: 8px;
+              margin-bottom: 15px;
+              align-items: center;
+              width: 100%;
+              padding: 0;
+          }
+
+          .info-pill, .link-pill {
+              background-color: rgba(255, 255, 255, 0.4);
+              padding: 3px 8px;
+              border-radius: 4px;
+              font-size: 9px;
+              white-space: nowrap;
+              border: 1px solid rgba(0, 0, 0, 0.1);
+          }
+
+          .link-pill {
+              cursor: pointer;
+          }
+
+          .description-text {
+              font-size: 10px;
+              font-weight: bold;
+              line-height: 1.5;
+              text-align: left;
+              margin-bottom: 10px;
+              letter-spacing: -0.2px;
+              width: 100%;
+              padding: 0;
+          }
+
+          .collection-text {
+              font-size: 9px;
+              font-style: italic;
+              line-height: 1.4;
+              text-align: justify;
+              width: 100%;
+              padding: 0;
+          }
+
+          .control-label, .lighting-label {
+              font-size: 11px;
+              color: rgba(0, 0, 0, 0.7);
+              margin-bottom: 5px;
+              display: block;
+              width: 100%;
+              padding: 0;
+          }
+
+          .control-row {
+              display: flex;
+              width: 100%;
+              gap: 14px; /* Adjusted gap to fit within 400px */
+              margin-bottom: 10px;
+              align-items: center;
+              padding: 0;
+          }
+
+          .control-btn, .light-btn, .action-btn {
+              padding: 8px 0;
+              border: 1px solid rgba(0, 0, 0, 0.2);
+              border-radius: 4px;
+              background-color: rgba(255, 255, 255, 0.5);
+              color: #000;
+              cursor: pointer;
+              font-size: 9px;
+              transition: all 0.2s;
+              text-align: center;
+              flex: 1;
+              box-sizing: border-box; /* Ensure border doesn't affect width */
+          }
+
+          .light-label {
+              font-size: 9px;
+              display: inline-block;
+              vertical-align: middle;
+              margin: 0;
+              padding: 0;
+              flex: 0 0 30px; /* Fixed width for label to ensure buttons stretch */
+          }
+
+          .control-btn:hover, .light-btn:hover, .action-btn:hover {
+              background-color: rgba(220, 220, 220, 0.9);
+          }
+
+          .control-btn.active, .light-btn.active {
+              background-color: rgba(100, 100, 100, 0.8);
+              color: white;
+          }
+
+          .bottom-section {
+              position: absolute;
+              left: 0;
+              right: 0;
+              height: 80px;
+              z-index: 5;
+              text-align: center;
+          }
+
+          .avatar-selector {
+              width: 100%;
+              height: 100%;
+              position: relative;
+          }
+
+          .avatar-carousel {
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              position: relative;
+              width: 100%;
+              height: 100%;
+          }
+
+          .avatar-item {
+              width: 80px;
+              height: 80px;
+              position: absolute;
+              transform-origin: center;
+              transition: all 0.3s ease;
+              opacity: 0.7;
+              z-index: 1;
+              margin: 0;
+              padding: 0;
+              cursor: pointer;
+              display: flex;
+              align-items: flex-end; /* Align thumbnails to bottom */
+              justify-content: center;
+          }
+
+          .avatar-thumbnail {
+              width: 100%;
+              height: 100%;
+              object-fit: contain; /* Maintain aspect ratio without cropping */
+              border-radius: 8px;
+              border: 2px solid transparent;
+              transition: all 0.3s ease;
+              background-color: #fff;
+              margin-bottom: 0; /* Consistent bottom alignment */
+          }
+
+          .avatar-item.active .avatar-thumbnail {
+              border-color: rgba(0, 120, 255, 0.8);
+              box-shadow: 0 0 10px rgba(0, 120, 255, 0.5);
+              opacity: 1;
+          }
+
+          .avatar-name, .media-item-name {
+              position: absolute;
+              top: -25px;
+              left: 50%;
+              transform: translateX(-50%);
+              background-color: rgba(255, 255, 255, 0.8);
+              color: #000;
+              padding: 3px 8px;
+              border-radius: 4px;
+              font-size: 12px;
+              white-space: nowrap;
+              transition: opacity 0.3s ease;
+              pointer-events: none;
+              z-index: 50;
+              opacity: 0;
+              font-weight: normal;
+          }
+
+          .avatar-item:hover .avatar-name, .media-item:hover .media-item-name {
+              opacity: 1;
+          }
+
+          .media-view {
+              position: absolute;
+              top: 90px;
+              left: 10px;
+              right: 10px;
+              bottom: 120px;
+              background-color: transparent;
+              z-index: 2;
+              display: none;
+              pointer-events: none;
+          }
+
+          .media-view.active {
+              pointer-events: auto;
+          }
+
+          .media-content {
+              position: relative;
+              width: 100%;
+              height: 100%;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              background: transparent !important;
+          }
+
+        .media-preview {
+          width: 80%;
+          height: 80%;
+          margin: 0 auto;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          overflow: visible;
+          background: transparent !important;
+          position: relative;
+      }
+
+          .media-image {
+              max-width: 100%;
+              max-height: 100%;
+              object-fit: contain;
+          }
+
+         .media-video-container {
+          width: 100%;
+          height: 100%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          background: transparent !important;
+          position: relative;
+      }
+
+          .media-video {
+              max-width: 100%;
+              max-height: 100%;
+              object-fit: contain;
+              width: auto;
+              height: auto;
+              background: transparent !important;
+              aspect-ratio: 16/9;
+          }
+
+          .media-overlay {
+              position: absolute;
+              top: 0;
+              left: 0;
+              width: 100%;
+              height: 100%;
+              background-color: rgba(255, 255, 255, 0.9);
+              display: flex;
+              flex-direction: column;
+              justify-content: center;
+              align-items: center;
+              transition: opacity 0.3s ease;
+              z-index: 5;
+              pointer-events: none;
+          }
+
+          .media-video-container:hover .media-overlay,
+          .media-preview:hover .media-overlay {
+              opacity: 0;
+          }
+
+          .media-overlay-title {
+              font-size: 18px;
+              font-weight: bold;
+              color: #000;
+              margin-bottom: 10px;
+              text-align: center;
+              padding: 0 20px;
+          }
+
+          .media-overlay-description {
+              font-size: 12px;
+              color: #000;
+              text-align: center;
+              padding: 0 20px;
+              line-height: 1.4;
+          }
+
+        .media-text {
+          width: 50%;
+          height: 90%;
+          padding: 0px;
+          padding-right: 10px; /* Kaydırma çubuğunu sağa 10px kaydırır */
+          letter-spacing: -0.15px; /* Metin aralığı */
+          background-color: rgba(255, 255, 255, 0);
+          overflow-y: auto;
+          border-radius: 0px;
+          color: #000;
+          font-size: 16px;
+          line-height: 1.5;
+          text-align: justify; /* İlk ve orta satırları iki yana yasla */
+          text-align-last: left; /* Son satırı sola yasla */
+          justify-content: flex-start; /* İçeriği sola hizala */
+          max-height: 80%;
+          box-sizing: border-box; /* Padding'in boyutlara dahil edilmesi */
+      }
+
+      /* Paragraflar arasında daha belirgin bir boşluk ekle */
+      .media-text p {
+          margin: 0 0 1.5em 0; /* Paragraflar arası boşluk */
+          padding: 0; /* Gereksiz padding'i sıfırla */
+      }
+
+      /* Boş paragrafları gizle */
+      .media-text p:empty {
+          display: none; /* Boş paragrafları gizle */
+      }
+
+      /* Eğer h2 varsa, onun da altında boşluk olsun */
+      .media-text h2 {
+          margin-bottom: 1em; /* h2 ile paragraf arasında boşluk */
+      }
+
+
+
+          .media-item {
+              position: absolute;
+              width: 80px;
+              height: 80px;
+              transition: all 0.3s ease;
+              cursor: pointer;
+              transform-origin: center center;
+              opacity: 0.7;
+              z-index: 10;
+              border-radius: 8px;
+              overflow: visible;
+              margin-top: 25px;
+              display: flex;
+              align-items: flex-end; /* Align thumbnails to bottom */
+              justify-content: center;
+          }
+
+          .media-item.image { background-color: white; }
+          .media-item.video { background-color: white; }
+          .media-item.text { background-color: white; }
+
+          .media-item-thumbnail {
+              width: 100%;
+              height: 100%;
+              object-fit: contain; /* Maintain aspect ratio without cropping */
+              border-radius: 8px;
+              border: 2px solid transparent;
+              transition: all 0.3s ease;
+              z-index: 11;
+              position: relative;
+              margin-bottom: 0; /* Consistent bottom alignment */
+          }
+
+          .media-item.active .media-item-thumbnail {
+              border-color: rgba(0, 120, 255, 0.8);
+              box-shadow: 0 0 10px rgba(0, 120, 255, 0.5);
+          }
+
+          .loading-overlay {
+              position: absolute;
+              top: 0;
+              left: 0;
+              width: 100%;
+              height: 100%;
+              background-color: transparent;
+              display: flex;
+              flex-direction: column;
+              justify-content: center;
+              align-items: center;
+              z-index: 100;
+              color: #000;
+          }
+
+          .loading-text {
+              font-size: 18px;
+              margin-bottom: 10px;
+              background-color: rgba(255, 255, 255, 0);
+              padding: 5px 15px;
+              border-radius: 4px;
+              font-family: "Lucida Console", monospace;
+              letter-spacing: -1px;
+          }
+
+          .loading-progress {
+              width: 200px;
+              height: 6px;
+              background-color: rgba(0, 0, 0, 0.1);
+              border-radius: 3px;
+              overflow: hidden;
+          }
+
+          .progress-bar {
+              height: 100%;
+              background-color: rgba(0, 120, 255, 0.8);
+              width: 0%;
+              transition: width 0.3s ease;
+          }
+
+          .video-container {
+              position: absolute;
+              top: 0;
+              left: 0;
+              right: 0;
+              bottom: 0;
+              display: none;
+              z-index: 3;
+              justify-content: center;
+              align-items: center;
+              background: transparent !important;
+              pointer-events: none;
+          }
+
+          .video-container.active {
+              pointer-events: auto;
+          }
+
+          .video-player {
+              max-width: 50%;
+              max-height: 50%;
+              width: auto;
+              height: auto;
+              object-fit: contain;
+              border-radius: 8px;
+              overflow: hidden;
+          }
+
+          /* Fix for main video player */
+          .video-container iframe.video-player {
+              width: auto;
+              height: auto;
+              max-width: 80%;
+              max-height: 80%;
+              border-radius: 8px;
+              overflow: hidden;
+              aspect-ratio: 16/9;
+          }
+
+          /* Fix for media section videos */
+          .media-video-container iframe.media-video {
+          width: auto;
+          height: 100%; /* Ensure YouTube videos take the full height of the container */
+          max-width: 100%;
+          max-height: 100%;
+          aspect-ratio: 16/9;
+          border-radius: 8px;
+          overflow: hidden;
+      }
+
+          /* Additional style to ensure container has proper display */
+          .video-container, .media-video-container {
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              width: 100%;
+              height: 100%;
+          }
+
+          /* Avatar Grid View Styles */
+          .avatar-grid-container {
+              position: absolute;
+              top: 250px; /* Position below search button */
+              left: 0;
+              right: 0;
+              bottom: 0px; /* Space for bottom bar */
+              padding: 15px;
+              overflow-y: auto;
+              z-index: 6; /* Higher than other elements */
+              background-color: rgba(255, 255, 255, 1); /* Nearly opaque background */
+              display: none; /* Hidden by default */
+          }
+
+          .avatar-grid {
+              display: grid;
+              grid-template-columns: repeat(7, 1fr); /* Always 7 columns */
+              gap: 100px; /* Reduced from 100px to 20px */
+              padding: 10px;
+          }
+
+          .grid-item {
+              width: 100%;
+              aspect-ratio: 1;
+              cursor: pointer;
+              transition: all 0.2s ease;
+              position: relative;
+              border-radius: 8px;
+              overflow: hidden;
+              display: flex;
+              align-items: flex-end; /* Align to bottom */
+              justify-content: center;
+          }
+
+          .grid-item img {
+              width: 100%;
+              height: 100%;
+              object-fit: contain; /* Maintain aspect ratio without cropping */
+              border-radius: 8px;
+              border: 2px solid transparent;
+              transition: all 0.3s ease;
+              background-color: #fff; /* Added background to make transparent PNGs visible */
+              margin-bottom: 0; /* Consistent bottom alignment */
+          }
+
+          .grid-item:hover img {
+              transform: scale(1.05);
+              border-color: rgba(0, 120, 255, 0.8);
+          }
+
+          .grid-item-name {
+              position: absolute;
+              bottom: 0;
+              left: 0;
+              right: 0;
+              background-color: rgba(0, 0, 0, 0.7);
+              color: white;
+              padding: 5px;
+              font-size: 10px;
+              text-align: center;
+              opacity: 0;
+              transition: opacity 0.3s ease;
+              word-break: break-word;
+          }
+
+          .grid-item:hover .grid-item-name {
+              opacity: 1;
+          }
+
+          .grid-toggle-button {
+              position: absolute;
+              bottom: 150px; /* Positioned above the thumbnail bar */
+              left: 50%;
+              transform: translateX(-50%);
+              width: 40px;
+              height: 40px;
+              background-color: rgba(255, 255, 255, 0.85); /* 50% transparent white */
+              border-radius: 50%;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              cursor: pointer;
+              z-index: 10;
+              box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+              transition: all 0.3s ease;
+          }
+
+          .grid-toggle-button:hover {
+              background-color: rgba(220, 220, 220, 0.9); /* Gray tone on hover */
+          }
+
+          .no-results {
+              grid-column: 1 / -1;
+              text-align: center;
+              padding: 20px;
+              font-size: 14px;
+              color: #666;
+          }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/DRACOLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/RGBELoader.js"></script>
+    <script src="https://unpkg.com/meshoptimizer@0.18.1/meshopt_decoder.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="top-section">
+    <div class="top-controls">
+        <div class="title">.</div>
+    </div>
+    <div class="collections-row">
+        <div class="collections" id="collections"></div>
+    </div>
+    <div class="search-row">
+        <div class="search-container">
+            <input type="text" class="search-input" id="search-input" placeholder="Search avatars...">
+        </div>
+    </div>
+        
+
+      <!-- New Grid View Container -->
+      <div class="avatar-grid-container" id="avatar-grid-container">
+        <div class="avatar-grid" id="avatar-grid"></div>
+      </div>
+
+      <div class="viewer-container" id="viewer-container">
+        <canvas id="viewer-canvas"></canvas>
+        <div class="avatar-details" id="avatar-details">
+          <div class="details-title" id="avatar-title">1651</div>
+          <div class="details-info" id="details-info"></div>
+          <div class="control-row" id="view-mode-controls"></div>
+          <div class="control-row">
+            <span class="light-label">Light</span>
+            <button class="light-btn active" id="light-btn-1">1</button>
+            <button class="light-btn" id="light-btn-2">2</button>
+            <button class="light-btn" id="light-btn-3">3</button>
+            <button class="light-btn" id="light-btn-4">4</button>
+            <button class="light-btn" id="light-btn-5">5</button>
+          </div>
+          <div class="control-row">
+            <button class="action-btn" id="download-btn">Download VRM</button>
+            <button class="action-btn" id="buy-btn">Buy VRM</button>
+            <button class="action-btn" id="mint-avatar-btn">Mint Avatar</button>
+            <button class="action-btn" id="mint-artwork-btn">
+              Mint Artwork
+            </button>
+            <button class="action-btn" id="view-artwork-btn">
+              View 3D Artwork
+            </button>
+          </div>
+          <div class="description-text" id="description-text"></div>
+          <div class="collection-text" id="collection-text"></div>
+        </div>
+        <div class="loading-overlay" id="loading-overlay">
+          <div class="loading-text">
+            Forging... <span id="loading-percentage">0%</span>
+          </div>
+          <div class="loading-progress">
+            <div class="progress-bar" id="progress-bar"></div>
+          </div>
+        </div>
+        <div class="media-view" id="media-view">
+          <div class="media-content" id="media-content">
+            <div class="media-preview" id="media-preview"></div>
+          </div>
+        </div>
+        <div class="video-container" id="video-container">
+          <video
+            id="avatar-video"
+            class="video-player"
+            autoplay
+            loop
+            muted
+            playsinline
+          ></video>
+        </div>
+      </div>
+
+      <!-- Grid toggle button -->
+      <div class="grid-toggle-button" id="grid-toggle-button">
+        <i class="fas fa-th-large"></i>
+      </div>
+
+      <div class="bottom-section" id="bottom-section">
+        <div class="avatar-selector">
+          <div class="avatar-carousel" id="avatar-carousel"></div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+              // Configurable Parameters
+              const CONFIG = {
+                  thumbnails: { size: 80, spacing: 40, minSideOffset: 40 },
+                  ui: { detailsBox: { top: 220, left: 0, width: 400 } },
+                  viewer: {
+                      top: 0, left: 10, right: 10, bottom: 0, modelScale: .8,
+                      camera: { position: { x: 0, y: 1, z: 4 }, target: { x: 0, y: 0.5, z: 0 } }
+                  },
+                  media: { top: 90, left: 10, right: 10, bottom: 120 },
+                  sectionPositions: { avatarBar: { bottom: 30 }, mediaBar: { bottom: 55 } }
+              };
+
+              // Global Variables
+// Global Variables
+let scene, camera, renderer, controls, clock = new THREE.Clock();
+let mixer = null, currentModel = null, currentArtworkModel = null, currentVrmModel = null;
+let isShowingArtwork = false, isShowingVrm = false, isShowingVideo = false, isTPoseMode = false;
+let activeAvatar = null, avatarData = [], collections = [], activeCollection = "ALL";
+let modelAnimations = [], activeAvatarIndex = 0, isModelLoading = false;
+let isGridView = true; // Start with grid view enabled
+let wasAutoRotateEnabled = false; // To store auto-rotate state
+let initialLoad = true; // Flag to track initial page load
+let hasAvatarBeenSelected = false; // Track if an avatar has been manually selected
+let activeHdriIndex = 0;
+
+              const collectionDescriptions = {
+                  "Paintings": "Evolution of 2D Art (Part 1): ...",
+                  "Virtual Fashion": "Virtual Fashion (Part 2): ...",
+                  "NavyChip": "Evolution Of Medium Of Art From NFT to Being (Part 3): ...",
+                  "AI-Power": "AI Powered (Part 4): ...",
+                  "RR": "Transhumanism (Part 5): ..."
+              };
+
+              const hdriPaths = [
+                  'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/equirectangular/venice_sunset_1k.hdr',
+                  'https://raw.githubusercontent.com/decentralize-dfw/c2w2/main/nebula-hdr.hdr',
+                  'https://raw.githubusercontent.com/decentralize-dfw/c2w2/main/surreal_hdr.hdr',
+                  'https://raw.githubusercontent.com/decentralize-dfw/c2w2/main/DARK-NEBULA.hdr',
+                  'https://raw.githubusercontent.com/decentralize-dfw/c2w2/main/photo_studio_01_2k.hdr'
+              ];
+
+              document.addEventListener('DOMContentLoaded', () => {
+                  initMeshoptDecoder();
+                  applyUIConfiguration();
+                  initApp();
+              });
+
+              function initMeshoptDecoder() {
+                  if (typeof MeshoptDecoder === 'undefined') {
+                      console.error("MeshoptDecoder not available!");
+                      return;
+                  }
+                  THREE.GLTFLoader.prototype.setMeshoptDecoder = function(decoder) {
+                      this.meshoptDecoder = decoder;
+                      return this;
+                  };
+              }
+
+             function applyUIConfiguration() {
+    const viewerContainer = document.getElementById('viewer-container');
+    viewerContainer.style.top = `${CONFIG.viewer.top}px`;
+    viewerContainer.style.left = `${CONFIG.viewer.left}px`;
+    viewerContainer.style.right = `${CONFIG.viewer.right}px`;
+    viewerContainer.style.bottom = `${CONFIG.viewer.bottom}px`;
+    
+    const avatarDetails = document.getElementById('avatar-details');
+    avatarDetails.style.top = `${CONFIG.ui.detailsBox.top}px`;
+    avatarDetails.style.left = `${CONFIG.ui.detailsBox.left}px`;
+    avatarDetails.style.width = `${CONFIG.ui.detailsBox.width}px`;
+    
+    const bottomSection = document.getElementById('bottom-section');
+    bottomSection.style.bottom = `${CONFIG.sectionPositions.avatarBar.bottom}px`;
+}
+
+              function initApp() {
+    initScene();
+    loadAvatarData();
+    setupEventListeners();
+
+    // Show grid view on initial load immediately
+    populateAvatarGrid();
+    toggleGridView(true);
+
+    // Hide loading overlay on initial load as no avatar is being loaded yet
+    document.getElementById('loading-overlay').style.display = 'none';
+
+    // Do NOT load any avatar initially, just prepare the grid
+    const filteredAvatars = activeCollection === 'ALL' ? [...avatarData] : avatarData.filter(avatar => avatar.collection === activeCollection);
+    if (filteredAvatars.length > 0) {
+        activeAvatar = filteredAvatars[0]; // Set the active avatar but do not load it
+        activeAvatarIndex = 0;
+        updateAvatarDetails(activeAvatar); // Update details but keep hidden
+        setupViewModeButtons();
+        updateActionButtons(activeAvatar);
+        document.getElementById('avatar-details').style.display = 'none'; // Ensure details are hidden initially
+        updateAvatarCarousel();
+    }
+
+    // Ensure canvas is hidden initially since no avatar is loaded
+    document.getElementById('viewer-canvas').style.display = 'none';
+}
+
+              function initScene() {
+                  scene = new THREE.Scene();
+                  scene.background = null;
+
+                  const canvasContainer = document.querySelector('.viewer-container');
+                  const aspect = canvasContainer.clientWidth / canvasContainer.clientHeight;
+                  camera = new THREE.PerspectiveCamera(45, aspect, 0.01, 1000);
+                  camera.position.set(CONFIG.viewer.camera.position.x, CONFIG.viewer.camera.position.y, CONFIG.viewer.camera.position.z);
+
+                  renderer = new THREE.WebGLRenderer({
+                      canvas: document.getElementById('viewer-canvas'),
+                      antialias: true, alpha: true, powerPreference: 'high-performance'
+                  });
+                  renderer.setSize(canvasContainer.clientWidth, canvasContainer.clientHeight);
+                  renderer.outputEncoding = THREE.sRGBEncoding;
+                  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+                  renderer.toneMappingExposure = 1.0;
+                  renderer.physicallyCorrectLights = true;
+
+                  controls = new THREE.OrbitControls(camera, renderer.domElement);
+                  controls.enableDamping = true;
+                  controls.dampingFactor = 0.05;
+                  controls.enablePan = true;
+                  controls.minDistance = 0.01;
+                  controls.maxDistance = 8;
+                  controls.autoRotate = true;
+                  controls.autoRotateSpeed = 1.0;
+                  controls.target.set(CONFIG.viewer.camera.target.x, CONFIG.viewer.camera.target.y, CONFIG.viewer.camera.target.z);
+                  controls.minPolarAngle = Math.PI / 4;
+                  controls.maxPolarAngle = Math.PI / 1.5;
+                  controls.enabled = true;
+                  controls.update();
+
+                  document.querySelector('.viewer-container').classList.add('active'); // Enable viewer by default
+
+                  window.addEventListener('resize', onWindowResize);
+                  setupHDRIEnvironment(activeHdriIndex);
+                  addBasicLighting();
+                  animate();
+              }
+
+              function setupHDRIEnvironment(hdriIndex = 0) {
+                  updateLoadingProgress(10, 'Loading environment...');
+                  const pmremGenerator = new THREE.PMREMGenerator(renderer);
+                  pmremGenerator.compileEquirectangularShader();
+                  new THREE.RGBELoader().load(hdriPaths[hdriIndex], texture => {
+                      const envMap = pmremGenerator.fromEquirectangular(texture).texture;
+                      scene.environment = envMap;
+                      texture.dispose();
+                      pmremGenerator.dispose();
+                      updateLoadingProgress(20, 'Environment loaded');
+                  });
+              }
+
+              function changeHDRIEnvironment(index) {
+                  if (index === activeHdriIndex) return;
+                  activeHdriIndex = index;
+                  updateLoadingProgress(10, 'Changing lighting...');
+                  const pmremGenerator = new THREE.PMREMGenerator(renderer);
+                  pmremGenerator.compileEquirectangularShader();
+                  new THREE.RGBELoader().load(hdriPaths[index], texture => {
+                      const envMap = pmremGenerator.fromEquirectangular(texture).texture;
+                      scene.environment = envMap;
+                      texture.dispose();
+                      pmremGenerator.dispose();
+                      updateLoadingProgress(100, 'Lighting updated');
+                  });
+                  document.querySelectorAll('.light-btn').forEach((btn, i) => btn.classList.toggle('active', i === index));
+              }
+
+              function addBasicLighting() {
+                  const ambientLight = new THREE.AmbientLight(0xffffff, 0.1);
+                  scene.add(ambientLight);
+                  const dirLight = new THREE.DirectionalLight(0xffffff, 0.1);
+                  dirLight.position.set(5, 5, 5);
+                  scene.add(dirLight);
+              }
+
+              function onWindowResize() {
+    const canvasContainer = document.querySelector('.viewer-container');
+    const width = canvasContainer.clientWidth;
+    const height = canvasContainer.clientHeight;
+    camera.aspect = width / height;
+    camera.updateProjectionMatrix();
+    renderer.setSize(width, height);
+    updateAvatarCarousel();
+}
+
+             function animate() {
+// Only run the animation loop if not in media mode
+requestAnimationFrame(animate);
+if (controls && controls.enabled) controls.update();
+if (mixer) mixer.update(clock.getDelta());
+if (renderer) renderer.render(scene, camera);
+}
+
+              function setupEventListeners() {
+    document.querySelectorAll('.light-btn').forEach((btn, index) => {
+        btn.addEventListener('click', () => {
+            if (isShowingVideo) return;
+            changeHDRIEnvironment(index);
+        });
+    });
+    
+    document.getElementById('view-artwork-btn').addEventListener('click', () => {
+        if (isShowingVideo) return;
+        toggleArtworkView();
+    });
+    
+    document.getElementById('download-btn').addEventListener('click', () => {
+        if (activeAvatar && activeAvatar.downloadLink && activeAvatar.downloadLink !== "null") window.open(activeAvatar.downloadLink, '_blank');
+    });
+    document.getElementById('buy-btn').addEventListener('click', () => {
+        if (activeAvatar && activeAvatar.buyLink && activeAvatar.buyLink !== "null") window.open(activeAvatar.buyLink, '_blank');
+    });
+    document.getElementById('mint-avatar-btn').addEventListener('click', () => {
+        if (activeAvatar && activeAvatar.mintAvatarUrl && activeAvatar.mintAvatarUrl !== "null") window.open(activeAvatar.mintAvatarUrl, '_blank');
+    });
+    document.getElementById('mint-artwork-btn').addEventListener('click', () => {
+        if (activeAvatar && activeAvatar.mintArtworkUrl && activeAvatar.mintArtworkUrl !== "null") window.open(activeAvatar.mintArtworkUrl, '_blank');
+    });
+    
+    document.querySelector('.avatar-selector').addEventListener('wheel', e => {
+        e.preventDefault();
+        const scrollDirection = e.deltaY > 0 ? 1 : -1;
+        changeActiveAvatar(scrollDirection);
+    }, { passive: false });
+    
+    document.addEventListener('keydown', e => {
+        if (e.key === 'ArrowLeft') changeActiveAvatar(-1);
+        else if (e.key === 'ArrowRight') changeActiveAvatar(1);
+        else if (e.key === 'Escape' && isShowingVideo) hideVideo();
+    });
+    
+    let searchTimeout;
+    document.getElementById('search-input').addEventListener('input', e => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            const searchTerm = e.target.value;
+            filterAvatars(searchTerm);
+        }, 300);
+    });
+    
+    document.addEventListener('click', e => {
+        if (e.target.classList.contains('collection-btn')) handleCollectionClick(e.target);
+    });
+
+    // Grid toggle button event
+    document.getElementById('grid-toggle-button').addEventListener('click', () => {
+        toggleGridView(!isGridView);
+    });
+}
+
+              function setupViewModeButtons() {
+                  const viewModeContainer = document.getElementById('view-mode-controls');
+                  viewModeContainer.innerHTML = '';
+                  let buttonCount = 0;
+
+                  if (activeAvatar.modelUrl && activeAvatar.modelUrl !== "null") {
+                      const animatedBtn = document.createElement('button');
+                      animatedBtn.id = 'animated-btn';
+                      animatedBtn.className = 'control-btn' + (!isShowingVideo && !isTPoseMode ? ' active' : '');
+                      animatedBtn.textContent = 'Animated';
+                      animatedBtn.addEventListener('click', () => switchToAnimated());
+                      viewModeContainer.appendChild(animatedBtn);
+                      buttonCount++;
+                  }
+
+                  if (activeAvatar.vrmUrl && activeAvatar.vrmUrl !== "null") {
+                      const tposeBtn = document.createElement('button');
+                      tposeBtn.id = 'tpose-btn';
+                      tposeBtn.className = 'control-btn' + (!isShowingVideo && isTPoseMode ? ' active' : '');
+                      tposeBtn.textContent = 'T-Pose';
+                      tposeBtn.addEventListener('click', () => switchToTPose());
+                      viewModeContainer.appendChild(tposeBtn);
+                      buttonCount++;
+                  }
+
+                  if (activeAvatar.videoUrl && activeAvatar.videoUrl !== "null") {
+                      const videoBtn = document.createElement('button');
+                      videoBtn.id = 'video-btn';
+                      videoBtn.className = 'control-btn' + (isShowingVideo ? ' active' : '');
+                      videoBtn.textContent = 'Video';
+                      videoBtn.addEventListener('click', () => showVideo(activeAvatar.videoUrl));
+                      viewModeContainer.appendChild(videoBtn);
+                      buttonCount++;
+                  }
+
+                  viewModeContainer.style.display = buttonCount === 0 ? 'none' : 'flex';
+                  if (buttonCount > 0) {
+                      const btnWidth = 100 / buttonCount;
+                      viewModeContainer.querySelectorAll('.control-btn').forEach(btn => btn.style.width = `${btnWidth}%`);
+                  }
+              }
+
+              function switchToAnimated() {
+    document.querySelectorAll('#view-mode-controls .control-btn').forEach(btn => btn.classList.remove('active'));
+    document.getElementById('animated-btn').classList.add('active');
+    
+    // Only set isModelLoading to true when actually starting to load
+    controls.enabled = true;
+    if (isShowingVideo) {
+        isModelLoading = true;
+        updateLoadingProgress(0, 'Loading animated model...');
+        isShowingVideo = false;
+        document.getElementById('video-container').style.display = 'none';
+        document.getElementById('viewer-canvas').style.opacity = '1';
+        setTimeout(() => {
+            document.getElementById('video-container').innerHTML = '';
+            clearScene();
+            isTPoseMode = false;
+            loadModelForDisplay(activeAvatar.modelUrl, activeAvatar.id);
+        }, 50);
+    } else if (isTPoseMode || isShowingArtwork) {
+        isModelLoading = true;
+        updateLoadingProgress(0, 'Loading animated model...');
+        isTPoseMode = false;
+        clearScene();
+        loadModelForDisplay(activeAvatar.modelUrl, activeAvatar.id);
+    }
+}
+
+function switchToTPose() {
+    document.querySelectorAll('#view-mode-controls .control-btn').forEach(btn => btn.classList.remove('active'));
+    document.getElementById('tpose-btn').classList.add('active');
+    
+    // Only set isModelLoading to true when actually starting to load
+    controls.enabled = true;
+    if (isShowingVideo) {
+        isModelLoading = true;
+        updateLoadingProgress(0, 'Loading T-pose model...');
+        isShowingVideo = false;
+        document.getElementById('video-container').style.display = 'none';
+        document.getElementById('viewer-canvas').style.opacity = '1';
+        setTimeout(() => {
+            document.getElementById('video-container').innerHTML = '';
+            clearScene();
+            isTPoseMode = true;
+            loadVrmForDisplay(activeAvatar.vrmUrl, activeAvatar.id);
+        }, 50);
+    } else if (!isTPoseMode || isShowingArtwork) {
+        isModelLoading = true;
+        updateLoadingProgress(0, 'Loading T-pose model...');
+        isTPoseMode = true;
+        clearScene();
+        loadVrmForDisplay(activeAvatar.vrmUrl, activeAvatar.id);
+    }
+}
+
+              function showVideo(videoUrl) {
+                  if (!videoUrl) return;
+                  document.querySelectorAll('#view-mode-controls .control-btn').forEach(btn => btn.classList.remove('active'));
+                  document.getElementById('video-btn').classList.add('active');
+                  isModelLoading = true;
+                  updateLoadingProgress(0, 'Loading video...');
+                  clearScene();
+                  controls.enabled = false;
+                  document.getElementById('viewer-canvas').style.opacity = '0';
+                  const videoContainer = document.getElementById('video-container');
+                  videoContainer.innerHTML = '';
+                  document.querySelector('.viewer-container').classList.remove('active'); // Disable viewer interactions
+                  videoContainer.classList.add('active'); // Enable video interactions
+
+                  if (videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')) {
+                      let videoId = videoUrl.includes('youtube.com') ? videoUrl.split('v=')[1]?.split('&')[0] : videoUrl.split('youtu.be/')[1]?.split('?')[0];
+                      const iframe = document.createElement('iframe');
+                      iframe.className = 'video-player';
+                      iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1&modestbranding=1&rel=0`;
+                      iframe.allow = 'autoplay; encrypted-media';
+                      iframe.allowFullscreen = true;
+                      videoContainer.appendChild(iframe);
+                  } else {
+                      const videoElement = document.createElement('video');
+                      videoElement.className = 'video-player';
+                      videoElement.src = videoUrl;
+                      videoElement.autoplay = true;
+                      videoElement.loop = true;
+                      videoElement.muted = true;
+                      videoElement.playsInline = true;
+                      videoElement.crossOrigin = 'anonymous';
+                      videoElement.onerror = () => console.error('Video error:', videoElement.error?.code);
+                      videoElement.oncanplay = () => {
+                          updateLoadingProgress(100, 'Video loaded');
+                          isModelLoading = false;
+                      };
+                      videoContainer.appendChild(videoElement);
+                  }
+
+                  videoContainer.style.display = 'flex';
+                  isShowingVideo = true;
+                  setTimeout(() => {
+                      updateLoadingProgress(100, 'Video loaded');
+                      isModelLoading = false;
+                  }, 2000);
+              }
+
+              function hideVideo() {
+                  if (!isShowingVideo) return;
+                  isModelLoading = true;
+                  updateLoadingProgress(0, 'Transitioning from video...');
+                  isShowingVideo = false;
+                  const videoContainer = document.getElementById('video-container');
+                  videoContainer.style.display = 'none';
+                  videoContainer.classList.remove('active'); // Disable video interactions
+                  document.querySelector('.viewer-container').classList.add('active'); // Enable viewer interactions
+                  setTimeout(() => {
+                      videoContainer.innerHTML = '';
+                      setTimeout(() => {
+                          document.getElementById('viewer-canvas').style.opacity = '1';
+                          controls.enabled = true;
+                          clearScene();
+                          if (document.getElementById('tpose-btn')?.classList.contains('active')) {
+                              isTPoseMode = true;
+                              if (activeAvatar && activeAvatar.vrmUrl) loadVrmForDisplay(activeAvatar.vrmUrl, activeAvatar.id);
+                          } else {
+                              isTPoseMode = false;
+                              if (activeAvatar && activeAvatar.modelUrl) loadModelForDisplay(activeAvatar.modelUrl, activeAvatar.id);
+                          }
+                      }, 50);
+                  }, 50);
+              }
+
+             
+
+             function handleCollectionClick(button) {
+    const collection = button.textContent;
+    if (activeCollection === collection) return;
+
+    activeCollection = collection;
+    document.querySelectorAll('.collection-btn').forEach(btn => btn.classList.remove('active'));
+    button.classList.add('active');
+
+    if (isShowingVideo) {
+        hideVideo();
+    }
+
+    isTPoseMode = false;
+    clearScene();
+
+    // Stop animation loop while in grid view
+    cancelAnimationFrame(animate);
+
+    renderer.render(scene, camera);
+
+    const filteredAvatars = collection === 'ALL' ? [...avatarData] : avatarData.filter(avatar => avatar.collection === activeCollection);
+
+    populateAvatarItems(filteredAvatars);
+    populateAvatarGrid(filteredAvatars); // Update grid view with filtered items
+
+    // Always open grid view when changing collection
+    toggleGridView(true);
+
+    if (filteredAvatars.length > 0) {
+        activeAvatarIndex = 0;
+        activeAvatar = filteredAvatars[0];
+        updateAvatarDetails(activeAvatar);
+        setupViewModeButtons();
+        updateActionButtons(activeAvatar);
+        updateAvatarCarousel();
+        // Do NOT load avatar automatically since we're in grid view
+        document.getElementById('avatar-details').style.display = 'none'; // Keep details hidden in grid view
+        document.getElementById('viewer-canvas').style.display = 'none'; // Hide canvas in grid view
+    } else {
+        document.getElementById('avatar-carousel').innerHTML = '<div class="avatar-name">No avatars found in this collection</div>';
+        document.getElementById('avatar-grid').innerHTML = '<div class="no-results">No avatars found in this collection</div>';
+        document.getElementById('avatar-details').style.display = 'none';
+        document.getElementById('viewer-canvas').style.display = 'none';
+    }
+
+    isModelLoading = false;
+}
+             
+
+              function loadAvatarData() {
+                  // KANKAA
+                    // KANKAA
+                  avatarData = [
+                  {
+        id: 1,
+        name: "Neue²Dojo Curator",
+        collection: "Paintings",
+        information: "This is Neue²Dojo Curator, Isabel Rawsthorne Head on an Independent Gallery Curator Outfit, a unique digital avatar from the Paintings collection.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/thmbnl/refs/heads/main/neuedojo.png",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-glb/main/curator-900-opt-v67.glb",
+        vrmUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/Neue2Dojo-Curator-C2W2-22.vrm",
+        artworkUrl: null,
+        videoUrl: "https://video.wixstatic.com/video/54a996_1e4a766e4eae430582194bf1a145923e/1080p/mp4/file.mp4", 
+        downloadLink: null,
+        buyLink: null,
+        mintAvatarUrl: null,
+        mintArtworkUrl: null,
+        fitNo: "22",
+        runwayPart: "Evolution of 2D Art (Part 1)",
+        license: "cc0",
+        additionalLink1: "https://www.youtube.com/watch?v=2EoaMKWp-Hs",
+        additionalLink2: "https://www.francis-bacon.com/artworks/paintings/portrait-isabel-rawsthorne"
+    },
+    {
+        id: 2,
+        name: "Lydia",
+        collection: "Paintings",
+        information: "This is Lydia, a Matisse Painting Comes Alive, a unique digital avatar from the Paintings collection.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/thmbnl/refs/heads/main/purplecoat.png",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-glb/main/matisse-900-opt-v80.glb",
+        vrmUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/Woman-with-Purple-Coat-C2W2-36.vrm",
+        artworkUrl: null,
+        videoUrl: "https://video.wixstatic.com/video/54a996_f8c1f3cdf61b46cb8e159b1af7879b82/1080p/mp4/file.mp4",
+        downloadLink: null,
+        buyLink: null,
+        mintAvatarUrl: null,
+        mintArtworkUrl: null,
+        fitNo: "36",
+        runwayPart: "Evolution of 2D Art (Part 1)",
+        license: "cc0",
+        additionalLink1: "https://www.youtube.com/watch?v=Heltj__3aSI",
+        additionalLink2: "https://www.google.com/search?q=woman+in+purple+coat+matisse"
+    },
+    {
+        id: 3,
+        name: "Lucien",
+        collection: "Paintings",
+        information: "This is Lucien, a Lucien Freud Study where the Main Figure Comes Alive and Catwalks, a unique digital avatar from the Paintings collection.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/thmbnl/refs/heads/main/frued.png",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-glb/main/frued-human-900-opt-v72.glb",
+        vrmUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/Frued_C2W2_27.vrm",
+        artworkUrl: null,
+        videoUrl: "https://video.wixstatic.com/video/54a996_7c69be9444f141f89a6f19c0495e6c10/1080p/mp4/file.mp4",
+        downloadLink: null,
+        buyLink: null,
+        mintAvatarUrl: null,
+        mintArtworkUrl: null,
+        fitNo: "27",
+        runwayPart: "Evolution of 2D Art (Part 1)",
+        license: "cc0",
+        additionalLink1: "https://www.youtube.com/watch?v=p0bJwkarhE8",
+        additionalLink2: "https://www.youtube.com/watch?v=QQIrruTKa4k"
+    },
+    {
+        id: 4,
+        name: "The Wrestler of Silence",
+        collection: "Paintings",
+        information: "This is The Wrestler of Silence, where the Whole Scene of the Painting is Recreated Virtually, Its Spectacular, a unique digital avatar from the Paintings collection.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/thmbnl/refs/heads/main/baconscene-humanstudy.png",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-glb/main/baconscene-900-opt-v59.glb",
+        vrmUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/BaconHumanStudy-C2W2_26.vrm",
+        artworkUrl: null,
+        videoUrl: "https://video.wixstatic.com/video/54a996_054e886262bf41e0bef2cbe7bf171cb2/1080p/mp4/file.mp4",
+        downloadLink: null,
+        buyLink: null,
+        mintAvatarUrl: null,
+        mintArtworkUrl: null,
+        fitNo: "26",
+        runwayPart: "Evolution of 2D Art (Part 1)",
+        license: "cc0",
+        additionalLink1: "https://www.francis-bacon.com/artworks/paintings/two-studies-human-body",
+        additionalLink2: null
+    },
+    {
+        id: 5,
+        name: "The Devoured Remnant",
+        collection: "Paintings",
+        information: "This is The Devoured Remnant, a Bacon Multiverse Mutant where We See 2 Different Figures From Bacon Two Paintings Merge Into a Body, a unique digital avatar from the Paintings collection.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/thmbnl/refs/heads/main/mutantbacon.png",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-glb/main/mutantbacon-900-opt-v86.glb",
+        vrmUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/MutantBacon_C2W2_28.vrm",
+        artworkUrl: null,
+        downloadLink: null,
+        videoUrl: "https://video.wixstatic.com/video/54a996_a5891f1820864145948ff33c448b0904/1080p/mp4/file.mp4",
+        buyLink: null,
+        mintAvatarUrl: null,
+        mintArtworkUrl: null,
+        fitNo: "28",
+        runwayPart: "Evolution of 2D Art (Part 1)",
+        license: "cc0",
+        additionalLink1: "https://www.guggenheim.org/artwork/293",
+        additionalLink2: "https://www.francis-bacon.com/artworks/paintings/three-studies-portrait-george-dyer-light-ground"
+    },
+    {
+        id: 6,
+        name: "Squallor Shark",
+        collection: "Paintings",
+        information: "This is Squallor Shark, a Figure From Decentralize Painting Comes Alive, Its Very Abstract Figure, So Cool Work, a unique digital avatar from the Paintings collection.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/thmbnl/refs/heads/main/squallo.png",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-glb/main/squallo-900-opt-v101.glb",
+        vrmUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/Squallo-C2W2-24.vrm",
+        artworkUrl: null,
+        videoUrl: "https://video.wixstatic.com/video/54a996_a75d12fbeee54e93bf08b6e04a8e3b64/1080p/mp4/file.mp4",
+        downloadLink: null,
+        buyLink: null,
+        mintAvatarUrl: null,
+        mintArtworkUrl: null,
+        fitNo: "24",
+        runwayPart: "Evolution of 2D Art (Part 1)",
+        license: "cc0",
+        additionalLink1: "https://www.de-centralize.com/figurative?pgid=ltq17n0p-4e21997b-6434-4874-93d2-37e9b2f8c5c1",
+        additionalLink2: null
+    },
+    {
+        id: 7,
+        name: "Belli Capelli",
+        collection: "Paintings",
+        information: "This is Belli Capelli, Damarlardan Oluşan Bir Abstract Avatar, a unique digital avatar from the Paintings collection.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/thmbnl/refs/heads/main/bellicapelli.png",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-glb/main/bellicapelli-900-opt-v64.glb",
+        vrmUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/Belli-Capelli-C2W2-16.vrm",
+        artworkUrl: null,
+        videoUrl: "https://video.wixstatic.com/video/54a996_6ccbcfdbeaae4693847ffe0eae39531c/1080p/mp4/file.mp4",
+        downloadLink: null,
+        buyLink: null,
+        mintAvatarUrl: null,
+        mintArtworkUrl: null,
+        fitNo: "16",
+        runwayPart: "Evolution of 2D Art (Part 1)",
+        license: "cc0",
+        additionalLink1: null,
+        additionalLink2: null
+    },
+    {
+        id: 8,
+        name: "Joker",
+        collection: "Virtual Fashion",
+        information: "This is Joker, a unique digital avatar from the Virtual Fashion collection.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/thmbnl/refs/heads/main/joker.png",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2/main/Joker-web-NOMAT-V3-v4.glb",
+        vrmUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/Joker-C2W2-3.vrm",
+        artworkUrl: null,
+        videoUrl: "https://video.wixstatic.com/video/54a996_b1ab3d15f57f4beeb6d73d493e16f018/1080p/mp4/file.mp4",
+        downloadLink: null,
+        buyLink: null,
+        mintAvatarUrl: null,
+        mintArtworkUrl: null,
+        fitNo: "3",
+        runwayPart: "Virtual Fashion (Part 2)",
+        license: "cc0",
+        additionalLink1: null,
+        additionalLink2: null
+    },
+    {
+        id: 9,
+        name: "Bulky Bride",
+        collection: "Virtual Fashion",
+        information: "This is Bulky Bride, fenna kas yapmış makara bir uzaylı gelin, a unique digital avatar from the Virtual Fashion collection.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/thmbnl/refs/heads/main/blukybride.png",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-glb/main/bulkgelin-900-opt-v65.glb",
+        vrmUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/BULKYBRIDE-C2W2-11.vrm",
+        artworkUrl: null,
+        videoUrl: "https://video.wixstatic.com/video/54a996_90faa1d54d78450ab9fe0a25c5273415/1080p/mp4/file.mp4",
+        downloadLink: null,
+        buyLink: null,
+        mintAvatarUrl: null,
+        mintArtworkUrl: null,
+        fitNo: "11",
+        runwayPart: "Virtual Fashion (Part 2)",
+        license: "cc0",
+        additionalLink1: null,
+        additionalLink2: null
+    },
+    {
+        id: 10,
+        name: "Mare",
+        collection: "Virtual Fashion",
+        information: "This is Mare, Just a Cool Futuristic Sexy Dress, Almost Disturbative Image of a Bride, a unique digital avatar from the Virtual Fashion collection.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/thmbnl/refs/heads/main/mare.png",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-glb/main/mare-900-opt-v79.glb",
+        vrmUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/Mare_c2w2_2.vrm",
+        artworkUrl: null,
+        videoUrl: "https://video.wixstatic.com/video/54a996_28a29d80253843719217a4a969777b8c/1080p/mp4/file.mp4",
+        downloadLink: null,
+        buyLink: null,
+        mintAvatarUrl: null,
+        mintArtworkUrl: null,
+        fitNo: "2",
+        runwayPart: "Virtual Fashion (Part 2)",
+        license: "cc0",
+        additionalLink1: null,
+        additionalLink2: null
+    },
+    {
+        id: 11,
+        name: "Vertical CT Feed Person",
+        collection: "Virtual Fashion",
+        information: "This is Vertical CT Feed Person, Long Elegant Dress Full of Memes on a Thick Alien Woman, a unique digital avatar from the Virtual Fashion collection.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/thmbnl/refs/heads/main/memelegencedress.png",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2/main/MemeleganceDress-WEB-NOAVATAR-v8.glb",
+        vrmUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/MemeleganceDress-C2W2-V2-8.vrm",
+        artworkUrl: null,
+        videoUrl: null,
+        downloadLink: null,
+        buyLink: null,
+        mintAvatarUrl: null,
+        mintArtworkUrl: null,
+        fitNo: "8",
+        runwayPart: "Virtual Fashion (Part 2)",
+        license: "cc0",
+        additionalLink1: null,
+        additionalLink2: null
+    },
+    {
+        id: 12,
+        name: "Astral Kindergarten Teacher",
+        collection: "Virtual Fashion",
+        information: "This is Astral Kindergarten Teacher, Very Interesting Outfit, a unique digital avatar from the Virtual Fashion collection.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/thmbnl/refs/heads/main/astral_kindergarten_teacher.png",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-glb/main/whitewearsdfw-900-opt-v105.glb",
+        vrmUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/astral_kindergarten_teacher_c2w2_21.vrm",
+        artworkUrl: null,
+        videoUrl: "https://video.wixstatic.com/video/54a996_581f5cb5939245ab9435037ccfb4ec76/1080p/mp4/file.mp4",
+        downloadLink: null,
+        buyLink: null,
+        mintAvatarUrl: null,
+        mintArtworkUrl: null,
+        fitNo: "21",
+        runwayPart: "Virtual Fashion (Part 2)",
+        license: "cc0",
+        additionalLink1: null,
+        additionalLink2: null
+    },
+    {
+        id: 13,   //      samu-walk-opt.glb
+        name: "Samu",
+        collection: "Virtual Fashion",
+        information: "This is Samu, asas, a unique digital avatar from the Virtual Fashion collection.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/thmbnl/refs/heads/main/SAMU.png",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-glb/main/samu-walk-opt-v2.glb",
+        vrmUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/SAMU-C2W2-20.vrm",
+        artworkUrl: null,
+        videoUrl: "https://video.wixstatic.com/video/54a996_aadea4356aff4304956582ab83030e76/1080p/mp4/file.mp4",
+        downloadLink: null,
+        buyLink: null,
+        mintAvatarUrl: null,
+        mintArtworkUrl: null,
+        fitNo: "14",
+        runwayPart: "Virtual Fashion (Part 2)",
+        license: "cc0",
+        additionalLink1: "https://www.youtube.com/watch?v=bNK3iZJtDY8",
+        additionalLink2: null
+    },
+
+
+    {
+        id: 15,
+        name: "Private Pile",
+        collection: "Virtual Fashion",
+        information: "This is Private Pile, Full Metal Jacket Ref, Pile of Textiles, a unique digital avatar from the Virtual Fashion collection.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/thmbnl/refs/heads/main/pile.png",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-glb/main/pile-900-opt-v92.glb",
+        vrmUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/Private-Pile-C2W2-7.vrm",
+        artworkUrl: null,
+        videoUrl: "https://video.wixstatic.com/video/54a996_95977a0aa9514c5b954f13652b015739/1080p/mp4/file.mp4",
+        downloadLink: null,
+        buyLink: null,
+        mintAvatarUrl: null,
+        mintArtworkUrl: null,
+        fitNo: "4",
+        runwayPart: "Virtual Fashion (Part 2)",
+        license: "cc0",
+        additionalLink1: "https://www.youtube.com/watch?v=k4eMhddTPg4",
+        additionalLink2: null
+    },
+    {
+        id: 16,
+        name: "Xoku",
+        collection: "Virtual Fashion",
+        information: "This is Xoku, Social Media Critic, a Cool Designed Suit, but There is Some Memes Sewed on Random Places, a unique digital avatar from the Virtual Fashion collection.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/thmbnl/refs/heads/main/XOKU_memeleganceShitpostagent.png",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-glb/main/xoku-v1-opt-v108.glb",
+        vrmUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/XOKU_memeleganceShitpostagent_C2W2-14.vrm",
+        artworkUrl: null,
+        videoUrl: "https://video.wixstatic.com/video/54a996_f5a49740685643a59ebae485c033e6c5/1080p/mp4/file.mp4",
+        downloadLink: null,
+        buyLink: null,
+        mintAvatarUrl: null,
+        mintArtworkUrl: null,
+        fitNo: "14",
+        runwayPart: "Virtual Fashion (Part 2)",
+        license: "cc0",
+        additionalLink1: null,
+        additionalLink2: null
+    },
+    {
+        id: 17,
+        name: "Xoqou",
+        collection: "Virtual Fashion",
+        information: "This is Xoqou, Social Media Critic, a Cool Designed Suit, but There is Some Memes Sewed on Random Places, a unique digital avatar from the Virtual Fashion collection.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/thmbnl/refs/heads/main/xoku_fup_14_2.png",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-glb/main/xoku-v2-opt-v109.glb",
+        vrmUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/XOKU_FUP_memeleganceShitpostagent_C2W2-14_2.vrm",
+        artworkUrl: null,
+        videoUrl: "https://video.wixstatic.com/video/54a996_35e3a2403a2d48558fa7b6511600c6f7/1080p/mp4/file.mp4",
+        downloadLink: null,
+        buyLink: null,
+        mintAvatarUrl: null,
+        mintArtworkUrl: null,
+        fitNo: "14_2",
+        runwayPart: "Virtual Fashion (Part 2)",
+        license: "cc0",
+        additionalLink1: null,
+        additionalLink2: null
+    },
+    {
+        id: 18,
+        name: "Zhoukouh",
+        collection: "Virtual Fashion",
+        information: "This is Zhoukouh, Social Media Critic, a Cool Designed Suit, but There is Some Memes Sewed on Random Places, a unique digital avatar from the Virtual Fashion collection.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/thmbnl/refs/heads/main/xoku_fup_decons-hayvangibi-14_3.png",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/XOKU_FUP_-DECONS-HAYVANGIBI-memeleganceShitpostagent_C2W2-14_3.vrm",
+        vrmUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/XOKU_FUP_-DECONS-HAYVANGIBI-memeleganceShitpostagent_C2W2-14_3.vrm",
+        artworkUrl: null,
+        videoUrl: "https://video.wixstatic.com/video/54a996_a9bb99c8e7944610bf6e7ed342f6b8ae/1080p/mp4/file.mp4",
+        downloadLink: null,
+        buyLink: null,
+        mintAvatarUrl: null,
+        mintArtworkUrl: null,
+        fitNo: "14_3",
+        runwayPart: "Virtual Fashion (Part 2)",
+        license: "cc0",
+        additionalLink1: null,
+        additionalLink2: null
+    },
+    {
+        id: 19,
+        name: "Xouqoo",
+        collection: "Virtual Fashion",
+        information: "This is Xouqoo, Social Media Critic, a Cool Designed Suit, but There is Some Memes Sewed on Random Places, a unique digital avatar from the Virtual Fashion collection.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/thmbnl/refs/heads/main/xoku_decons-hayvangibi-14_4.png",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/XOKU_-DECONS-HAYVANGIBI-memeleganceShitpostagent_C2W2-14_4.vrm",
+        vrmUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/XOKU_-DECONS-HAYVANGIBI-memeleganceShitpostagent_C2W2-14_4.vrm",
+        artworkUrl: null,
+        videoUrl: "https://video.wixstatic.com/video/54a996_0ab17ad7193747daa66e353a0f8bcc99/1080p/mp4/file.mp4",
+        downloadLink: null,
+        buyLink: null,
+        mintAvatarUrl: null,
+        mintArtworkUrl: null,
+        fitNo: "14_4",
+        runwayPart: "Virtual Fashion (Part 2)",
+        license: "cc0",
+        additionalLink1: null,
+        additionalLink2: null
+    },
+    {
+        id: 20,
+        name: "Invert Smiley",
+        collection: "Virtual Fashion",
+        information: "This is Invert Smiley, Social Media Critic, a Cool Designed Suit, but There is Some Memes Sewed on Random Places, a unique digital avatar from the Virtual Fashion collection.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/thmbnl/refs/heads/main/invertsmiley.png",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-glb/main/invertmemelegancesuit-900-opt-v74.glb",
+        vrmUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/MEMELEGANCEAGENT-INVERT-C2W2-15.vrm",
+        artworkUrl: null,
+        videoUrl: "https://video.wixstatic.com/video/54a996_b2dae9d832c64b3e9d8dec2dee02f0b1/1080p/mp4/file.mp4",
+        downloadLink: null,
+        buyLink: null,
+        mintAvatarUrl: null,
+        mintArtworkUrl: null,
+        fitNo: "15",
+        runwayPart: "Virtual Fashion (Part 2)",
+        license: "cc0",
+        additionalLink1: null,
+        additionalLink2: null
+    },
+    {
+        id: 22,
+        name: "Stow",
+        collection: "Virtual Fashion",
+        information: "This is Stow, Social Media Critic, a Cool Designed Suit, but There is Some Memes Sewed on Random Places, a unique digital avatar from the Virtual Fashion collection.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/thmbnl/refs/heads/main/invert-hell.png",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-glb/main/invertmemelegancesuit-hell-opt-v75.glb",
+        vrmUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/MEMELEGANCEAGENT-HELL-C2W2-15..vrm",
+        artworkUrl: null,
+        videoUrl: null,
+        downloadLink: null,
+        buyLink: null,
+        mintAvatarUrl: null,
+        mintArtworkUrl: null,
+        fitNo: "15_3",
+        runwayPart: "Virtual Fashion (Part 2)",
+        license: "cc0",
+        additionalLink1: null,
+        additionalLink2: null
+    },
+    {
+        id: 23,
+        name: "FUP_Smiley",
+        collection: "Virtual Fashion",
+        information: "This is FUP_Smiley, Social Media Critic, a Cool Designed Suit, but There is Some Memes Sewed on Random Places, a unique digital avatar from the Virtual Fashion collection.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/thmbnl/refs/heads/main/memeagent-decons-NVERTSM-15_4.png",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-glb/main/memeagent-decons-invertsmiley-opt-v82.glb",
+        vrmUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/MEMEAGENT-DECONS-INVERTSMILEY-C2W2-15..vrm",
+        artworkUrl: null,
+        videoUrl: null,
+        downloadLink: null,
+        buyLink: null,
+        mintAvatarUrl: null,
+        mintArtworkUrl: null,
+        fitNo: "15_4",
+        runwayPart: "Virtual Fashion (Part 2)",
+        license: "cc0",
+        additionalLink1: null,
+        additionalLink2: null
+    },
+    {
+        id: 24,
+        name: "FUP_Rebrand",
+        collection: "Virtual Fashion",
+        information: "This is FUP_Rebrand, Social Media Critic, a Cool Designed Suit, but There is Some Memes Sewed on Random Places, a unique digital avatar from the Virtual Fashion collection.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/thmbnl/refs/heads/main/memeagent-decons-WHT-15_5.png",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-glb/main/memeagent-decons-wht-opt-v83.glb",
+        vrmUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/MEMEAGENT-DECONS-WHT-C2W2-15..vrm",
+        artworkUrl: null,
+        videoUrl: null,
+        downloadLink: null,
+        buyLink: null,
+        mintAvatarUrl: null,
+        mintArtworkUrl: null,
+        fitNo: "15_5",
+        runwayPart: "Virtual Fashion (Part 2)",
+        license: "cc0",
+        additionalLink1: null,
+        additionalLink2: null
+    },
+    {
+        id: 24,
+        name: "Seize",
+        collection: "NavyChip",
+        information: "This is Seize, a unique digital avatar from the NavyChip collection.",
+        thumbnailUrl: "https://github.com/decentralize-dfw/c2w2-thumbnail/blob/main/6529.png?raw=true",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-glb/main/6529memes-walk-opt-v1.glb",
+        vrmUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/6529-Memes-C2W2-33.vrm",
+        artworkUrl: null,
+        videoUrl: "https://video.wixstatic.com/video/54a996_0b60c5f7637d40858f645a4f144e9675/1080p/mp4/file.mp4",
+        downloadLink: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/6529-Memes-C2W2-33.vrm",
+        buyLink: null,
+        mintAvatarUrl: null,
+        mintArtworkUrl: null,
+        fitNo: "33",
+        runwayPart: "Evolution Of Medium Of Art From NFT to Being (Part 3)",
+        license: "cc0",
+        additionalLink1: null,
+        additionalLink2: null
+    },
+    {
+        id: 26,
+        name: "Uncle Red",
+        collection: "NavyChip",
+        information: "This is Uncle Red, a Cryptopunk Derivative, a unique digital avatar from the NavyChip collection.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/thmbnl/refs/heads/main/redpunk.png",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-glb/main/redpunnnk-900-opt-v95.glb",
+        vrmUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/RedPunk_C2W2_6.vrm",
+        artworkUrl: null,
+        videoUrl: "https://video.wixstatic.com/video/54a996_9c3191423a114ba498f22d6360050e1d/1080p/mp4/file.mp4",
+        downloadLink: null,
+        buyLink: null,
+        mintAvatarUrl: null,
+        mintArtworkUrl: null,
+        fitNo: "6",
+        runwayPart: "Evolution Of Medium Of Art From NFT to Being (Part 3)",
+        license: "cc0",
+        additionalLink1: null,
+        additionalLink2: null
+    },
+    {
+        id: 27,
+        name: "Weekend @ Saturn",
+        collection: "NavyChip",
+        information: "This is Weekend @ Saturn, a Cryptopunk Derivative, a unique digital avatar from the NavyChip collection.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/thmbnl/refs/heads/main/saturnalien.png",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-glb/main/saturnweekend-900-v2-opt-v99.glb",
+        vrmUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/SaturnWeekend-C2W2-7.vrm",
+        artworkUrl: null,
+        videoUrl: "https://video.wixstatic.com/video/54a996_412b0709a7bb481ea59a855cc3eb6134/1080p/mp4/file.mp4",
+        downloadLink: null,
+        buyLink: null,
+        mintAvatarUrl: null,
+        mintArtworkUrl: null,
+        fitNo: "7",
+        runwayPart: "Evolution Of Medium Of Art From NFT to Being (Part 3)",
+        license: "cc0",
+        additionalLink1: "https://www.youtube.com/watch?v=V2G8ESoDXm8",
+        additionalLink2: null
+    },
+    {
+        id: 29,
+        name: "Midemoiselle",
+        collection: "NavyChip",
+        information: "This is Midemoiselle, Moca Nft Collection, Powered by Ai and God-touch Curation, Redwell in 3d, a unique digital avatar from the NavyChip collection.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/thmbnl/refs/heads/main/artdecc0.png",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-glb/main/artdecc0-900-opt-v3.glb",
+        vrmUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/artdecc0-c2w2-38.vrm",
+        artworkUrl: null,
+        videoUrl: "https://video.wixstatic.com/video/54a996_ce10187fb31a480a9237fe65a9fde5d5/1080p/mp4/file.mp4",
+        downloadLink: null,
+        buyLink: null,
+        mintAvatarUrl: null,
+        mintArtworkUrl: null,
+        fitNo: "38",
+        runwayPart: "Evolution Of Medium Of Art From NFT to Being (Part 3)",
+        license: "cc0",
+        additionalLink1: "https://opensea.io/assets/ethereum/0x97f69e1f54a4b10d934ff67e65b7ecfbab6ec652/3617",
+        additionalLink2: null
+    },
+    {
+        id: 30,
+        name: "Ferryman",
+        collection: "NavyChip",
+        information: "This is Ferryman, Early Xcopy Artwork Come Alive, a unique digital avatar from the NavyChip collection.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/thmbnl/refs/heads/main/ferryman.png",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-glb/main/xcopy-900-opt-v106.glb",
+        vrmUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/ferryman-c2w2-31.vrm",
+        artworkUrl: null,
+        videoUrl: "https://video.wixstatic.com/video/54a996_716f2529747e4fab84b80a3f5e360934/1080p/mp4/file.mp4",
+        downloadLink: null,
+        buyLink: null,
+        mintAvatarUrl: null,
+        mintArtworkUrl: null,
+        fitNo: "31",
+        runwayPart: "Evolution Of Medium Of Art From NFT to Being (Part 3)",
+        license: "cc0",
+        additionalLink1: "https://xcopy.art/works/a-coin-for-the-ferryman",
+        additionalLink2: null
+    },
+    {
+        id: 61,
+        name: "Panda Boss",
+        collection: "NavyChip",
+        information: "This is Panda Boss, a unique digital avatar from the NavyChip collection.",
+        thumbnailUrl: "https://github.com/decentralize-dfw/c2w2-thumbnail/blob/main/ailu.png?raw=true",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-glb/main/ailu-900-opt-v2.glb",
+        vrmUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/AILU-Btc-boss_C2W2-2-37.vrm",
+        artworkUrl: null,
+        videoUrl: "https://video.wixstatic.com/video/54a996_54c14a611cc34b378f1be98e7dd5e47e/1080p/mp4/file.mp4",
+        downloadLink: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/AILU-Btc-boss_C2W2-2-37.vrm",
+        buyLink: null,
+        mintAvatarUrl: null,
+        mintArtworkUrl: null,
+        fitNo: "37",
+        runwayPart: "Evolution Of Medium Of Art From NFT to Being (Part 3)",
+        license: "cc0",
+        additionalLink1: null,
+        additionalLink2: null
+    },
+    {
+        id: 32,
+        name: "Founder Ape",
+        collection: "NavyChip",
+        information: "This is Founder Ape, Gordon Goner, Who is the One of the Founders of Bayc, is Reimagined, a unique digital avatar from the NavyChip collection.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/thmbnl/refs/heads/main/founder-ape.png",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-glb/main/gordon-900-opt-v73.glb",
+        vrmUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/founder-ape-C2W2-34.vrm",
+        artworkUrl: null,
+        videoUrl: "https://video.wixstatic.com/video/54a996_8463a9b69be4467d83539f8c4598aa76/1080p/mp4/file.mp4",
+        downloadLink: null,
+        buyLink: null,
+        mintAvatarUrl: null,
+        mintArtworkUrl: null,
+        fitNo: "34",
+        runwayPart: "Evolution Of Medium Of Art From NFT to Being (Part 3)",
+        license: "cc0",
+        additionalLink1: null,
+        additionalLink2: null
+    },
+    {
+        id: 62,
+        name: "Chromozom",
+        collection: "NavyChip",
+        information: "This is Chromozom, a unique digital avatar from the NavyChip collection.",
+        thumbnailUrl: "https://github.com/decentralize-dfw/c2w2-thumbnail/blob/main/cozom.png?raw=true",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-glb/main/cozom-900-opt-v66.glb",
+        vrmUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/Cozom-C2W2-V2-39.vrm",
+        artworkUrl: null,
+        videoUrl: "https://video.wixstatic.com/video/54a996_5e0a4042952249359323bf387bfaf64b/1080p/mp4/file.mp4",
+        downloadLink: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/Cozom-C2W2-V2-39.vrm",
+        buyLink: null,
+        mintAvatarUrl: null,
+        mintArtworkUrl: null,
+        fitNo: "39",
+        runwayPart: "Evolution Of Medium Of Art From NFT to Being (Part 3)",
+        license: "cc0",
+        additionalLink1: null,
+        additionalLink2: null
+    },
+    {
+        id: 33,
+        name: "Davicni",
+        collection: "NavyChip",
+        information: "This is Davicni, Self Identity, DAVİNCİ, a unique digital avatar from the NavyChip collection.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/thmbnl/refs/heads/main/davinic.png",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-glb/main/davicni-900-opt-v69.glb",
+        vrmUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/DAVICNI-C2W2-V2-5.vrm",
+        artworkUrl: null,
+        videoUrl: "https://video.wixstatic.com/video/54a996_e748d24ff648460891b4718e8f98a48b/720p/mp4/file.mp4",
+        downloadLink: null,
+        buyLink: null,
+        mintAvatarUrl: null,
+        mintArtworkUrl: null,
+        fitNo: "5",
+        runwayPart: "Evolution Of Medium Of Art From NFT to Being (Part 3)",
+        license: "cc0",
+        additionalLink1: "https://www.youtube.com/watch?v=ijMoFqxxWsU",
+        additionalLink2: null
+    },
+    {
+        id: 35,
+        name: "Can't See Beep Bop Crap",
+        collection: "NavyChip",
+        information: "This is Can't See Beep Bop Crap, Well-known Artist Beeple is Regenerated as Head on One of His Memes, a unique digital avatar from the NavyChip collection.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/thmbnl/refs/heads/main/beeple1.png",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-glb/main/beeple-nudedoge-opt-v63.glb",
+        vrmUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/can't_see_beep_bop_crap_doge_C2W2_30.vrm",
+        artworkUrl: null,
+        videoUrl: "https://video.wixstatic.com/video/54a996_74595772826646a8949ba88ffd66a6a6/1080p/mp4/file.mp4",
+        downloadLink: null,
+        buyLink: null,
+        mintAvatarUrl: null,
+        mintArtworkUrl: null,
+        fitNo: "30",
+        runwayPart: "Evolution Of Medium Of Art From NFT to Being (Part 3)",
+        license: "cc0",
+        additionalLink1: "https://www.youtube.com/watch?v=U0N6TmDWuf8",
+        additionalLink2: null
+    },
+    {
+        id: 36,
+        name: "Dogers",
+        collection: "NavyChip",
+        information: "This is Dogers, Well-known Artist Beeple is Regenerated as Head on One of His Memes, a unique digital avatar from the NavyChip collection.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/thmbnl/refs/heads/main/beeple2.png",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-glb/main/beeple-cena-opt-v62.glb",
+        vrmUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/can't_see_beep_bop_crap_doge_-FIT-C2W2_30_2.vrm",
+        artworkUrl: null,
+        videoUrl: null,
+        downloadLink: null,
+        buyLink: null,
+        mintAvatarUrl: null,
+        mintArtworkUrl: null,
+        fitNo: "30_2",
+        runwayPart: "Evolution Of Medium Of Art From NFT to Being (Part 3)",
+        license: "cc0",
+        additionalLink1: "https://www.youtube.com/watch?v=qqXi8WmQ_WM",
+        additionalLink2: null
+    },
+     
+    
+    {
+        id: 63,
+        name: "Bone on Air",
+        collection: "NavyChip",
+        information: "This is Bone on Air, a unique digital avatar from the NavyChip collection.",
+        thumbnailUrl: "https://github.com/decentralize-dfw/c2w2-thumbnail/blob/main/sam-ape-baller.png?raw=true",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-glb/main/samspratt-900-opt-v97.glb",
+        vrmUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/Sam-Baller-C2W2-32.vrm",
+        artworkUrl: null,
+        videoUrl: "https://video.wixstatic.com/video/54a996_f373a25106b14c5ca066ffe3f861bb65/1080p/mp4/file.mp4",
+        downloadLink: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/Sam-Baller-C2W2-32.vrm",
+        buyLink: null,
+        mintAvatarUrl: null,
+        mintArtworkUrl: null,
+        fitNo: "32",
+        runwayPart: "Evolution Of Medium Of Art From NFT to Being (Part 3)",
+        license: "cc0",
+        additionalLink1: null,
+        additionalLink2: null
+    },
+    {
+        id: 38,
+        name: "Ashium",
+        collection: "NavyChip",
+        information: "This is Ashium, Founder of Hyperfy, Ash's Avatar, as Well as the Mascot of the Hyperfy, is Reimagined, a unique digital avatar from the NavyChip collection.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/thmbnl/refs/heads/main/ash.png",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-glb/main/ash-futuro-opt-v5.glb",
+        vrmUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/Ash-C2W2_35.vrm",
+        artworkUrl: null,
+        videoUrl: "https://video.wixstatic.com/video/54a996_e47f8938681c4ce38056f9aaaebbaf39/1080p/mp4/file.mp4",
+        downloadLink: null,
+        buyLink: null,
+        mintAvatarUrl: null,
+        mintArtworkUrl: null,
+        fitNo: "35",
+        runwayPart: "Evolution Of Medium Of Art From NFT to Being (Part 3)",
+        license: "cc0",
+        additionalLink1: null,
+        additionalLink2: null
+    },
+    {
+        id: 39,
+        name: "Asiah",
+        collection: "NavyChip",
+        information: "This is Asiah, Founder of Hyperfy, Ash's Avatar, as Well as the Mascot of the Hyperfy, is Reimagined, a unique digital avatar from the NavyChip collection.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/thmbnl/refs/heads/main/asiah-rr.png",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-glb/main/ashiah-rr-opt-v6.glb",
+        vrmUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/ASIAH-RR-C2W2-35_2_2.vrm",
+        artworkUrl: null,
+        videoUrl: "https://video.wixstatic.com/video/54a996_b4cf70db44db487c875205baf309a689/1080p/mp4/file.mp4",
+        downloadLink: null,
+        buyLink: null,
+        mintAvatarUrl: null,
+        mintArtworkUrl: null,
+        fitNo: "35_2",
+        runwayPart: "Evolution Of Medium Of Art From NFT to Being (Part 3)",
+        license: "cc0",
+        additionalLink1: null,
+        additionalLink2: null
+    },
+       
+   
+        {
+        id: 64,
+        name: "RR-Tiger",
+        collection: "AI-Power",
+        information: "This is RR-Tiger, a unique digital avatar from the AI-Power collection.",
+        thumbnailUrl: "https://github.com/decentralize-dfw/c2w2-thumbnail/blob/main/baiencaigai-tigai.png?raw=true",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-glb/main/baiencaigai-tigai-900-opt-v60.glb",
+        vrmUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/baiencaigai-tigai-C2W2-40.vrm",
+        artworkUrl: null,
+        videoUrl: "https://video.wixstatic.com/video/54a996_5b1b380252d244f8907b80f9953d11fc/1080p/mp4/file.mp4",
+        downloadLink: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/baiencaigai-tigai-C2W2-40.vrm",
+        buyLink: null,
+        mintAvatarUrl: null,
+        mintArtworkUrl: null,
+        fitNo: "40",
+        runwayPart: "AI Powered (Part 4)",
+        license: "cc0",
+        additionalLink1: null,
+        additionalLink2: null
+    },
+    {
+        id: 41,
+        name: "Teddyminator",
+        collection: "AI-Power",
+        information: "This is Teddyminator, AI Powered (Part 4), a unique digital avatar from the AI-Power collection.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/thmbnl/refs/heads/main/teddyminator.png",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-glb/main/teddyminator-opt-v103.glb",
+        vrmUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/teddyminator_c2w2_45.vrm",
+        artworkUrl: null,
+        videoUrl: "https://video.wixstatic.com/video/54a996_77e02e061d5f4ef4bfe2501f4c986db5/1080p/mp4/file.mp4",
+        downloadLink: null,
+        buyLink: null,
+        mintAvatarUrl: null,
+        mintArtworkUrl: null,
+        fitNo: "45",
+        runwayPart: "AI Powered (Part 4)",
+        license: "cc0",
+        additionalLink1: null,
+        additionalLink2: null
+    },
+    {
+        id: 42,
+        name: "Bad Luck",
+        collection: "AI-Power",
+        information: "This is Bad Luck, AI Generated Fit Straight From a Picture, to Show Whats Possible, a unique digital avatar from the AI-Power collection.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/thmbnl/refs/heads/main/badluck.png",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-glb/main/asian-900-opt-v7.glb",
+        vrmUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/BadLuck-C2W2-25.vrm",
+        artworkUrl: null,
+        videoUrl: "https://video.wixstatic.com/video/54a996_6b0158e98cb94d63b0c9bc12eed61707/1080p/mp4/file.mp4",
+        downloadLink: null,
+        buyLink: null,
+        mintAvatarUrl: null,
+        mintArtworkUrl: null,
+        fitNo: "25",
+        runwayPart: "AI Powered (Part 4)",
+        license: "cc0",
+        additionalLink1: null,
+        additionalLink2: null
+    },
+    {
+        id: 65,
+        name: "Mayhem Clown",
+        collection: "AI-Power",
+        information: "This is Mayhem Clown, a unique digital avatar from the AI-Power collection.",
+        thumbnailUrl: "https://github.com/decentralize-dfw/c2w2-thumbnail/blob/main/tommygunclown.png?raw=true",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-glb/main/tommygunclown-opt-v104.glb",
+        vrmUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/tommygunclown-C2W2-47.vrm",
+        artworkUrl: null,
+        videoUrl: "https://video.wixstatic.com/video/54a996_68ba917e9dc945bebcf8e137e216a380/1080p/mp4/file.mp4",
+        downloadLink: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/tommygunclown-C2W2-47.vrm",
+        buyLink: null,
+        mintAvatarUrl: null,
+        mintArtworkUrl: null,
+        fitNo: "47",
+        runwayPart: "AI Powered (Part 4)",
+        license: "cc0",
+        additionalLink1: null,
+        additionalLink2: null
+    },
+    {
+        id: 44,
+        name: "Baincaigai",
+        collection: "AI-Power",
+        information: "This is Baincaigai, AI Generated Fit Straight From a Picture, to Show Whats Possible, a unique digital avatar from the AI-Power collection.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/thmbnl/refs/heads/main/baiencaigai.png",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-glb/main/baienciaia-opt-v61.glb",
+        vrmUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/baincaigai-C2W2-V2-23.vrm",
+        artworkUrl: null,
+        videoUrl: "https://video.wixstatic.com/video/54a996_a94fdd486c4a409f9c9f15420b4bb3d6/1080p/mp4/file.mp4",
+        downloadLink: null,
+        buyLink: null,
+        mintAvatarUrl: null,
+        mintArtworkUrl: null,
+        fitNo: "23",
+        runwayPart: "AI Powered (Part 4)",
+        license: "cc0",
+        additionalLink1: null,
+        additionalLink2: null
+    },
+    {
+        id: 45,
+        name: "exBunny",
+        collection: "AI-Power",
+        information: "This is exBunny, AI Powered (Part 4), a unique digital avatar from the AI-Power collection.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/thmbnl/refs/heads/main/c-rabbit.png",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-glb/main/rabbit900-opt-v94.glb",
+        vrmUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/C-Rabbit_C2W2_46.vrm",
+        artworkUrl: null,
+        videoUrl: "https://video.wixstatic.com/video/54a996_40bed824f51f47ec81c0bb4c1abd71d4/1080p/mp4/file.mp4",
+        downloadLink: null,
+        buyLink: null,
+        mintAvatarUrl: null,
+        mintArtworkUrl: null,
+        fitNo: "46",
+        runwayPart: "AI Powered (Part 4)",
+        license: "cc0",
+        additionalLink1: null,
+        additionalLink2: null
+    },
+    {
+        id: 48,
+        name: "Thomas_DT",
+        collection: "AI-Power",
+        information: "This is Thomas_DT, Social Media Critic, a Cool Designed Suit, but There is Some Memes Sewed on Random Places, a unique digital avatar from the Virtual Fashion collection.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/thmbnl/refs/heads/main/neo-dt.png",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-glb/main/neo-dt-opt-v87.glb",
+        vrmUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/NEO_dt-pattern-c2w2-19.vrm",
+        artworkUrl: null,
+        videoUrl: null,
+        downloadLink: null,
+        buyLink: null,
+        mintAvatarUrl: null,
+        mintArtworkUrl: null,
+        fitNo: "19",
+        runwayPart: "Virtual Fashion (Part 2)",
+        license: "cc0",
+        additionalLink1: "https://www.youtube.com/watch?v=98Ox_yf3UxY",
+        additionalLink2: null
+    },
+     {
+        id: 66,
+        name: "Bobo Delirium",
+        collection: "AI-Power",
+        information: "This is Bobo Delirium, a unique digital avatar from the AI-Power collection.",
+        thumbnailUrl: "https://github.com/decentralize-dfw/c2w2-thumbnail/blob/main/psyclown.png?raw=true",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-glb/main/psyclown-900-opt-v93.glb",
+        vrmUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/PSYCLOWN-C2W2_42.vrm",
+        artworkUrl: null,
+        videoUrl: "https://video.wixstatic.com/video/54a996_5f7204565e614d99aca403966e215f53/1080p/mp4/file.mp4",
+        downloadLink: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/PSYCLOWN-C2W2_42.vrm",
+        buyLink: null,
+        mintAvatarUrl: null,
+        mintArtworkUrl: null,
+        fitNo: "42",
+        runwayPart: "AI Powered (Part 4)",
+        license: "cc0",
+        additionalLink1: null,
+        additionalLink2: null
+    },
+    {
+        id: 47,
+        name: "Xeu2",
+        collection: "AI-Power",
+        information: "This is Xeu2, AI Powered (Part 4), a unique digital avatar from the AI-Power collection.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/thmbnl/refs/heads/main/xeu2.png",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-glb/main/xeu2-900-opt-v107.glb",
+        vrmUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/Xeus2-C2W2-41.vrm",
+        artworkUrl: null,
+        videoUrl: "https://video.wixstatic.com/video/54a996_21380e15250f4860ab253ce027ffec12/1080p/mp4/file.mp4",
+        downloadLink: null,
+        buyLink: null,
+        mintAvatarUrl: null,
+        mintArtworkUrl: null,
+        fitNo: "41",
+        runwayPart: "AI Powered (Part 4)",
+        license: "cc0",
+        additionalLink1: "https://opensea.io/assets/ethereum/0xdd0df57dbbf9dc804e778fd907e5a7f5d3051d60/9",
+        additionalLink2: null
+    },
+  
+    
+    {
+        id: 57,
+        name: "Ya Bish Opps",
+        collection: "RR",
+        information: "This is Elextrogxd, AI Powered (Part 4), a unique digital avatar from the AI-Power collection.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/thmbnl/refs/heads/main/papaz.png",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-glb/main/papaz-900-opt-v89.glb",
+        vrmUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/Ya-Bish-Opp-C2W2-1.vrm",
+        artworkUrl: null,
+        videoUrl: "https://video.wixstatic.com/video/54a996_f57f45e9964a412d9f733cbc0bf0e7ff/1080p/mp4/file.mp4",
+        downloadLink: null,
+         buyLink: null,
+        mintAvatarUrl: null,
+        mintArtworkUrl: null,
+        fitNo: "1",
+        runwayPart: "Transhumanism (Part 5)",
+        license: "cc0",
+        additionalLink1: "https://www.youtube.com/watch?v=8dcY9LDdRIk",
+        additionalLink2: null
+    },
+   { id: 58,
+        name: "Ya Bish Opps Red",
+        collection: "RR",
+        information: "This is Elextrogxd, AI Powered (Part 4), a unique digital avatar from the AI-Power collection.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/thmbnl/refs/heads/main/ya-bish-RED.png",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-glb/main/papaz-red-opt-v90.glb",
+        vrmUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/Ya-Bish-Opp-C2W2-V2-RED-1.vrm",
+        artworkUrl: null,
+        videoUrl: null,
+        downloadLink: null,
+        buyLink: null,
+        mintAvatarUrl: null,
+        mintArtworkUrl: null,
+        fitNo: "1_2",
+        runwayPart: "Transhumanism (Part 5)",
+        license: "cc0",
+        additionalLink1: "https://www.youtube.com/watch?v=8dcY9LDdRIk",
+        additionalLink2: null
+    },
+    {
+        id: 59,
+        name: "Ya Bish Opps Mono",
+        collection: "RR",
+        information: "This is Elextrogxd, AI Powered (Part 4), a unique digital avatar from the AI-Power collection.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/thmbnl/refs/heads/main/ya-bish-WHT.png",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-glb/main/papaz-wht-opt-v91.glb",
+        vrmUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/Ya-Bish-Opp-C2W2-V2-WHT-1.vrm",
+        artworkUrl: null,
+        videoUrl: null,
+        downloadLink: null,
+        buyLink: null,
+        mintAvatarUrl: null,
+        mintArtworkUrl: null,
+        fitNo: "1_3",
+        runwayPart: "Transhumanism (Part 5)",
+        license: "cc0",
+        additionalLink1: "https://www.youtube.com/watch?v=8dcY9LDdRIk",
+        additionalLink2: null
+    },
+    
+    {
+        id: 50,
+        name: "sleekrobobİtch/SPIKES",
+        collection: "RR",
+        information: "This is sleekrobobİtch/SPIKES, Sophia, First Robot -remix, a unique digital avatar from the RR collection.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/thmbnl/refs/heads/main/sleekrobobitch-spkiey.png",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-glb/main/sleekrobobitchspikey-900-opt-v100.glb",
+        vrmUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/sleekrobobitchspikey-C2W2-10.vrm",
+        artworkUrl: null,
+        videoUrl: "https://video.wixstatic.com/video/54a996_fff14803e98c4b34a81533f69fdb9fb3/1080p/mp4/file.mp4",
+        downloadLink: null,
+        buyLink: null,
+        mintAvatarUrl: null,
+        mintArtworkUrl: null,
+        fitNo: "10",
+        runwayPart: "Transhumanism (Part 5)",
+        license: "cc0",
+        additionalLink1: "https://www.de-centralize.com/video?pgid=lb71f6zf-a6cb7bd0-38e0-43d0-bfa9-9a56ae449fff",
+        additionalLink2: null
+    },
+    {
+        id: 51,
+        name: "Don Mac Don",
+        collection: "RR",
+        information: "This is Don Mac Don, McDonalds Bishop, a unique digital avatar from the RR collection.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/thmbnl/refs/heads/main/donmac.png",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-glb/main/donmac-900-opt-v70.glb",
+        vrmUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/DonMacDon-C2W2-v2-18.vrm",
+        artworkUrl: null,
+        videoUrl: "https://video.wixstatic.com/video/54a996_107f106845df4475be02b83cfe6973db/1080p/mp4/file.mp4",
+        downloadLink: null,
+        buyLink: null,
+        mintAvatarUrl: null,
+        mintArtworkUrl: null,
+        fitNo: "18",
+        runwayPart: "Transhumanism (Part 5)",
+        license: "cc0",
+        additionalLink1: "https://www.youtube.com/watch?v=dI-xHMM8wXE",
+        additionalLink2: null
+    },
+        {
+        id: 14,
+        name: "Call_2_Sim",
+        collection: "Virtual Fashion",
+        information: "This is Call_2_Sim, Sexapel Zirve, a unique digital avatar from the Virtual Fashion collection.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/thmbnl/refs/heads/main/call2sim.png",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-glb/main/redwearsdfw-900-opt-v96.glb",
+        vrmUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/call2sim_c2w2_17.vrm",
+        artworkUrl: null,
+        videoUrl: "https://video.wixstatic.com/video/54a996_0ebdbd926d4248b7bfa6bd8c54b9ef2e/1080p/mp4/file.mp4",
+        downloadLink: null,
+        buyLink: null,
+        mintAvatarUrl: null,
+        mintArtworkUrl: null,
+        fitNo: "17",
+        runwayPart: "Virtual Fashion (Part 2)",
+        license: "cc0",
+        additionalLink1: null,
+        additionalLink2: null
+    },
+        {
+        id: 67,
+        name: "CYB0RG-E-xyz",
+        collection: "RR",
+        information: "This is CYB0RG-E-xyz, a unique digital avatar from the RR collection.",
+        thumbnailUrl: "https://github.com/decentralize-dfw/c2w2-thumbnail/blob/main/CYB0RG-ESYZ.png?raw=true",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-glb/main/cybergesu-900-opt-v68.glb",
+        vrmUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/CYB0RG-ESYZ_C2W2_12.vrm",
+        artworkUrl: null,
+        videoUrl: null,
+        downloadLink: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/CYB0RG-ESYZ_C2W2_12.vrm",
+        buyLink: null,
+        mintAvatarUrl: null,
+        mintArtworkUrl: null,
+        fitNo: "12",
+        runwayPart: "Transhumanism (Part 5)",
+        license: "cc0",
+        additionalLink1: null,
+        additionalLink2: null
+    },
+    {
+        id: 53,
+        name: "Steroive iObs",
+        collection: "RR",
+        information: "This is Steroive iObs, Vc Steroided Startup Ecosystem Critic With Bulked Steve Jobs Holding/presenting an Apple Vr Headset, a unique digital avatar from the RR collection.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/thmbnl/refs/heads/main/steroive.png",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-glb/main/steve-900-opt-v102.glb",
+        vrmUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/steroive_iobs_c2w2_29.vrm",
+        artworkUrl: null,
+        videoUrl: "https://video.wixstatic.com/video/54a996_13f8091ed15e4b65b7b9bb072740cb18/1080p/mp4/file.mp4",
+        downloadLink: null,
+        buyLink: null,
+        mintAvatarUrl: null,
+        mintArtworkUrl: null,
+        fitNo: "29",
+        runwayPart: "Transhumanism (Part 5)",
+        license: "cc0",
+        additionalLink1: "https://www.youtube.com/watch?v=esR0HLf-nUU",
+        additionalLink2: null
+    },
+    {
+        id: 54,
+        name: "Tobby Millefuille",
+        collection: "RR",
+        information: "",
+        thumbnailUrl: "https://github.com/decentralize-dfw/c2w2-thumbnail/blob/main/tobby-comp.png?raw=true",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-glb/main/tobbymillefeuille-web-opt-v3.glb",
+        vrmUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/millefeuille-tobby_c2w2_13.vrm",
+        artworkUrl: null,
+        videoUrl: "https://video.wixstatic.com/video/54a996_8ab6727125ce4503a05a2fcb32e9fa59/1080p/mp4/file.mp4",
+        downloadLink: null,
+        buyLink: null,
+        mintAvatarUrl: null,
+        mintArtworkUrl: null,
+        fitNo: "13",
+        runwayPart: "Transhumanism (Part 5)",
+        license: "cc0",
+        additionalLink1: null,
+        additionalLink2: null
+    },
+    {
+        id: 69,
+        name: "Junya",
+        collection: "RR",
+        information: "This is Junya, a unique digital avatar from the RR collection.",
+        thumbnailUrl: "https://github.com/decentralize-dfw/c2w2-thumbnail/blob/main/junya.png?raw=true",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-glb/main/junya-900-opt-v78.glb",
+        vrmUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/Junya_C2W2_9.vrm",
+        artworkUrl: null,
+        videoUrl: "https://video.wixstatic.com/video/54a996_f7667b772ec14473821359c6f54d4c51/1080p/mp4/file.mp4",
+        downloadLink: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/Junya_C2W2_9.vrm",
+        buyLink: null,
+        mintAvatarUrl: null,
+        mintArtworkUrl: null,
+        fitNo: "9",
+        runwayPart: "Transhumanism (Part 5)",
+        license: "cc0",
+        additionalLink1: null,
+        additionalLink2: null
+    },
+    {
+        id: 56,
+        name: "Elextrogxd",
+        collection: "RR",
+        information: "This is Elextrogxd, AI Powered (Part 4), a unique digital avatar from the AI-Power collection.",
+        thumbnailUrl: "https://raw.githubusercontent.com/decentralize-dfw/thmbnl/refs/heads/main/ELEXTROGOD.png",
+        modelUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-glb/main/electrogod-900-opt-v71.glb",
+        vrmUrl: "https://raw.githubusercontent.com/decentralize-dfw/c2w2-vrm/main/ELEXTROGOD-C2W2_43.vrm",
+        artworkUrl: null,
+        videoUrl: "https://video.wixstatic.com/video/54a996_b206681159f04e2ead711405f8d94e66/1080p/mp4/file.mp4",
+        downloadLink: null,
+        buyLink: null,
+        mintAvatarUrl: null,
+        mintArtworkUrl: null,
+        fitNo: "43",
+        runwayPart: "AI Powered (Part 4)",
+        license: "cc0",
+        additionalLink1: "https://www.youtube.com/watch?v=XJTXpItCqFU",
+        additionalLink2: null
+    }
+    
+   
+
+ 
+    
+    
+    
+
+
+
+
+          ];
+                //bitti
+                  collections = [...new Set(avatarData.map(avatar => avatar.collection))];
+                  activeCollection = "ALL";
+                  populateCollections();
+                  populateAvatarItems(avatarData);
+                  populateAvatarGrid(avatarData); // Populate the grid view
+
+                  // Show grid view immediately and don't load any avatar by default
+                  toggleGridView(true);
+              }
+
+              function populateCollections() {
+                  const collectionsContainer = document.getElementById('collections');
+                  collectionsContainer.innerHTML = '';
+                  const allButton = document.createElement('button');
+                  allButton.className = 'collection-btn all-btn' + (activeCollection === 'ALL' ? ' active' : '');
+                  allButton.textContent = 'ALL';
+                  allButton.style.fontWeight = 'bold';
+                  collectionsContainer.appendChild(allButton);
+                  collections.forEach(collection => {
+                      const button = document.createElement('button');
+                      button.className = 'collection-btn' + (collection === activeCollection ? ' active' : '');
+                      button.textContent = collection;
+                      collectionsContainer.appendChild(button);
+                  });
+              }
+
+              function filterAvatars(searchTerm) {
+    searchTerm = searchTerm.toLowerCase().trim();
+    let filteredAvatars;
+    if (!searchTerm) {
+        filteredAvatars = activeCollection === 'ALL' ? [...avatarData] : avatarData.filter(avatar => avatar.collection === activeCollection);
+    } else {
+        filteredAvatars = (activeCollection === 'ALL' ? avatarData : avatarData.filter(avatar => avatar.collection === activeCollection))
+            .filter(avatar => 
+                (avatar.name && avatar.name.toLowerCase().includes(searchTerm)) ||
+                (avatar.collection && avatar.collection.toLowerCase().includes(searchTerm)) ||
+                (avatar.fitNo && avatar.fitNo.toLowerCase().includes(searchTerm)) ||
+                (avatar.runwayPart && avatar.runwayPart.toLowerCase().includes(searchTerm)) ||
+                (avatar.license && avatar.license.toLowerCase().includes(searchTerm)) ||
+                (avatar.information && avatar.information.toLowerCase().includes(searchTerm))
+            );
+    }
+    populateAvatarItems(filteredAvatars);
+    populateAvatarGrid(filteredAvatars); // Update grid with filtered results
+    
+    if (filteredAvatars.length > 0) {
+        activeAvatarIndex = 0;
+        updateAvatarCarousel();
+        
+        // Keep grid view active after filtering
+        toggleGridView(true);
+    } else {
+        document.getElementById('avatar-carousel').innerHTML = '<div class="avatar-name">No results found</div>';
+        document.getElementById('avatar-grid').innerHTML = '<div class="no-results">No avatars found matching your search.</div>';
+        if (!isGridView) {
+            clearScene();
+        }
+    }
+}
+
+              // Grid view functions
+              function populateAvatarGrid(avatarsToShow) {
+                  if (!avatarsToShow) avatarsToShow = activeCollection === 'ALL' ? [...avatarData] : avatarData.filter(avatar => avatar.collection === activeCollection);
+                  const gridContainer = document.getElementById('avatar-grid');
+                  gridContainer.innerHTML = '';
+
+                  if (avatarsToShow.length === 0) {
+                      gridContainer.innerHTML = '<div class="no-results">No avatars found</div>';
+                      return;
+                  }
+
+                  avatarsToShow.forEach((avatar, index) => {
+                      const gridItem = document.createElement('div');
+                      gridItem.className = 'grid-item';
+                      gridItem.dataset.id = avatar.id;
+                      gridItem.dataset.index = index;
+
+                      const thumbnailUrl = avatar.thumbnailUrl || 'https://via.placeholder.com/120x120';
+                      gridItem.innerHTML = `
+                          <img src="${thumbnailUrl}" alt="${avatar.name}" loading="lazy">
+                          <div class="grid-item-name">${avatar.name}</div>
+                      `;
+
+                      gridItem.addEventListener('click', () => {
+                          hasAvatarBeenSelected = true; // Mark that an avatar has been selected
+                          activeAvatarIndex = index;
+                          toggleGridView(false);
+                          updateAvatarCarousel(); // Update carousel to match selected avatar
+                          loadAndDisplayAvatar(avatar);
+                      });
+
+                      gridContainer.appendChild(gridItem);
+                  });
+              }
+
+              function toggleGridView(show) {
+    const gridContainer = document.getElementById('avatar-grid-container');
+    const viewerContainer = document.getElementById('viewer-container');
+    const avatarDetails = document.getElementById('avatar-details');
+    const bottomSection = document.getElementById('bottom-section');
+    const toggleButton = document.getElementById('grid-toggle-button');
+
+    isGridView = show;
+
+    if (show) {
+        // Store current auto-rotate state before pausing
+        wasAutoRotateEnabled = controls.autoRotate;
+        
+        // Pause animation and auto-rotate
+        if (controls) controls.autoRotate = false;
+        
+        // Show grid
+        gridContainer.style.display = 'block';
+        viewerContainer.style.opacity = '0.3';
+        avatarDetails.style.opacity = '0';
+        avatarDetails.style.display = 'none'; // Hide details panel in grid view
+        bottomSection.style.opacity = '0.3';
+        toggleButton.innerHTML = '<i class="fas fa-arrow-down"></i>';
+        clearScene(); // Clear scene when showing grid
+        
+        // Hide canvas and stop animation loop
+        document.getElementById('viewer-canvas').style.display = 'none';
+        cancelAnimationFrame(animate);
+        
+        // Hide loading overlay when showing grid
+        document.getElementById('loading-overlay').style.display = 'none';
+    } else {
+        // Hide grid, show single avatar view
+        gridContainer.style.display = 'none';
+        viewerContainer.style.opacity = '1';
+        
+        // Show avatar details if an avatar is selected or exists
+        if (hasAvatarBeenSelected || activeAvatar) {
+            avatarDetails.style.opacity = '1';
+            avatarDetails.style.display = 'block'; // Show details panel in single view
+        } else {
+            // If no avatar has been selected, use the first avatar in the collection
+            const filteredAvatars = activeCollection === 'ALL' ? 
+                [...avatarData] : 
+                avatarData.filter(avatar => avatar.collection === activeCollection);
+            if (filteredAvatars.length > 0) {
+                activeAvatarIndex = 0;
+                activeAvatar = filteredAvatars[0];
+                updateAvatarDetails(activeAvatar);
+                setupViewModeButtons();
+                updateActionButtons(activeAvatar);
+                avatarDetails.style.opacity = '1';
+                avatarDetails.style.display = 'block';
+            }
+        }
+        
+        bottomSection.style.opacity = '1';
+        toggleButton.innerHTML = '<i class="fas fa-th-large"></i>';
+        
+        // Restore auto-rotate state
+        if (controls) controls.autoRotate = wasAutoRotateEnabled;
+        
+        // Ensure canvas is visible
+        document.getElementById('viewer-canvas').style.display = 'block';
+        viewerContainer.classList.add('active');
+        
+        // Load the currently selected avatar if we're closing the grid
+        if (activeAvatarIndex >= 0) {
+            const filteredAvatars = activeCollection === 'ALL' ? 
+                [...avatarData] : 
+                avatarData.filter(avatar => avatar.collection === activeCollection);
+            
+            if (filteredAvatars.length > 0) {
+                // Make sure activeAvatarIndex is within bounds
+                if (activeAvatarIndex >= filteredAvatars.length) {
+                    activeAvatarIndex = 0;
+                }
+                
+                loadAndDisplayAvatar(filteredAvatars[activeAvatarIndex]);
+            }
+        }
+        
+        // Restart the animation loop
+        animate();
+    }
+}
+              function populateAvatarItems(avatarsToShow) {
+                  if (!avatarsToShow) avatarsToShow = activeCollection === 'ALL' ? [...avatarData] : avatarData.filter(avatar => avatar.collection === activeCollection);
+                  const carouselContainer = document.getElementById('avatar-carousel');
+                  carouselContainer.innerHTML = '';
+                  avatarsToShow.forEach((avatar, index) => {
+                      const avatarItem = document.createElement('div');
+                      avatarItem.className = 'avatar-item';
+                      avatarItem.dataset.id = avatar.id;
+                      avatarItem.dataset.index = index;
+                      const thumbnailUrl = avatar.thumbnailUrl || 'https://via.placeholder.com/60x60';
+                      avatarItem.innerHTML = `<img src="${thumbnailUrl}" class="avatar-thumbnail" alt="${avatar.name}"><div class="avatar-name">${avatar.name}</div>`;
+                      avatarItem.addEventListener('click', () => {
+                          hasAvatarBeenSelected = true; // Mark that an avatar has been selected
+                          activeAvatarIndex = index;
+                          updateAvatarCarousel();
+
+                          // If in grid view, close grid and show the avatar
+                          if (isGridView) {
+                              toggleGridView(false);
+                          }
+
+                          loadAndDisplayAvatar(avatar);
+                      });
+                      carouselContainer.appendChild(avatarItem);
+                  });
+                  updateAvatarCarousel();
+              }
+
+              function changeActiveAvatar(direction) {
+    // Allow avatar navigation even during loading
+    const filteredAvatars = activeCollection === 'ALL' ? [...avatarData] : avatarData.filter(avatar => avatar.collection === activeCollection);
+    const numAvatars = filteredAvatars.length;
+    if (numAvatars === 0) return;
+    
+    // If we're in grid view, exit grid view when navigating with arrows
+    if (isGridView) {
+        toggleGridView(false);
+    }
+    
+    activeAvatarIndex = (activeAvatarIndex + direction + numAvatars) % numAvatars;
+    updateAvatarCarousel();
+    hasAvatarBeenSelected = true; // Mark that an avatar has been selected
+    loadAndDisplayAvatar(filteredAvatars[activeAvatarIndex]);
+}
+
+              function updateAvatarCarousel() {
+                  const avatarItems = document.querySelectorAll('.avatar-item');
+                  const numItems = avatarItems.length;
+                  if (numItems === 0) return;
+                  avatarItems.forEach(item => {
+                      item.classList.remove('active');
+                      item.style.display = 'none';
+                  });
+                  const windowWidth = window.innerWidth;
+                  const itemWidth = CONFIG.thumbnails.size;
+                  const spacing = CONFIG.thumbnails.spacing;
+                  const minSideOffset = CONFIG.thumbnails.minSideOffset;
+                  const availableWidth = windowWidth - (2 * minSideOffset);
+                  const maxItemsVisible = Math.floor(availableWidth / (itemWidth + spacing));
+                  const itemsPerSide = Math.floor(maxItemsVisible / 2);
+                  const centerX = windowWidth / 2;
+                  for (let i = 0; i < numItems; i++) {
+                      let relativePos = ((i - activeAvatarIndex) + numItems) % numItems;
+                      if (relativePos > numItems / 2) relativePos -= numItems;
+                      if (Math.abs(relativePos) <= itemsPerSide) {
+                          const item = avatarItems[i];
+                          item.style.display = '';
+                          const xPos = centerX - (itemWidth / 2) + (relativePos * (itemWidth + spacing));
+                          item.style.left = `${xPos}px`;
+                          item.style.top = '0px';
+                          item.style.opacity = relativePos === 0 ? '1' : '0.7';
+                          item.style.zIndex = 100 - Math.abs(relativePos);
+                          if (i === activeAvatarIndex) item.classList.add('active');
+                      }
+                  }
+              }
+
+              function loadAndDisplayAvatar(avatar, isInitialLoad = false) {
+    if (!avatar) return;
+
+    // Always show the avatar details when an avatar is selected
+    document.getElementById('avatar-details').style.display = 'block';
+
+    // Ensure canvas is visible
+    document.getElementById('viewer-canvas').style.display = 'block';
+    document.querySelector('.viewer-container').classList.add('active'); // Enable viewer
+
+    isModelLoading = true;
+    updateLoadingProgress(0, 'Forging...');
+    if (isShowingVideo) hideVideo();
+    clearScene();
+    isShowingArtwork = false;
+    isTPoseMode = false;
+    controls.enabled = true;
+    activeAvatar = avatar;
+    updateAvatarDetails(avatar);
+    setupViewModeButtons();
+    updateActionButtons(avatar);
+
+    // Restart the animation loop if it's not running
+    animate();
+
+    setTimeout(() => loadModelForDisplay(avatar.modelUrl, avatar.id), 50);
+}
+
+              function updateAvatarDetails(avatar) {
+                  const titleElement = document.getElementById('avatar-title');
+                  const detailsInfo = document.getElementById('details-info');
+                  const descriptionText = document.getElementById('description-text');
+                  const collectionText = document.getElementById('collection-text');
+                  titleElement.textContent = avatar.name;
+                  let compactInfoHTML = '<div class="compact-info">';
+                  if (avatar.runwayPart && avatar.runwayPart !== "null") compactInfoHTML += `<div class="info-pill">${avatar.runwayPart}</div>`;
+                  if (avatar.fitNo && avatar.fitNo !== "null") compactInfoHTML += `<div class="info-pill">${avatar.fitNo}</div>`;
+                  compactInfoHTML += `<div class="info-pill">${avatar.license}</div>`;
+                  if (avatar.additionalLink1 && avatar.additionalLink1 !== "null") compactInfoHTML += `<div class="link-pill" onclick="window.open('${avatar.additionalLink1}', '_blank')">🔗1</div>`;
+                  if (avatar.additionalLink2 && avatar.additionalLink2 !== "null") compactInfoHTML += `<div class="link-pill" onclick="window.open('${avatar.additionalLink2}', '_blank')">🔗2</div>`;
+                  compactInfoHTML += '</div>';
+                  detailsInfo.innerHTML = compactInfoHTML;
+                  //descriptionText.textContent = avatar.information || `This is ${avatar.name}, a unique digital avatar from the ${avatar.collection} collection.`;
+                  //collectionText.textContent = collectionDescriptions[avatar.collection] || `The ${avatar.collection} collection represents a unique approach to digital avatar creation.`;
+              }
+
+              function updateActionButtons(avatar) {
+                  document.getElementById('download-btn').style.display = (avatar.downloadLink && avatar.downloadLink !== "null") ? 'block' : 'none';
+                  document.getElementById('buy-btn').style.display = (avatar.buyLink && avatar.buyLink !== "null") ? 'block' : 'none';
+                  document.getElementById('mint-avatar-btn').style.display = (avatar.mintAvatarUrl && avatar.mintAvatarUrl !== "null") ? 'block' : 'none';
+                  document.getElementById('mint-artwork-btn').style.display = (avatar.mintArtworkUrl && avatar.mintArtworkUrl !== "null") ? 'block' : 'none';
+                  const viewArtworkBtn = document.getElementById('view-artwork-btn');
+                  if (avatar.artworkUrl && avatar.artworkUrl !== "null") {
+                      viewArtworkBtn.style.display = 'block';
+                      viewArtworkBtn.textContent = isShowingArtwork ? 'View Avatar' : 'View 3D Artwork';
+                  } else viewArtworkBtn.style.display = 'none';
+              }
+
+              let currentLoadToken = 0; // Token to track current loading operation
+
+              function loadModelForDisplay(modelUrl, avatarId) {
+                  if (!modelUrl) {
+                      isModelLoading = false;
+                      updateLoadingProgress(100, 'Complete!');
+                      return;
+                  }
+                  updateLoadingProgress(0, 'Loading model...');
+                  mixer = null;
+                  isShowingVrm = false;
+                  controls.enabled = true;
+
+                  // Generate a new loading token
+                  const loadToken = ++currentLoadToken;
+
+                  const gltfLoader = new THREE.GLTFLoader();
+                  const dracoLoader = new THREE.DRACOLoader();
+                  dracoLoader.setDecoderPath('https://www.gstatic.com/draco/v1/decoders/');
+                  gltfLoader.setDRACOLoader(dracoLoader);
+                  if (typeof MeshoptDecoder !== 'undefined') gltfLoader.setMeshoptDecoder(MeshoptDecoder);
+                  gltfLoader.load(
+                      modelUrl,
+                      gltf => {
+                          // Check if this loading operation is still valid
+                          if (loadToken !== currentLoadToken) {
+                              console.log('Loading cancelled, new loading operation started.');
+                              return;
+                          }
+                          currentModel = gltf.scene;
+                          currentModel.userData.avatarId = avatarId;
+                          modelAnimations = gltf.animations || [];
+                          centerAndScaleModel(currentModel);
+                          setupAnimations(modelAnimations);
+                          scene.add(currentModel);
+                          resetCameraPosition();
+                          updateLoadingProgress(100, 'Complete!');
+                          setTimeout(() => isModelLoading = false, 500);
+                      },
+                      xhr => {
+                          if (loadToken !== currentLoadToken) return; // Cancel progress updates if operation is invalid
+                          if (xhr.lengthComputable) updateLoadingProgress(Math.min(95, (xhr.loaded / xhr.total) * 95), 'Loading model...');
+                      },
+                      error => {
+                          if (loadToken !== currentLoadToken) return;
+                          console.error('Error loading model:', error);
+                          updateLoadingProgress(100, 'Error loading model');
+                          isModelLoading = false;
+                      }
+                  );
+              }
+
+              function loadVrmForDisplay(vrmUrl, avatarId) {
+                  if (!vrmUrl) {
+                      isModelLoading = false;
+                      updateLoadingProgress(100, 'Complete!');
+                      return;
+                  }
+                  updateLoadingProgress(0, 'Loading VRM model...');
+                  isShowingVrm = true;
+                  mixer = null;
+                  controls.enabled = true;
+
+                  const loadToken = ++currentLoadToken;
+
+                  const gltfLoader = new THREE.GLTFLoader();
+                  const dracoLoader = new THREE.DRACOLoader();
+                  dracoLoader.setDecoderPath('https://www.gstatic.com/draco/v1/decoders/');
+                  gltfLoader.setDRACOLoader(dracoLoader);
+                  if (typeof MeshoptDecoder !== 'undefined') gltfLoader.setMeshoptDecoder(MeshoptDecoder);
+                  gltfLoader.load(
+                      vrmUrl,
+                      gltf => {
+                          if (loadToken !== currentLoadToken) {
+                              console.log('VRM loading cancelled.');
+                              return;
+                          }
+                          currentVrmModel = gltf.scene;
+                          currentVrmModel.userData.avatarId = avatarId;
+                          centerAndScaleModel(currentVrmModel);
+                          scene.add(currentVrmModel);
+                          resetCameraPosition();
+                          updateLoadingProgress(100, 'Complete!');
+                          setTimeout(() => isModelLoading = false, 500);
+                      },
+                      xhr => {
+                          if (loadToken !== currentLoadToken) return;
+                          if (xhr.lengthComputable) updateLoadingProgress(Math.min(95, (xhr.loaded / xhr.total) * 95), 'Loading VRM model...');
+                      },
+                      error => {
+                          if (loadToken !== currentLoadToken) return;
+                          console.error('Error loading VRM:', error);
+                          updateLoadingProgress(100, 'Error loading VRM model');
+                          isModelLoading = false;
+                      }
+                  );
+              }
+
+              function clearScene() {
+                  // Clean up animation mixer
+                  if (mixer) {
+                      mixer.stopAllAction();
+                      mixer.uncacheRoot(mixer.getRoot());
+                      mixer = null;
+                  }
+
+                  // Remove all objects from scene
+                  while (scene.children.length > 0) {
+                      const object = scene.children[0];
+                      scene.remove(object);
+                      disposeObject(object);
+                  }
+
+                  // Reset model references
+                  currentModel = null;
+                  currentVrmModel = null;
+                  currentArtworkModel = null;
+
+                  // Add back basic lighting
+                  addBasicLighting();
+
+                  clock = new THREE.Clock();
+                  if (controls && !isShowingVideo) controls.enabled = true;
+                  if (renderer) renderer.render(scene, camera);
+              }
+
+              function disposeObject(obj) {
+                  if (!obj) return;
+                  if (obj.geometry) obj.geometry.dispose();
+                  if (obj.material) {
+                      if (Array.isArray(obj.material)) obj.material.forEach(material => disposeMaterial(material));
+                      else disposeMaterial(obj.material);
+                  }
+                  if (obj.children && obj.children.length > 0) {
+                      for (let i = obj.children.length - 1; i >= 0; i--) disposeObject(obj.children[i]);
+                  }
+              }
+
+              function disposeMaterial(material) {
+                  if (!material) return;
+                  for (const prop in material) {
+                      if (material[prop] && typeof material[prop].dispose === 'function') material[prop].dispose();
+                  }
+                  material.dispose();
+              }
+
+              function centerAndScaleModel(model) {
+                  if (!model) return;
+                  const bbox = new THREE.Box3().setFromObject(model);
+                  const size = bbox.getSize(new THREE.Vector3());
+                  const center = bbox.getCenter(new THREE.Vector3());
+                  model.position.x = -center.x;
+                  model.position.z = -center.z;
+                  model.position.y = isTPoseMode ? -center.y : -.8;
+                  return { size, center, scale: 1.0 };
+              }
+
+              function resetCameraPosition() {
+                  camera.near = 0.01;
+                  camera.far = 1000;
+                  camera.updateProjectionMatrix();
+                  camera.position.set(0, 1, 5);
+                  camera.lookAt(0, 0, 0);
+                  if (controls) {
+                      controls.target.set(0, 0, 0);
+                      controls.minDistance = 0.001;
+                      controls.maxDistance = 10;
+                      controls.update();
+                  }
+              }
+
+              function setupAnimations(animations) {
+                  if (!animations || animations.length === 0 || !currentModel) return;
+                  mixer = new THREE.AnimationMixer(currentModel);
+                  clock = new THREE.Clock();
+                  clock.start();
+                  animations.forEach(clip => {
+                      const action = mixer.clipAction(clip);
+                      action.setLoop(THREE.LoopRepeat);
+                      action.play();
+                  });
+                  mixer.update(0);
+              }
+
+              function toggleArtworkView() {
+                  if (!activeAvatar.artworkUrl || activeAvatar.artworkUrl === "null") return;
+                  isShowingArtwork = !isShowingArtwork;
+                  isModelLoading = true;
+                  controls.enabled = true;
+                  clearScene();
+
+                  // Update artwork button text immediately
+                  document.getElementById('view-artwork-btn').textContent = isShowingArtwork ? 'View Avatar' : 'View 3D Artwork';
+
+                  if (isShowingArtwork) {
+                      const gltfLoader = new THREE.GLTFLoader();
+                      const dracoLoader = new THREE.DRACOLoader();
+                      dracoLoader.setDecoderPath('https://www.gstatic.com/draco/v1/decoders/');
+                      gltfLoader.setDRACOLoader(dracoLoader);
+                      if (typeof MeshoptDecoder !== 'undefined') gltfLoader.setMeshoptDecoder(MeshoptDecoder);
+
+                      const loadToken = ++currentLoadToken;
+
+                      updateLoadingProgress(0, 'Loading artwork...');
+                      gltfLoader.load(
+                          activeAvatar.artworkUrl,
+                          gltf => {
+                              if (loadToken !== currentLoadToken) return;
+
+                              currentArtworkModel = gltf.scene;
+                              currentArtworkModel.userData.avatarId = activeAvatar.id;
+                              currentArtworkModel.scale.set(0.38, 0.38, 0.38);
+                              centerAndScaleModel(currentArtworkModel);
+                              scene.add(currentArtworkModel);
+                              if (gltf.animations && gltf.animations.length > 0) {
+                                  mixer = new THREE.AnimationMixer(currentArtworkModel);
+                                  gltf.animations.forEach(clip => {
+                                      const action = mixer.clipAction(clip);
+                                      action.setLoop(THREE.LoopRepeat);
+                                      action.play();
+                                  });
+                              }
+                              updateLoadingProgress(100, 'Complete!');
+                              setTimeout(() => isModelLoading = false, 500);
+                          },
+                          xhr => {
+                              if (loadToken !== currentLoadToken) return;
+                              if (xhr.lengthComputable) updateLoadingProgress(Math.min(95, (xhr.loaded / xhr.total) * 95), 'Loading artwork...');
+                          },
+                          error => {
+                              if (loadToken !== currentLoadToken) return;
+                              console.error('Error loading artwork:', error);
+                              updateLoadingProgress(100, 'Error loading artwork');
+                              isModelLoading = false;
+                          }
+                      );
+                  } else {
+                      if (isTPoseMode) loadVrmForDisplay(activeAvatar.vrmUrl, activeAvatar.id);
+                      else loadModelForDisplay(activeAvatar.modelUrl, activeAvatar.id);
+                  }
+              }
+
+              function updateLoadingProgress(percent, message = 'Forging...') {
+                  const progressBar = document.getElementById('progress-bar');
+                  const loadingPercentage = document.getElementById('loading-percentage');
+                  const loadingOverlay = document.getElementById('loading-overlay');
+                  if (progressBar && loadingPercentage) {
+                      progressBar.style.width = `${percent}%`;
+                      loadingPercentage.textContent = `${Math.round(percent)}%`;
+                      loadingOverlay.style.display = percent >= 100 ? 'none' : 'flex';
+                  }
+              }
+    </script>
+  </body>
+</html>
