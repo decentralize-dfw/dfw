@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --viewer-left: 615px;  /* Edit this value to change left position */
+            --viewer-top: 250px;     /* Edit this value to change top position */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            overflow: hidden;
+        }
+        .main-frame {
+            width: 100vw;
+            height: 800px;
+            overflow-y: scroll;
+            overflow-x: hidden;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            position: relative;
+        }
+        .main-frame::-webkit-scrollbar {
+            display: none;
+        }
+        #htmlViewer {
+            position: fixed;
+            width: 630px;
+            height: 320px;
+            left: var(--viewer-left);
+            top: var(--viewer-top);
+            background: rgba(255, 255, 255, 0.5);
+            z-index: 1000;
+border-radius: 5px;
+             border: 1px solid #000000;
+            overflow: hidden;
+            pointer-events: auto;
+        }
+        .image-container {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            line-height: 0;
+            font-size: 0;
+        }
+        .image-wrapper {
+            width: 100%;
+            display: block;
+            line-height: 0;
+        }
+        .image-wrapper img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        .error-message {
+            color: red;
+            padding: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-frame">
+        <iframe 
+            id="htmlViewer" 
+            allow="*"
+            sandbox="allow-scripts allow-same-origin allow-forms allow-popups">
+        </iframe>
+        
+        <div class="image-container">
+            <div class="image-wrapper">
+                <img src="https://static.wixstatic.com/media/54a996_2598bd0a3bab4c419b1939d8cee8b485~mv2.png" alt="Image 1">
+            </div>
+            <div class="image-wrapper">
+                <img src="https://static.wixstatic.com/media/54a996_c4c2d6de38af47b099a5042ebeb14dbd~mv2.png" alt="Image 2">
+            </div>
+            <div class="image-wrapper">
+                <img src="/api/placeholder/1920/1080" alt="Image 3">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const iframe = document.getElementById('htmlViewer');
+            
+            fetch('https://raw.githubusercontent.com/decentralize-dfw/finder/main/RR-text.html')
+                .then(response => response.text())
+                .then(content => {
+                    const iframeDoc = iframe.contentWindow.document;
+                    iframeDoc.open();
+                    iframeDoc.write(content);
+                    iframeDoc.close();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    const iframeDoc = iframe.contentWindow.document;
+                    iframeDoc.open();
+                    iframeDoc.write(`<div class="error-message">Error loading content: ${error.message}</div>`);
+                    iframeDoc.close();
+                });
+        });
+    </script>
+</body>
+</html>
