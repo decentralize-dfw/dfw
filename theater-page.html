@@ -335,24 +335,23 @@
         allBtn.addEventListener('click', () => {
             console.log('C2W2 button clicked');
             setActiveButton(allBtn, 'collection');
-            loadContent('https://raw.githubusercontent.com/decentralize-dfw/finder/main/hatch-v1.html', 'html');
+            loadContent('https://raw.githubusercontent.com/decentralize-dfw/dfw/main/theater-hatch.html', 'html');
         });
     }
     if (experienceBtn) {
         experienceBtn.addEventListener('click', () => {
             console.log('C2W button clicked');
             setActiveButton(experienceBtn, 'collection');
-            loadContent('https://raw.githubusercontent.com/decentralize-dfw/finder/main/balloon-v1.html', 'html');
+            loadContent('https://raw.githubusercontent.com/decentralize-dfw/dfw/main/theater-balloon.html', 'html');
         });
     }
     if (galleryBtn) {
         galleryBtn.addEventListener('click', () => {
             console.log('Legacy button clicked');
             setActiveButton(galleryBtn, 'collection');
-            loadContent('https://raw.githubusercontent.com/decentralize-dfw/finder/main/wwe.html', 'html');
+            loadContent('https://raw.githubusercontent.com/decentralize-dfw/dfw/main/theater-wwe.html', 'html');
         });
-    }
-   
+    }   
     // Automatically load the first page ("ALL") on page load
     if (allBtn) {
         console.log('Page loaded, triggering ALL button click');
