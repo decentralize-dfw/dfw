@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elements Store Viewer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Helvetica", monospace;
+        }
+
+        body {
+            background-color: transparent;
+            overflow: hidden;
+            color: #000;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            width: 100vw;
+            height: 800px;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .top-section {
+            height: auto;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            padding: 15px;
+            background-color: transparent;
+            z-index: 10;
+            position: absolute;
+            top: 0;
+            left: 0;
+            gap: 10px;
+        }
+
+        .top-controls {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            width: 500px;
+            gap: 10px;
+        }
+
+        .menu-btn-container {
+            z-index: 6;
+            height: 32px;
+            display: flex;
+            gap: 8px;
+            width: 500px;
+            padding: 0;
+        }
+
+        .fullscreen-row {
+            display: flex;
+            width: 500px;
+            padding: 0;
+            margin-top: 0px;
+        }
+
+        .fullscreen-container {
+            z-index: 6;
+            width: 100%;
+        }
+
+        .menu-btn, .fullscreen-btn {
+            padding: 5px 4px;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+            background-color: rgba(255, 255, 255, 0.7);
+            cursor: pointer;
+            font-size: 9px;
+            transition: all 0.2s;
+            color: #000;
+            box-shadow: none;
+            text-shadow: none;
+            line-height: 20px;
+            flex: 1;
+            outline: none;
+            letter-spacing: 0px;
+        }
+
+        .menu-btn {
+            font-style: italic;
+            font-weight: bold;
+            letter-spacing: 0.1px;
+            height: 32px;
+        }
+
+        .fullscreen-btn {
+            font-weight: bolder;
+            background-color: rgba(240, 240, 240, 0.9);
+            height: 30px;
+            width: 500px;
+            padding: 5px 0;
+            line-height: 20px;
+            flex: none;
+        }
+
+        .menu-btn:hover, .fullscreen-btn:hover {
+            background-color: rgba(240, 240, 240, 0.9);
+        }
+
+        .menu-btn.active {
+            background-color: rgba(100, 100, 100, 0.8);
+            color: white;
+        }
+
+        .viewer-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 800px;
+            z-index: 1;
+            overflow: hidden;
+            pointer-events: auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: transparent;
+            opacity: 1;
+        }
+
+        .viewer-content {
+            width: 100%;
+            height: 100%;
+            pointer-events: auto;
+            position: absolute;
+            top: 0;
+            left: 0;
+            overflow: hidden;
+            opacity: 1;
+        }
+
+        .viewer-container.active {
+            pointer-events: auto;
+            z-index: 1;
+        }
+
+        .media-details {
+            position: absolute;
+            padding: 0;
+            max-height: 80vh;
+            overflow: hidden;
+            z-index: 4;
+            color: #000;
+            background-color: transparent;
+            width: 500px;
+            display: flex;
+            flex-direction: column;
+            margin: 0;
+            left: 15px;
+            top: 50px;
+            box-sizing: border-box;
+        }
+
+        .details-title {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            width: 100%;
+            padding: 0;
+        }
+
+        .compact-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+            align-items: center;
+            width: 100%;
+            padding: 0;
+        }
+
+        .info-pill {
+            background-color: rgba(255, 255, 255, 0.4);
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 9px;
+            white-space: nowrap;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .description-text {
+            font-size: 10px;
+            font-weight: bold;
+            line-height: 1.5;
+            text-align: left;
+            margin-bottom: 10px;
+            letter-spacing: -0.2px;
+            width: 100%;
+            padding: 0;
+        }
+
+        .control-row {
+            display: flex;
+            width: 100%;
+            gap: 14px;
+            margin-bottom: 10px;
+            align-items: center;
+            padding: 0;
+        }
+
+        .action-btn {
+            padding: 8px 0;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+            background-color: rgba(255, 255, 255, 0.5);
+            color: #000;
+            cursor: pointer;
+            font-size: 9px;
+            transition: all 0.2s;
+            text-align: center;
+            flex: 1;
+            box-sizing: border-box;
+        }
+
+        .action-btn:hover {
+            background-color: rgba(220, 220, 220, 0.9);
+        }
+
+        .media-preview {
+            width: 60%;
+            height: 80%;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            background: transparent;
+            position: relative;
+        }
+
+        .media-video-container {
+            top: 50px;
+            width: 70%;
+            height: 70%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: transparent;
+            position: relative;
+        }
+
+        .media-video {
+            height: 70%;
+            width: 70%;
+            max-width: 70%;
+            max-height: 70%;
+            object-fit: contain;
+            background: transparent !important;
+            aspect-ratio: 1/1;
+        }
+
+        .container.fullscreen-mode {
+            height: 100vh !important;
+            max-height: 100vh !important;
+            width: 100vw !important;
+        }
+
+        .fullscreen-mode .viewer-container {
+            height: 100vh !important;
+        }
+
+        .fullscreen-mode .top-section {
+            display: none !important;
+        }
+
+        .text-box {
+            position: absolute;
+            left: 15px;
+            bottom: 50px;
+            top: 57px;
+            width: 500px;
+            max-height: 700px;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 8px;
+            padding: 5px;
+            overflow-y: auto;
+            z-index: 4;
+        }
+
+        .text-box::-webkit-scrollbar {
+            width: 3px;
+        }
+
+        .text-box::-webkit-scrollbar-track {
+            background: transparent;
+            margin-right: 2px;
+        }
+
+        .text-box::-webkit-scrollbar-thumb {
+            background: #808080;
+            border-radius: 4px;
+        }
+
+        .text-content {
+            padding: 5px;
+        }
+
+        .text-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .text-subtitle {
+            font-size: 14px;
+            font-style: italic;
+            margin-bottom: 10px;
+        }
+
+        .text-body {
+            font-size: 11px;
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+
+        .text-italic {
+            font-style: italic;
+        }
+
+        .speaker-icon {
+            position: absolute;
+            top: 415px;
+            right: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            z-index: 5;
+            fill: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="top-section" id="top-section">
+            <div class="top-controls">
+                <div class="menu-btn-container">
+                    <button class="menu-btn active" id="info-btn">Info</button>
+                    <button class="menu-btn" id="experience-btn">Experience Now</button>
+                </div>
+                <div class="fullscreen-row" id="fullscreen-row" style="display: none;">
+                    <div class="fullscreen-container">
+                        <button class="fullscreen-btn" id="fullscreen-btn">Fullscreen</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="viewer-container" id="viewer-container">
+            <div class="viewer-content" id="viewer-content"></div>
+            <div class="media-details" id="media-details" style="display: none;">
+                <div class="details-title" id="media-title"></div>
+                <div class="details-info" id="details-info"></div>
+                <div class="control-row">
+                    <button class="action-btn" id="mint-btn">Mint</button>
+                </div>
+                <div class="description-text" id="description-text"></div>
+            </div>
+            <div class="text-box" id="text-box" style="display: none;">
+                <div class="text-content">
+                    <div class="text-title">ELEMENTS STORE</div>
+                    <div class="text-subtitle text-italic">Virtual Furniture Gallery for DFW Designs</div>
+                    <div class="text-body">Housed in a futuristic, minimalist structure within Hyperfy, the Elements Store showcases DFW's design legacy—starting with the iconic Mermaid Chair and expanding to include furniture, sculptures, and vehicles.</div>
+<div class="text-body">Spanning three floors, each with four customizable interior styles, the gallery offers 15,625 unique spatial variations. Users can navigate freely across this adaptive environment, explore works from 2021 to today, and personalize their journey through an intuitive UI—adjusting floor layouts, colors, and materials in real time.</div>
+<div class="text-body">Guided by the concept of “sampling and chopping,” borrowed from experimental music production, the gallery embraces deconstruction and remixing of the architectural environment. This transforms the space into an evolving visual composition—where abstract collage elements and surreal overlays shift the mood and perception of the gallery itself.</div>
+<div class="text-body">The Elements Store is more than a showroom—it’s a spatial instrument for experiencing digital design through play, layering, and choice.</div>
+
+</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const CONFIG = {
+            viewer: { top: 0, left: 0, right: 0, bottom: 0, height: 800 }
+        };
+
+        let activeMode = 'info';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            applyUIConfiguration();
+            initApp();
+        });
+
+        function applyUIConfiguration() {
+            const viewerContainer = document.getElementById('viewer-container');
+            viewerContainer.style.top = `${CONFIG.viewer.top}px`;
+            viewerContainer.style.left = `${CONFIG.viewer.left}px`;
+            viewerContainer.style.right = `${CONFIG.viewer.right}px`;
+            viewerContainer.style.height = `${CONFIG.viewer.height}px`;
+        }
+
+        function initApp() {
+            setupEventListeners();
+            resetViewer();
+            showInfo();
+            updateMenuButtons();
+        }
+
+        function setupEventListeners() {
+            document.getElementById('info-btn').addEventListener('click', showInfo);
+            document.getElementById('experience-btn').addEventListener('click', showExperience);
+
+            document.getElementById('fullscreen-btn').addEventListener('click', toggleFullscreen);
+
+            document.addEventListener('keydown', e => {
+                if (e.key === 'Escape' && document.fullscreenElement) {
+                    document.exitFullscreen();
+                }
+            });
+
+            document.addEventListener('fullscreenchange', () => {
+                const container = document.querySelector('.container');
+                if (document.fullscreenElement) {
+                    container.classList.add('fullscreen-mode');
+                } else {
+                    container.classList.remove('fullscreen-mode');
+                }
+            });
+        }
+
+        function toggleFullscreen() {
+            const container = document.querySelector('.container');
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen()
+                    .then(() => {
+                        container.classList.add('fullscreen-mode');
+                        if (activeMode === 'experience') {
+                            const iframe = document.querySelector('.viewer-content iframe');
+                            if (iframe) {
+                                iframe.style.height = '100vh';
+                                iframe.style.width = '100vw';
+                            }
+                        }
+                    })
+                    .catch(err => console.error('Fullscreen error:', err));
+            } else {
+                document.exitFullscreen()
+                    .then(() => {
+                        container.classList.remove('fullscreen-mode');
+                        if (activeMode === 'experience') {
+                            const iframe = document.querySelector('.viewer-content iframe');
+                            if (iframe) {
+                                iframe.style.height = '800px';
+                                iframe.style.width = '100%';
+                            }
+                        }
+                    })
+                    .catch(err => console.error('Exit fullscreen error:', err));
+            }
+        }
+
+        function resetViewer() {
+            const viewerContent = document.getElementById('viewer-content');
+            viewerContent.innerHTML = '';
+            viewerContent.style.opacity = '1';
+            document.getElementById('viewer-container').style.opacity = '1';
+            document.getElementById('media-details').style.display = 'none';
+            document.getElementById('fullscreen-row').style.display = 'none';
+            document.getElementById('text-box').style.display = 'none';
+        }
+
+        function showInfo() {
+            activeMode = 'info';
+            updateMenuButtons();
+            resetViewer();
+            const viewerContent = document.getElementById('viewer-content');
+            const mediaPreview = document.createElement('div');
+            mediaPreview.className = 'media-preview';
+            mediaPreview.id = 'media-preview';
+            viewerContent.appendChild(mediaPreview);
+
+            const videoContainer = document.createElement('div');
+            videoContainer.className = 'media-video-container';
+            const video = document.createElement('video');
+            video.className = 'media-video';
+            video.src = 'https://video.twimg.com/ext_tw_video/1878077102919958529/pu/vid/avc1/1802x1080/A_5kd2gBFkEQPQdl.mp4?tag=14';
+            video.autoplay = true;
+            video.muted = true;
+            video.controls = false;
+            video.loop = true;
+            videoContainer.appendChild(video);
+
+            const speakerIcon = document.createElement('svg');
+            speakerIcon.className = 'speaker-icon';
+            speakerIcon.innerHTML = `
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3 9V15H7L12 20V4L7 9H3Z" fill="currentColor"/>
+                </svg>
+            `;
+            speakerIcon.addEventListener('click', () => {
+                video.muted = !video.muted;
+                speakerIcon.innerHTML = video.muted ? `
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3 9V15H7L12 20V4L7 9H3Z" fill="currentColor"/>
+                        <path d="M16 9L20 13M20 9L16 13" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                ` : `
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3 9V15H7L12 20V4L7 9H3Z" fill="currentColor"/>
+                    </svg>
+                `;
+            });
+
+            videoContainer.appendChild(speakerIcon);
+            mediaPreview.appendChild(videoContainer);
+
+            document.getElementById('text-box').style.display = 'block';
+        }
+
+        function showExperience() {
+            if (activeMode === 'experience') return;
+            activeMode = 'experience';
+            updateMenuButtons();
+            resetViewer();
+            const viewerContent = document.getElementById('viewer-content');
+            const iframe = document.createElement('iframe');
+            iframe.src = 'https://hyperfy.io/dfw';
+            iframe.style.width = '100%';
+            iframe.style.height = document.fullscreenElement ? '100vh' : '800px';
+            iframe.style.border = 'none';
+            iframe.style.opacity = '0';
+            iframe.onload = () => {
+                iframe.style.opacity = '1';
+            };
+            viewerContent.innerHTML = '';
+            viewerContent.appendChild(iframe);
+            document.getElementById('viewer-container').style.opacity = '1';
+            document.getElementById('fullscreen-row').style.display = 'block';
+        }
+
+        function updateMenuButtons() {
+            document.querySelectorAll('.menu-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.id === `${activeMode}-btn`) btn.classList.add('active');
+            });
+        }
+    </script>
+</body>
+</html>
