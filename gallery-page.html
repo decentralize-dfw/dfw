@@ -322,47 +322,47 @@
             const forgeBtn = document.getElementById('forge-btn');
 
             if (scaffoldBtn) {
-                scaffoldBtn.addEventListener('click', () => {
-                    console.log('Scaffold button clicked');
-                    setActiveButton(scaffoldBtn, 'collection');
-                    loadContent('https://raw.githubusercontent.com/decentralize-dfw/finder/main/scaffold.html', 'html');
-                });
-            }
-            if (retailBtn) {
-                retailBtn.addEventListener('click', () => {
-                    console.log('Retail button clicked');
-                    setActiveButton(retailBtn, 'collection');
-                    loadContent('https://raw.githubusercontent.com/decentralize-dfw/finder/main/retailv6.html', 'html');
-                });
-            }
-            if (neue2dojoBtn) {
-                neue2dojoBtn.addEventListener('click', () => {
-                    console.log('Neue²Dojo button clicked');
-                    setActiveButton(neue2dojoBtn, 'collection');
-                    loadContent('https://raw.githubusercontent.com/decentralize-dfw/finder/main/neue2dojogallery.html', 'html');
-                });
-            }
-            if (elementsBtn) {
-                elementsBtn.addEventListener('click', () => {
-                    console.log('Elements Store button clicked');
-                    setActiveButton(elementsBtn, 'collection');
-                    loadContent('https://raw.githubusercontent.com/decentralize-dfw/finder/main/elementstore.html', 'html');
-                });
-            }
-            if (blackcityBtn) {
-                blackcityBtn.addEventListener('click', () => {
-                    console.log('Black City button clicked');
-                    setActiveButton(blackcityBtn, 'collection');
-                    loadContent('https://raw.githubusercontent.com/decentralize-dfw/finder/main/blackcity.html', 'html');
-                });
-            }
-            if (forgeBtn) {
-                forgeBtn.addEventListener('click', () => {
-                    console.log('Forge button clicked');
-                    setActiveButton(forgeBtn, 'collection');
-                    loadContent('https://raw.githubusercontent.com/decentralize-dfw/finder/main/forge.html', 'html');
-                });
-            }
+    scaffoldBtn.addEventListener('click', () => {
+        console.log('Scaffold button clicked');
+        setActiveButton(scaffoldBtn, 'collection');
+        loadContent('https://raw.githubusercontent.com/decentralize-dfw/dfw/main/gallery-scaffold.html', 'html');
+    });
+}
+if (retailBtn) {
+    retailBtn.addEventListener('click', () => {
+        console.log('Retail button clicked');
+        setActiveButton(retailBtn, 'collection');
+        loadContent('https://raw.githubusercontent.com/decentralize-dfw/dfw/main/gallery-retail.html', 'html');
+    });
+}
+if (neue2dojoBtn) {
+    neue2dojoBtn.addEventListener('click', () => {
+        console.log('Neue²Dojo button clicked');
+        setActiveButton(neue2dojoBtn, 'collection');
+        loadContent('https://raw.githubusercontent.com/decentralize-dfw/dfw/main/gallery-neue2dojo.html', 'html');
+    });
+}
+if (elementsBtn) {
+    elementsBtn.addEventListener('click', () => {
+        console.log('Elements Store button clicked');
+        setActiveButton(elementsBtn, 'collection');
+        loadContent('https://raw.githubusercontent.com/decentralize-dfw/dfw/main/gallery-elements.html', 'html');
+    });
+}
+if (blackcityBtn) {
+    blackcityBtn.addEventListener('click', () => {
+        console.log('Black City button clicked');
+        setActiveButton(blackcityBtn, 'collection');
+        loadContent('https://raw.githubusercontent.com/decentralize-dfw/dfw/main/gallery-blackcity.html', 'html');
+    });
+}
+if (forgeBtn) {
+    forgeBtn.addEventListener('click', () => {
+        console.log('Forge button clicked');
+        setActiveButton(forgeBtn, 'collection');
+        loadContent('https://raw.githubusercontent.com/decentralize-dfw/dfw/main/gallery-forge.html', 'html');
+    });
+}
 
             // Automatically load Neue²Dojo on page load
             if (neue2dojoBtn) {
