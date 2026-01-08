@@ -334,7 +334,7 @@
         allBtn.addEventListener('click', () => {
             console.log('Digital Topographies button clicked');
             setActiveButton(allBtn, 'collection');
-            loadContent('https://raw.githubusercontent.com/decentralize-dfw/finder/main/architecture_v1.html', 'html');
+            loadContent('https://raw.githubusercontent.com/decentralize-dfw/dfw/main/space-dt.html', 'html');
         });
     }
     
