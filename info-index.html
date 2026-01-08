@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DFW, Digital Forgery Workshop Viewer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Helvetica", monospace;
+        }
+
+        body {
+            background-color: transparent;
+            overflow: hidden;
+            color: #000;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            width: 100vw;
+            height: 800px;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .top-section {
+            height: auto;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            padding: 15px;
+            background-color: transparent;
+            z-index: 10;
+            position: absolute;
+            top: 0;
+            left: 0;
+            gap: 10px;
+        }
+
+        .top-controls {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            width: 500px;
+            gap: 10px;
+        }
+
+        .menu-btn-container {
+            z-index: 6;
+            height: 32px;
+            display: flex;
+            gap: 8px;
+            width: 500px;
+            padding: 0;
+        }
+
+        .menu-btn {
+            padding: 5px 4px;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+            background-color: rgba(255, 255, 255, 0.7);
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+            color: #000;
+            box-shadow: none;
+            text-shadow: none;
+            line-height: 20px;
+            flex: 1;
+            outline: none;
+            letter-spacing: 0px;
+          
+            font-weight: bold;
+            letter-spacing: 0.1px;
+            height: 32px;
+        }
+
+        .menu-btn:hover {
+            background-color: rgba(240, 240, 240, 0.9);
+        }
+
+        .menu-btn.active {
+            background-color: rgba(100, 100, 100, 0.8);
+            color: white;
+        }
+
+        .viewer-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 800px;
+            z-index: 1;
+            overflow: hidden;
+            pointer-events: auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: transparent;
+            opacity: 1;
+        }
+
+        .viewer-content {
+            width: 100%;
+            height: 100%;
+            pointer-events: auto;
+            position: absolute;
+            top: 0;
+            left: 0;
+            overflow: hidden;
+            opacity: 1;
+        }
+
+        .viewer-container.active {
+            pointer-events: auto;
+            z-index: 1;
+        }
+
+        .media-details {
+            position: absolute;
+            padding: 0;
+            max-height: 80vh;
+            overflow: hidden;
+            z-index: 4;
+            color: #000;
+            background-color: transparent;
+            width: 500px;
+            display: flex;
+            flex-direction: column;
+            margin: 0;
+            left: 15px;
+            top: 50px;
+            box-sizing: border-box;
+        }
+
+        .details-title {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            width: 100%;
+            padding: 0;
+        }
+
+        .compact-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+            align-items: center;
+            width: 100%;
+            padding: 0;
+        }
+
+        .info-pill {
+            background-color: rgba(255, 255, 255, 0.4);
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 9px;
+            white-space: nowrap;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .description-text {
+            font-size: 10px;
+            font-weight: bold;
+            line-height: 1.5;
+            text-align: left;
+            margin-bottom: 10px;
+            letter-spacing: -0.2px;
+            width: 100%;
+            padding: 0;
+        }
+
+        .control-row {
+            display: flex;
+            width: 100%;
+            gap: 14px;
+            margin-bottom: 10px;
+            align-items: center;
+            padding: 0;
+        }
+
+        .action-btn {
+            padding: 8px 0;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+            background-color: rgba(255, 255, 255, 0.5);
+            color: #000;
+            cursor: pointer;
+            font-size: 9px;
+            transition: all 0.2s;
+            text-align: center;
+            flex: 1;
+            box-sizing: border-box;
+        }
+
+        .action-btn:hover {
+            background-color: rgba(220, 220, 220, 0.9);
+        }
+
+        .bottom-section {
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 80px;
+            z-index: 5;
+            text-align: center;
+            bottom: 0;
+            display: none;
+        }
+
+        .media-selector {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        .media-carousel {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .media-item {
+            width: 80px;
+            height: 80px;
+            position: absolute;
+            transform-origin: center;
+            transition: all 0.3s ease;
+            opacity: 0.7;
+            z-index: 1;
+            margin: 0;
+            padding: 0;
+            cursor: pointer;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            bottom: 250px;
+        }
+
+        .media-thumbnail {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 8px;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            background-color: #fff;
+            margin-bottom: 0;
+        }
+
+        .media-item.active .media-thumbnail {
+            border-color: rgba(0, 120, 255, 0.8);
+            box-shadow: 0 0 10px rgba(0, 120, 255, 0.5);
+            opacity: 1;
+        }
+
+        .media-item-name {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(255, 255, 255, 0.8);
+            color: #000;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            z-index: 50;
+            opacity: 0;
+            font-weight: normal;
+        }
+
+        .media-item:hover .media-item-name {
+            opacity: 1;
+        }
+
+        .media-preview {
+            width: 60%;
+            height: 80%;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            background: transparent;
+            position: relative;
+        }
+
+        .media-video-container {
+            top: 50px;
+            width: 70%;
+            height: 70%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: transparent;
+            position: relative;
+        }
+
+        .media-video {
+            height: 70%;
+            width: 70%;
+            max-width: 70%;
+            max-height: 70%;
+            object-fit: contain;
+            background: transparent !important;
+            aspect-ratio: 1/1;
+        }
+
+        .youtube-iframe {
+            max-width: 100%;
+            max-height: 100%;
+            width: 70%;
+            height: 70%;
+            object-fit: contain;
+            border: none;
+        }
+
+        .recording-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container.fullscreen-mode {
+            height: 100vh !important;
+            max-height: 100vh !important;
+            width: 100vw !important;
+        }
+
+        .fullscreen-mode .viewer-container {
+            height: 100vh !important;
+        }
+
+        .fullscreen-mode .top-section,
+        .fullscreen-mode .bottom-section {
+            display: none !important;
+        }
+
+        .text-box {
+            position: absolute;
+            left: 15px;
+            bottom: 50px;
+            top: 57px;
+            width: 500px;
+            max-height: 700px;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 8px;
+            padding: 5px;
+            overflow-y: auto;
+            z-index: 4;
+        }
+
+        .text-box::-webkit-scrollbar {
+            width: 3px;
+        }
+
+        .text-box::-webkit-scrollbar-track {
+            background: transparent;
+            margin-right: 2px;
+        }
+
+        .text-box::-webkit-scrollbar-thumb {
+            background: #808080;
+            border-radius: 4px;
+        }
+
+        .text-content {
+            padding: 5px;
+        }
+
+        .main-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            letter-spacing: 0.5px;
+        }
+
+        .second-title {
+            font-size: 15px;
+            font-weight: 500;
+            margin-bottom: 12px;
+            letter-spacing: -0.5px;
+        }
+
+        .third-title {
+            font-size: 11px;
+            font-weight: 500;
+            font-style: italic;
+            margin-bottom: 13px;
+            letter-spacing: -0.25px;
+        }
+
+        .third2-title {
+            font-size: 10px;
+            font-weight: 100;
+            font-style: italic;
+            margin-bottom: 10px;
+            letter-spacing: -0.25px;
+        }
+
+        .regular-text {
+            font-size: 9px;
+            font-weight: normal;
+            margin-bottom: 9px;
+            letter-spacing: -0.2px;
+        }
+
+        .regular2-text {
+            font-size: 9px;
+            font-weight: italic;
+            margin-bottom: 9px;
+            letter-spacing: -0.2px;
+        }
+
+        .speaker-icon {
+            position: absolute;
+            top: 415px;
+            right: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            z-index: 5;
+            fill: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="top-section" id="top-section">
+            <div class="top-controls">
+                <div class="menu-btn-container">
+                    <button class="menu-btn active" id="info-btn">Index</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="viewer-container" id="viewer-container">
+            <div class="viewer-content" id="viewer-content"></div>
+            <div class="media-details" id="media-details">
+                <div class="details-title" id="media-title"></div>
+                <div class="details-info" id="details-info"></div>
+                <div class="control-row">
+                    <button class="action-btn" id="mint-btn" style="display: none;">Mint</button>
+                </div>
+                <div class="description-text" id="description-text"></div>
+            </div>
+            <div class="text-box" id="text-box" style="display: none;">
+                <div class="text-content">
+                    <div class="main-title">AWARDS / MENTIONS</div>
+        <div class="regular-text bullet-point">Creatorverse Buildathon by Parcel x PangeaDAO, Music Venue, 2022, Winner</div>
+        <div class="regular-text bullet-point">Creatorverse Buildathon by Parcel x PangeaDAO, Meeting Space, 2022, Runner-Up</div>
+        <div class="regular-text bullet-point">Grant Program by EnterDAO's Landworks, Fashion Venue, 2022, Winner</div>
+        <div class="regular-text bullet-point">Grant Program by EnterDAO's Landworks, Headquarters, 2022, Winner</div>
+        <div class="regular-text bullet-point">Top 50 Creators of Metaverse by Metamundo, 2023</div>
+        <div class="regular-text bullet-point">CryptoCubes by Han, 2023, Runner-Up</div>
+        <div class="regular-text bullet-point">VCA x Draup Virtual Fashion Residency 1st Prize, selected by RedDAO, 2023</div>
+        <div class="regular-text bullet-point">MONA 3D Objects Buildathon, Center Pieces, 2024, Honorable Mention</div>
+
+        <div class="main-title">TALKS</div>
+        <div class="regular-text bullet-point">Virtual Show & Tell at Hyperfy, Hosted by untitled, xyz- 2023</div>
+        <div class="regular-text bullet-point">VCA Mentorship, 6th Cohort, Architecture in the Metaverse - 2023</div>
+        <div class="regular-text bullet-point">Opening Keynote, Digital Fashion Summit, Lifestyle Design Cluster, Creative Denmark -2024</div>
+
+        <div class="main-title">EXHIBITIONS</div>
+        <div class="regular-text bullet-point">Power of the Nature @ Fabbrica Del Vapore, Milano / ITA - 2019</div>
+        <div class="regular-text bullet-point">The Art's Special Projects @ Fabbrica Del Vapore, Milano / ITA - 2019</div>
+        <div class="regular-text bullet-point">Communitas III: Digital Community by Kollektiv Kollektiv @ Kunsthaus Steffisburg / CH - 2021</div>
+        <div class="regular-text bullet-point">New Freedom Think @ Mads Gallery, Milano / ITA - 2022</div>
+        <div class="regular-text bullet-point">Art Design @ Holy Art Gallery, London / UK - 2022</div>
+        <div class="regular-text bullet-point">Klein Metaverse Event @ BabylonsNFT, Yacthingverse - 2022</div>
+        <div class="regular-text bullet-point">DYOR @ Kunsthalle Zürich, Zurich/ CH - 2022</div>
+        <div class="regular-text bullet-point">Creators of the Metaverse by Metamundo @ Art Basel Miami, Miami / USA - 2022</div>
+        <div class="regular-text bullet-point">FIRST LOOK METAVERSE WATCH PARTY @MONA -2023</div>
+        <div class="regular-text bullet-point">KODA by Polkadot @ Factory Berlin, Berlin / GER - 2023</div>
+        <div class="regular-text bullet-point">New Codes Exhibition by VCA, Draup, Mad Global @ Royal Institution, London / UK - 2023</div>
+
+        <div class="main-title">VIRTUAL WORLDS</div>
+        <div class="regular-text bullet-point">C2W Runway, Virtual Runway, Event, Hyperfy</div>
+        <div class="regular-text bullet-point">Afterparty, Interactive Shop, Event, Mona</div>
+        <div class="regular-text bullet-point">Concept Furniture Store, Showroom, Oncyber</div>
+        <div class="regular-text bullet-point">Scaffold, 3D Smart Browser, Showroom, Hyperfy</div>
+        <div class="regular-text bullet-point">C2W2 Runners, Conceptual, Showroom, Oncyber</div>
+        <div class="regular-text bullet-point">SERVICES, Info Point, Showroom, Oncyber</div>
+        <div class="regular-text bullet-point">Black City, MOCA ROOMS World, Museum City, Hyperfy</div>
+        <div class="regular-text bullet-point">Neue2Dojo, Independent Art Gallery, Hyperfy</div>
+        <div class="regular-text bullet-point">Promethade, Museum, Oncyber</div>
+        <div class="regular-text bullet-point">Forge, NoiseDAO Music Collection World, Museum City, Hyperfy</div>
+        <div class="regular-text bullet-point">JJ8, avatar / virtual fashion store, retail no.4, hyperfy</div>
+        <div class="regular-text bullet-point">C2W-R-V3 Rust,Bau,Rabbit,Nietzsc., avatar / virtual fashion store, retail no.3, Oncyber</div>
+        <div class="regular-text bullet-point">Blackcorridor, avatar / virtual fashion store, retail no.2, Oncyber</div>
+        <div class="regular-text bullet-point">QQ-FU2 Patio, avatar / virtual fashion store, retail no.1, Oncyber</div>
+        <div class="regular-text bullet-point">forgeshop.arch, Arch.Viewer, Building Exhibition, Oncyber</div>
+        <div class="regular-text bullet-point">forgeshop.design, Design Viewer, Objects Exhibition, Oncyber</div>
+        <div class="regular-text bullet-point">Why We Exist, virtual theater no 1, Hyperfy</div>
+        <div class="regular-text bullet-point">Balloon, virtual theater no 2, Hyperfy</div>
+        <div class="regular-text bullet-point">Hatch, virtual theater no:3, Hyperfy</div>
+
+        <div class="main-title">COMPLETED PROJECTS</div>
+        <div class="regular-text bullet-point">Why We Exist? / Virtual Theater (world) / CloneX</div>
+        <div class="regular-text bullet-point">C2W Virtual Runway / Event (world) / DFW</div>
+        <div class="regular-text bullet-point">Solar Panel Construction XR Integration / Digital Twin(world) / anon</div>
+        <div class="regular-text bullet-point">Scaffold / 3D Architecture Browser (world) / DFW</div>
+        <div class="regular-text bullet-point">Neue² Dojo Gallery / Virtual Art Space of the Future Forged in Blockchain (world) / F.D*</div>
+        <div class="regular-text bullet-point">Retail / C2W Virtual Shop (world) / DFW</div>
+        <div class="regular-text bullet-point">Black City / ROOMS (world) / MOCA</div>
+        <div class="regular-text bullet-point">Metacoders / 3D Collection Design (project) / crypto_Txt</div>
+        <div class="regular-text bullet-point">Radio Existpert / VRM (avatar) / NFT Crap</div>
+        <div class="regular-text bullet-point">0PP13 / Experimental Audio Museum (building) / NoiseDAO</div>
+        <div class="regular-text bullet-point">Centipede / High Frequency Building (building) / NoiseDAO</div>
+        <div class="regular-text bullet-point">Metaboilerism / Music NFT Building (building) / NoiseDAO</div>
+        <div class="regular-text bullet-point">The Constro / World Design (world) / Endangered Labs</div>
+        <div class="regular-text bullet-point">Black City, 2Pac / Music Video (artwork) / ROOMS</div>
+        <div class="regular-text bullet-point">Poddio Dark Twisted Verticale / Competition (building) / EnterDAO</div>
+        <div class="regular-text bullet-point">Museum of Unlimited Growth ii / ROOMS (building) / MOCA</div>
+        <div class="regular-text bullet-point">SpyderMosk / ROOMS (building) / MOCA</div>
+        <div class="regular-text bullet-point">Spyder Mosk Piccolo / ROOMS (building) / MOCA</div>
+        <div class="regular-text bullet-point">FlyClub / ROOMS (building) / MOCA</div>
+        <div class="regular-text bullet-point">Astral Egg Plant / Competition (building) / Parcel + PangeaDAO</div>
+        <div class="regular-text bullet-point">Finger Dome / Competition (building) / Parcel + PangeaDAO</div>
+        <div class="regular-text bullet-point">UMMUSE / Buildathon Submission (building) / Neon Buidl</div>
+        <div class="regular-text bullet-point">Holy Shadow HQ / Facility at DAOTown (building) / Neon Buidl</div>
+        <div class="regular-text bullet-point">PH / Performance Hall (building) / NoiseDAO</div>
+        <div class="regular-text bullet-point">Promethade / Museum (building) / F.D*</div>
+        <div class="regular-text bullet-point">Cave Design Store / Buildathon Submission (building) / Neon Buidl</div>
+        <div class="regular-text bullet-point">C2W Ticket Artwork / Competition (artwork) / VCA x Draup x RedDAO</div>
+        <div class="regular-text bullet-point">C2W / Click-to-Wear Collection (vrm avatars) / DFW</div>
+        <div class="regular-text bullet-point">C2W Virtual Runway / Event (world) / DFW</div>
+        <div class="regular-text bullet-point">pxl DUOMO / Competition (building) / CryptoCubes</div>
+
+        <div class="main-title">DIGITAL TOPOGRAPHIES</div>
+        <div class="regular-text bullet-point">POTBELLY Q_FU (Digital_Topographies_00)</div>
+        <div class="regular-text bullet-point">XHBTION_SPC (Digital_Topographies_01)</div>
+        <div class="regular-text bullet-point">VEGANCELL+PARK (Digital_Topographies_02)</div>
+        <div class="regular-text bullet-point">BUREAU+THEATRE (Digital_Topographies_03)</div>
+        <div class="regular-text bullet-point">DIGITAL EXPO CENTER (Digital_Topographies_04)</div>
+        <div class="regular-text bullet-point">BEPFMV (Digital_Topographies_05)</div>
+        <div class="regular-text bullet-point">DECONSTRUCTIVIST EAGLE NEST (Digital_Topographies_06)</div>
+        <div class="regular-text bullet-point">ASTRAL EGG PLANT (Digital_Topographies_07)</div>
+        <div class="regular-text bullet-point">THE FINGER DOME (Digital_Topographies_08)</div>
+        <div class="regular-text bullet-point">UMMUSE (Digital_Topographies_09)</div>
+        <div class="regular-text bullet-point">#NP17658 (Digital_Topographies_10)</div>
+        <div class="regular-text bullet-point">HOLY SHADOW HQ (Digital_Topographies_11)</div>
+        <div class="regular-text bullet-point">TECHNO BRUTAL PUNK FABRIQUE (Digital_Topographies_12)</div>
+        <div class="regular-text bullet-point">K-DOCIINE HQ (Digital_Topographies_13)</div>
+        <div class="regular-text bullet-point">PODDIO VERTICALE (Digital_Topographies_14)</div>
+        <div class="regular-text bullet-point">PODDIO DARK TWISTED VERTICALE (Digital_Topographies_15)</div>
+        <div class="regular-text bullet-point">SPACE TIME ROOMS (Digital_Topographies_16)</div>
+        <div class="regular-text bullet-point">MATISSE TIME CHAIPEL (Digital_Topographies_17)</div>
+        <div class="regular-text bullet-point">MATSOUKA HILLS MANSION (Digital_Topographies_18)</div>
+        <div class="regular-text bullet-point">MUSEUM OF UNLIMITED GROWTH 2 (Digital_Topographies_19)</div>
+        <div class="regular-text bullet-point">SPYDER MOSK (Digital_Topographies_20)</div>
+        <div class="regular-text bullet-point">SPYDER MOSK PICCOLO (Digital_Topographies_21)</div>
+        <div class="regular-text bullet-point">THE FLY CLUB (Digital_Topographies_22)</div>
+        <div class="regular-text bullet-point">BEYOND THE INFINITY (Digital_Topographies_23)</div>
+        <div class="regular-text bullet-point">ATONAL VEINS (Digital_Topographies_24)</div>
+        <div class="regular-text bullet-point">C2W-R-v3 (Digital_Topographies_25)</div>
+        <div class="regular-text bullet-point">NEUEDOJO (Digital_Topographies_26)</div>
+        <div class="regular-text bullet-point">DFWAM (Digital_Topographies_27)</div>
+        <div class="regular-text bullet-point">PROMETHADE (Digital_Topographies_28)</div>
+        <div class="regular-text bullet-point">CAVE DESIGN STORE (Digital_Topographies_29)</div>
+        <div class="regular-text bullet-point">POP-YP (Digital_Topographies_30)</div>
+        <div class="regular-text bullet-point">C1TY (Digital_Topographies_31)</div>
+        <div class="regular-text bullet-point">MUSEBOROUGH PAVS (Digital_Topographies_32)</div>
+        <div class="regular-text bullet-point">FIGHT ARENA(Digital_Topographies_33)</div>
+        <div class="regular-text bullet-point">MIKADO FIBER PAVILLION (Digital_Topographies_34)</div>
+        <div class="regular-text bullet-point">POTBELLY QQ_FU_v2 (Digital_Topographies_35)</div>
+        <div class="regular-text bullet-point">CONCEPT FURNITURE STORE (Digital_Topographies_36)</div>
+        <div class="regular-text bullet-point">POKEMUSEUM (Digital_Topographies_37)</div>
+        <div class="regular-text bullet-point">THE CONSTRO (Digital_Topographies_38)</div>
+        <div class="regular-text bullet-point">METABOILERISM (Digital_Topographies_39)</div>
+        <div class="regular-text bullet-point">pxl DUOMO (Digital_Topographies_40)</div>
+        <div class="regular-text bullet-point">ROTAS VIRGIL (Digital_Topographies_41)</div>
+        <div class="regular-text bullet-point">BOXMATE (Digital_Topographies_42)</div>
+        <div class="regular-text bullet-point">CARBINE WICK (Digital_Topographies_43)</div>
+        <div class="regular-text bullet-point">0PP13 (Digital_Topographies_44)</div>
+        <div class="regular-text bullet-point">STARDEM (Digital_Topographies_45)</div>
+        <div class="regular-text bullet-point">ISOLA (Digital_Topographies_46)</div>
+        <div class="regular-text bullet-point">ALIEN EARTHQUAKE (Digital_Topographies_47)</div>
+        <div class="regular-text bullet-point">CENTIPEDE (Digital_Topographies_48)</div>
+        <div class="regular-text bullet-point">VERTICAL CANDY BUNGALOWS (Digital_Topographies_49)</div>
+        <div class="regular-text bullet-point">MYNHTTNWARE (Digital_Topographies_50)</div>
+        <div class="regular-text bullet-point">JJ8 (Digital_Topographies_51)</div>
+
+        <div class="main-title">DESIGN</div>
+        <div class="regular-text bullet-point">MERMAIDCHAIR, chair1 (og + blck + chrome + red)</div>
+        <div class="regular-text bullet-point">FETUCHAIR, chair2 (og + blck + wht + red)</div>
+        <div class="regular-text bullet-point">DSE, chair3 (antrst + blck + wht + red)</div>
+        <div class="regular-text bullet-point">JACKTHELAD, chair4 (og + blck + wht + red)</div>
+        <div class="regular-text bullet-point">ARETAIX, chair5 (antrst + blck + wht + red)</div>
+        <div class="regular-text bullet-point">ARMAGEDDON, chair6 (og + blck + wht + dark)</div>
+        <div class="regular-text bullet-point">BILBAO LEGO CHAIR, chair7 (chrome + blck + wht + red)</div>
+        <div class="regular-text bullet-point">HIGGS BOSON, chair8 (chrome + night + concrete + red)</div>
+        <div class="regular-text bullet-point">E66, chair9 (og + blck + antrst + red)</div>
+        <div class="regular-text bullet-point">ACCELERATOR, chair10 (og + mono + davnc + red)</div>
+        <div class="regular-text bullet-point">GLASS GOUGNUT, sofa1 (og + blck + wht + red)</div>
+        <div class="regular-text bullet-point">SJSOC, sofa2 (og + mono + wht + neon)</div>
+        <div class="regular-text bullet-point">CRAWRECKSOFA, sofa3 (og + blck + wht + red)</div>
+        <div class="regular-text bullet-point">JAPON, sofa4 (og + blck + wht + red)</div>
+        <div class="regular-text bullet-point">2070S DJ TABLE, table1 (og + blck + wht + red)</div>
+        <div class="regular-text bullet-point">BOARDROOMTABLE-, table2 (og + blck + wht + red)</div>
+        <div class="regular-text bullet-point">BROWN SHARK TABLE, table3 (og + dark + rock + red)</div>
+        <div class="regular-text bullet-point">DECENTRLIZEJOKING1, music1 (og + blck + wht + red)</div>
+        <div class="regular-text bullet-point">DECENTRLIZEJOKING2_OFFROAD, music2 (og + gry + wht + red)</div>
+        <div class="regular-text bullet-point">DECENTRLIZE*JOKING2_2, music3 (og + blck + wht + red)</div>
+        <div class="regular-text bullet-point">SCREAMER, music4 (og + blck + wht + red)</div>
+        <div class="regular-text bullet-point">GENETIC CARPET, carpet1 (og + blck + wht + red)</div>
+        <div class="regular-text bullet-point">SPOOKY CARPET, carpet2 (og + blackigator + throne + davnc)</div>
+        <div class="regular-text bullet-point">OSIRIS RAKE, sculpture1 (og + blck + gry + red)</div>
+        <div class="regular-text bullet-point">MIDAS SPACE, sculpture2 (og + dark + light + candle)</div>
+        <div class="regular-text bullet-point">ANGRY NAPKIN, sculpture3 (og + blck + wht + red)</div>
+        <div class="regular-text bullet-point">W6O1M6, sculpture4 (og + blck + gry + red)</div>
+        <div class="regular-text bullet-point">STATUE OF HANGOVER, sculpture5 (sohiii + sohii + sohi + -)</div>
+        <div class="regular-text bullet-point">PRAİFİED, sculpture6 (og + blck + wht + red)</div>
+        <div class="regular-text bullet-point">SANCTİFİED, sculpture7 (og + blck + wht + red)</div>
+        <div class="regular-text bullet-point">ME-TREE-X, sculpture8 (og + blck + wht + red)</div>
+        <div class="regular-text bullet-point">MOLECULAR DATA PLANT, sculpture9 (og + blck + wht + red)</div>
+        <div class="regular-text bullet-point">NEO KLEIN, sculpture10 (og + blck + gry + red)</div>
+        <div class="regular-text bullet-point">SQUGGLE, sculpture11 (og + alien + gry + red)</div>
+        <div class="regular-text bullet-point">CROOKEDASWEFUNASYU, sculpture12 (og + blck + wht + red)</div>
+        <div class="regular-text bullet-point">LEGEND, sculpture13 (og + blck + wht + red)</div>
+        <div class="regular-text bullet-point">2002, sculpture14 (og + blck + tea + red)</div>
+        <div class="regular-text bullet-point">0FF_WITH_HIS_HEAD, sculpture15 (no colors listed)</div>
+        <div class="regular-text bullet-point">MYSTICALARCASES, sculpture16 (black + red + - + -)</div>
+        <div class="regular-text bullet-point">EXCLAMATIONAL PENCIL SHARPENER-ANIMATED, sculpture17 (og + wood + tea + red)</div>
+        <div class="regular-text bullet-point">XYZ008, automobile1 (og + blck + glasser + gold)</div>
+        <div class="regular-text bullet-point">ZENBUBBLE, automobile2 (og + blck + wht + neon)</div>
+        <div class="regular-text bullet-point">SKEWER, automobile3 (og + blck + wht + red)</div>
+        <div class="regular-text bullet-point">WELLINGTON, automobile4 (og + blck + wht + red)</div>
+        <div class="regular-text bullet-point">MARSDEADLEAF, automobile5 (og + villain + wht + red)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const CONFIG = {
+            thumbnails: { size: 80, spacing: 40, minSideOffset: 40 },
+            ui: { detailsBox: { top: 220, left: 15, width: 500 } },
+            viewer: { top: 0, left: 0, right: 0, bottom: 0, height: 800 }
+        };
+
+        let mediaData = [], activeMediaIndex = 0, activeMode = 'info';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            applyUIConfiguration();
+            initApp();
+        });
+
+        function applyUIConfiguration() {
+            const viewerContainer = document.getElementById('viewer-container');
+            if (viewerContainer) {
+                viewerContainer.style.top = `${CONFIG.viewer.top}px`;
+                viewerContainer.style.left = `${CONFIG.viewer.left}px`;
+                viewerContainer.style.right = `${CONFIG.viewer.right}px`;
+                viewerContainer.style.height = `${CONFIG.viewer.height}px`;
+            }
+
+            const mediaDetails = document.getElementById('media-details');
+            if (mediaDetails) {
+                mediaDetails.style.top = `${CONFIG.ui.detailsBox.top}px`;
+                mediaDetails.style.left = `${CONFIG.ui.detailsBox.left}px`;
+                mediaDetails.style.width = `${CONFIG.ui.detailsBox.width}px`;
+            }
+        }
+
+        function initApp() {
+            loadMediaData();
+            setupEventListeners();
+            resetViewer();
+            showInfo();
+            updateMenuButtons();
+        }
+
+        function setupEventListeners() {
+            const infoBtn = document.getElementById('info-btn');
+            if (infoBtn) {
+                infoBtn.addEventListener('click', showInfo);
+            }
+        }
+
+        function resetViewer() {
+            const viewerContent = document.getElementById('viewer-content');
+            if (viewerContent) {
+                viewerContent.innerHTML = '';
+                viewerContent.style.opacity = '1';
+            }
+            const viewerContainer = document.getElementById('viewer-container');
+            if (viewerContainer) {
+                viewerContainer.style.opacity = '1';
+            }
+            const mediaDetails = document.getElementById('media-details');
+            if (mediaDetails) {
+                mediaDetails.style.display = 'none';
+            }
+            const bottomSection = document.getElementById('bottom-section');
+            if (bottomSection) {
+                bottomSection.style.display = 'none';
+                bottomSection.style.opacity = '0';
+            }
+            const textBox = document.getElementById('text-box');
+            if (textBox) {
+                textBox.style.display = 'none';
+            }
+        }
+
+        function showInfo() {
+            activeMode = 'info';
+            updateMenuButtons();
+            resetViewer();
+            const viewerContent = document.getElementById('viewer-content');
+            if (!viewerContent) return;
+            const mediaPreview = document.createElement('div');
+            mediaPreview.className = 'media-preview';
+            mediaPreview.id = 'media-preview';
+            viewerContent.appendChild(mediaPreview);
+
+            const videoContainer = document.createElement('div');
+            videoContainer.className = 'media-video-container';
+            const video = document.createElement('video');
+            video.className = 'media-video';
+            video.src = 'https://video.wixstatic.com/video/54a996_6da48d6916b24734aba549bb585d4675/720p/mp4/file.mp4';
+            video.autoplay = true;
+            video.muted = true;
+            video.controls = false;
+            video.loop = true;
+            videoContainer.appendChild(video);
+
+            const speakerIcon = document.createElement('svg');
+            speakerIcon.className = 'speaker-icon';
+            speakerIcon.innerHTML = `
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3 9V15H7L12 20V4L7 9H3Z" fill="currentColor"/>
+                </svg>
+            `;
+            speakerIcon.addEventListener('click', () => {
+                video.muted = !video.muted;
+                speakerIcon.innerHTML = video.muted ? `
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3 9V15H7L12 20V4L7 9H3Z" fill="currentColor"/>
+                        <path d="M16 9L20 13M20 9L16 13" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                ` : `
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3 9V15H7L12 20V4L7 9H3Z" fill="currentColor"/>
+                    </svg>
+                `;
+            });
+
+            videoContainer.appendChild(speakerIcon);
+            mediaPreview.appendChild(videoContainer);
+
+            const textBox = document.getElementById('text-box');
+            if (textBox) {
+                textBox.style.display = 'block';
+            }
+        }
+
+        function updateMenuButtons() {
+            const menuBtns = document.querySelectorAll('.menu-btn');
+            if (menuBtns) {
+                menuBtns.forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.id === `${activeMode}-btn`) btn.classList.add('active');
+                });
+            }
+        }
+
+        function loadMediaData() {
+            mediaData = [];
+        }
+
+        window.addEventListener('resize', () => {
+            if (activeMode === 'media') updateMediaCarousel();
+        });
+    </script>
+</body>
+</html>
