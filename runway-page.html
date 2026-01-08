@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DFWy</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Helvetica", monospace;
+        }
+        
+        body {
+            background-color: transparent;
+            overflow: hidden;
+            color: #000;
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: 100vw;
+            margin: 0;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .top-section {
+            position: absolute;
+            top: 55px;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 500px;
+            display: flex;
+            flex-direction: column;
+            padding: 10px 15px 15px 15px;
+            background-color: rgba(255, 255, 255, 0);
+            z-index: 10;
+            gap: 10px;
+        }
+
+        .top-controls {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            width: 500px;
+            gap: 10px;
+        }
+
+        .media-btn-container {
+            z-index: 11;
+            height: 32px;
+            display: flex;
+            gap: 8px;
+            width: 500px;
+            padding-left: 0;
+            padding-right: 0;
+        }
+
+        .collections-row {
+            display: flex;
+            width: 500px;
+            padding-left: 0;
+            padding-right: 0;
+            gap: 6px;
+            z-index: 11;
+        }
+
+        .collections {
+            display: flex;
+            gap: 6px;
+            z-index: 11;
+            height: 32px;
+            width: 100%;
+            white-space: nowrap;
+        }
+
+        .media-btn, .collection-btn {
+            padding: 5px 6px;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+            background-color: rgba(255, 255, 255, 0.7);
+            cursor: pointer;
+            font-size: 10px;
+            transition: all 0.2s;
+            color: #000;
+            box-shadow: none;
+            text-shadow: none;
+            height: 32px;
+            line-height: 20px;
+            flex: 1;
+            outline: none;
+            position: relative;
+        }
+
+        .collection-btn {
+            padding: 5px 4px;
+            font-size: 9px;
+            letter-spacing: 0px;
+        }
+
+        .media-btn {
+            font-style: italic;
+            font-weight: bold;
+            letter-spacing: 0.1px;
+        }
+
+        .all-btn {
+            font-weight: bolder !important;
+            background-color: rgba(240, 240, 240, 0.9) !important;
+        }
+        
+        .collection-btn:hover, .media-btn:hover {
+            background-color: rgba(240, 240, 240, 0.9);
+        }
+
+        .collection-btn.active, .media-btn.active {
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            opacity: 1;
+        }
+
+        #viewerContainer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        #contentViewer,
+        #htmlViewer {
+            width: 100%;
+            height: min(100vh, 840px);
+            border: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            transition: opacity 0.3s ease;
+        }
+
+        #htmlViewer {
+            display: none;
+            background: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="top-section">
+            <div class="top-controls">
+                <div class="media-btn-container">
+                    <button class="media-btn" id="media-btn">Home</button>
+                    <button class="media-btn" id="theater-btn">Theater</button>
+                    <button class="media-btn active" id="runway-btn">Runway</button>
+                    <button class="media-btn" id="gallery-top-btn">Gallery</button>
+                    <button class="media-btn" id="space-btn">Space</button>
+                    <button class="media-btn" id="avatar-top-btn">Avatar</button>
+                    <button class="media-btn" id="design-top-btn">Design</button>
+                    <button class="media-btn" id="info-btn">Info</button>
+                </div>
+            </div>
+            <div class="collections-row">
+                <div class="collections">
+                    <button class="collection-btn active" id="c2w2-btn">C2W</button>
+                    
+                </div>
+            </div>
+        </div>
+
+        <div id="viewerContainer">
+            <iframe id="contentViewer" src="about:blank"></iframe>
+            <iframe id="htmlViewer" src="about:blank"></iframe>
+        </div>
+    </div>
+    
+    <script>
+        const dom = {
+            viewer: {
+                container: document.getElementById('viewerContainer'),
+                content: document.getElementById('contentViewer'),
+                html: document.getElementById('htmlViewer')
+            }
+        };
+
+        function setActiveButton(button, buttonType) {
+            const selector = buttonType === 'media' ? '.media-btn' : '.collection-btn';
+            document.querySelectorAll(selector).forEach(btn => btn.classList.remove('active'));
+            if (button) {
+                button.classList.add('active');
+            } else {
+                console.error(`Button not found for ${buttonType}`);
+            }
+        }
+
+        async function loadContent(url, type) {
+            console.log(`Attempting to load content from: ${url}`);
+            const contentViewer = dom.viewer.content;
+            const htmlViewer = dom.viewer.html;
+
+            if (type === 'html') {
+                contentViewer.src = 'about:blank';
+                htmlViewer.srcdoc = '';
+                contentViewer.style.display = 'none';
+                htmlViewer.style.display = 'block';
+            } else {
+                htmlViewer.srcdoc = '';
+                contentViewer.src = 'about:blank';
+                htmlViewer.style.display = 'none';
+                contentViewer.style.display = 'block';
+            }
+
+            try {
+                if (type === 'html') {
+                    const response = await fetch(url, { cache: 'no-store' });
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    const html = await response.text();
+                    htmlViewer.srcdoc = html;
+                    console.log('Content loaded successfully');
+                } else {
+                    contentViewer.src = url;
+                    console.log('External URL loaded');
+                }
+
+                await new Promise((resolve, reject) => {
+                    const activeViewer = type === 'html' ? htmlViewer : contentViewer;
+                    activeViewer.onload = () => {
+                        console.log('Viewer loaded successfully');
+                        resolve();
+                    };
+                    activeViewer.onerror = (error) => {
+                        console.error('Viewer load error:', error);
+                        reject(error);
+                    };
+                });
+            } catch (error) {
+                console.error('Loading error:', error);
+                htmlViewer.srcdoc = `<p>Error loading content: ${error.message}</p>`;
+            }
+        }
+
+        function setupEventListeners() {
+            // Top menu buttons
+            const buttons = [
+                { id: 'media-btn', url: 'https://www.digitalforgerywork.shop/dojjo', log: 'Media button clicked' },
+                { id: 'theater-btn', url: 'https://www.digitalforgerywork.shop/theater', log: 'Theater button clicked' },
+                { id: 'runway-btn', url: 'https://www.digitalforgerywork.shop/runway', log: 'Runway button clicked' },
+                { id: 'gallery-top-btn', url: 'https://www.digitalforgerywork.shop/gallery', log: 'Gallery (top) button clicked' },
+                { id: 'space-btn', url: 'https://www.digitalforgerywork.shop/space', log: 'Space button clicked' },
+                { id: 'avatar-top-btn', url: 'https://www.digitalforgerywork.shop/avatar', log: 'Avatar (top) button clicked' },
+                { id: 'design-top-btn', url: 'https://www.digitalforgerywork.shop/design', log: 'Design (top) button clicked' },
+                { id: 'info-btn', url: 'https://www.digitalforgerywork.shop/info', log: 'Info button clicked' }
+            ];
+
+            buttons.forEach(({ id, url, log }) => {
+                const btn = document.getElementById(id);
+                if (btn) {
+                    btn.addEventListener('click', () => {
+                        console.log(log);
+                        setActiveButton(btn, 'media');
+                        window.top.location.href = url;
+                    });
+                } else {
+                    console.error(`Button with ID ${id} not found`);
+                }
+            });
+
+            // Collection buttons
+            const collectionButtons = [
+                { id: 'c2w2-btn', url: '', log: 'C2W2 button clicked' },
+               
+            ];
+
+            collectionButtons.forEach(({ id, url, log }) => {
+                const btn = document.getElementById(id);
+                if (btn) {
+                    btn.addEventListener('click', () => {
+                        console.log(log);
+                        setActiveButton(btn, 'collection');
+                        loadContent(url, 'html');
+                    });
+                } else {
+                    console.error(`Button with ID ${id} not found`);
+                }
+            });
+
+            // Initialize
+            const c2w2Btn = document.getElementById('c2w2-btn');
+            const runwayBtn = document.getElementById('runway-btn');
+
+            if (c2w2Btn) {
+                console.log('Page loaded, triggering C2W2 button click');
+                setActiveButton(c2w2Btn, 'collection');
+                loadContent('https://raw.githubusercontent.com/decentralize-dfw/finder/main/c2wrunway.html', 'html');
+            } else {
+                console.error('C2W2 button not found on page load');
+            }
+
+            if (runwayBtn) {
+                console.log('Setting Runway as active by default');
+                setActiveButton(runwayBtn, 'media');
+            } else {
+                console.error('Runway button not found');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM fully loaded, setting up event listeners');
+            setupEventListeners();
+        });
+    </script>
+</body>
+</html>
