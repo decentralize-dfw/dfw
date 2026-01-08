@@ -1,0 +1,1387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DFW Files - Digital Forgery Workshop</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #1e1e1e;
+            --surface: #2d2d2d;
+            --surface-hover: #3d3d3d;
+            --text: #ffffff;
+            --text-dim: #a0a0a0;
+            --border: #404040;
+            --accent: #0a84ff;
+            --accent-hover: #0066cc;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        /* Top Menu Bar */
+        .menu-bar {
+            background: #1c1c1c;
+            border-bottom: 1px solid var(--border);
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            font-size: 13px;
+            height: 40px;
+        }
+
+        .menu-item {
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+
+        .menu-item:hover {
+            background: var(--surface-hover);
+        }
+
+        .menu-brand {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        /* Main Container */
+        .finder-container {
+            display: flex;
+            height: calc(100vh - 40px);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 200px;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            padding: 16px 8px;
+            overflow-y: auto;
+        }
+
+        .sidebar-section {
+            margin-bottom: 20px;
+        }
+
+        .sidebar-title {
+            font-size: 11px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 8px 12px;
+            font-weight: 600;
+        }
+
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 12px;
+            font-size: 13px;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+
+        .sidebar-item:hover {
+            background: var(--surface-hover);
+        }
+
+        .sidebar-item.active {
+            background: var(--accent);
+        }
+
+        .sidebar-icon {
+            font-size: 16px;
+        }
+
+        /* Content Area */
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg);
+        }
+
+        /* Toolbar */
+        .toolbar {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .toolbar-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .toolbar-btn:hover {
+            background: var(--surface-hover);
+            border-color: var(--text-dim);
+        }
+
+        .breadcrumb {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--text-dim);
+        }
+
+        .breadcrumb-item {
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .breadcrumb-item:hover {
+            background: var(--surface-hover);
+            color: var(--text);
+        }
+
+        .breadcrumb-separator {
+            color: var(--text-dim);
+        }
+
+        /* File Grid */
+        .file-grid {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 20px;
+            align-content: start;
+        }
+
+        .file-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            padding: 12px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+
+        .file-item:hover {
+            background: var(--surface);
+        }
+
+        .file-icon {
+            width: 64px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            border-radius: 8px;
+        }
+
+        .file-icon.folder {
+            color: #5eb3f6;
+        }
+
+        .file-icon.image {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-size: 32px;
+        }
+
+        .file-icon.video {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            font-size: 32px;
+        }
+
+        .file-icon.text {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            font-size: 32px;
+        }
+
+        .file-icon.link {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            font-size: 32px;
+        }
+
+        .file-icon.html {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            font-size: 32px;
+        }
+
+        .file-thumbnail {
+            width: 64px;
+            height: 64px;
+            border-radius: 8px;
+            object-fit: cover;
+            border: 1px solid var(--border);
+        }
+
+        .file-name {
+            font-size: 12px;
+            text-align: center;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--surface);
+            border-radius: 12px;
+            max-width: 900px;
+            width: 100%;
+            max-height: 90vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: transparent;
+            border: none;
+            color: var(--text);
+            font-size: 24px;
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+
+        .modal-close:hover {
+            background: var(--surface-hover);
+        }
+
+        .modal-body {
+            padding: 20px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .modal-media {
+            width: 100%;
+            max-height: 400px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .modal-media img,
+        .modal-media video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .modal-description {
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--text-dim);
+            margin-bottom: 20px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .modal-btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+            display: inline-block;
+        }
+
+        .modal-btn-primary {
+            background: var(--accent);
+            color: white;
+            border: none;
+        }
+
+        .modal-btn-primary:hover {
+            background: var(--accent-hover);
+        }
+
+        .modal-btn-secondary {
+            background: transparent;
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .modal-btn-secondary:hover {
+            border-color: var(--text);
+        }
+
+        /* Mobile Styles */
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+
+            .file-grid {
+                grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+                gap: 16px;
+                padding: 16px;
+            }
+
+            .file-icon {
+                width: 48px;
+                height: 48px;
+                font-size: 36px;
+            }
+
+            .file-thumbnail {
+                width: 48px;
+                height: 48px;
+            }
+
+            .file-name {
+                font-size: 11px;
+            }
+
+            .modal {
+                padding: 20px;
+            }
+
+            .breadcrumb {
+                font-size: 12px;
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--surface-hover);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--border);
+        }
+    </style>
+</head>
+<body>
+    <!-- Menu Bar -->
+    <div class="menu-bar">
+        <div class="menu-brand">🗂️ DFW</div>
+        <div class="menu-item">File</div>
+        <div class="menu-item">Edit</div>
+        <div class="menu-item">View</div>
+        <div class="menu-item">Go</div>
+    </div>
+
+    <!-- Finder Container -->
+    <div class="finder-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title">Favorites</div>
+                <div class="sidebar-item active" data-path="/">
+                    <span class="sidebar-icon">🏠</span>
+                    <span>C:/</span>
+                </div>
+                <div class="sidebar-item" data-path="/Experience">
+                    <span class="sidebar-icon">🎭</span>
+                    <span>Experience</span>
+                </div>
+                <div class="sidebar-item" data-path="/Gallery">
+                    <span class="sidebar-icon">🖼️</span>
+                    <span>Gallery</span>
+                </div>
+                <div class="sidebar-item" data-path="/Design">
+                    <span class="sidebar-icon">✨</span>
+                    <span>Design</span>
+                </div>
+                <div class="sidebar-item" data-path="/Info">
+                    <span class="sidebar-icon">ℹ️</span>
+                    <span>Info</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <!-- Toolbar -->
+            <div class="toolbar">
+                <button class="toolbar-btn" id="back-btn">◀</button>
+                <button class="toolbar-btn" id="forward-btn">▶</button>
+                <div class="breadcrumb" id="breadcrumb"></div>
+            </div>
+
+            <!-- File Grid -->
+            <div class="file-grid" id="file-grid"></div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modal-title"></h2>
+                <button class="modal-close" id="modal-close">&times;</button>
+            </div>
+            <div class="modal-body" id="modal-body"></div>
+        </div>
+    </div>
+
+    <script>
+        // File System Database
+        const fileSystem = {
+            '/': {
+                type: 'folder',
+                name: 'C:/',
+                children: {
+                    'README.txt': {
+                        type: 'text',
+                        name: 'README.txt',
+                        content: 'DIGITAL FORGERY WORKSHOP\n\nWelcome to DFW - where architecture meets fashion, art intersects with technology, and virtual spaces become living experiences.\n\nExplore our folders:\n• Experience - Immersive theater and runway events\n• Gallery - Virtual exhibitions and architectural spaces\n• Design - Digital objects, avatars, and collections\n• Info - About DFW, services, and contact'
+                    },
+                    'Experience': {
+                        type: 'folder',
+                        name: 'Experience',
+                        children: {
+                            'Theater': {
+                                type: 'folder',
+                                name: 'Theater',
+                                children: {
+                                    'Hatch': {
+                                        type: 'folder',
+                                        name: 'Hatch',
+                                        children: {
+                                            'README.txt': {
+                                                type: 'text',
+                                                name: 'README.txt',
+                                                content: 'HATCH - Virtual Theater No:3, 07/24\n\nIn a nihilistic virtual setup, two digital beings and an external entity explore existence, freedom, and control. Their journey leads them to question the nature of their reality and dimensions, uncovering deeper truths that challenge their roles. The external entity faces a pivotal choice that could redefine their understanding of existence.\n\nHatch represents an innovative intersection of theater and technology, realized through WebXR. This 27-minute immersive experience unfolds in a metaverse environment where audiences participate either through VR headsets with complete freedom of movement or via computer with access to 32 distinct camera angles.\n\nTechnical Highlights:\n• WebXR implementation for VR and desktop\n• 32 dynamic camera angles\n• Real-time 3D environment\n• 27-minute runtime\n• Hyperfy platform integration'
+                                            },
+                                            'poster.jpg': {
+                                                type: 'image',
+                                                name: 'poster.jpg',
+                                                url: 'https://static.wixstatic.com/media/54a996_26886a672f784198b9f8af4c4c93a5b9~mv2.jpg'
+                                            },
+                                            'trailer.mp4': {
+                                                type: 'video',
+                                                name: 'trailer.mp4',
+                                                url: 'https://video.wixstatic.com/video/54a996_a6992df717194d93bb8b40ac47036304/1080p/mp4/file.mp4'
+                                            },
+                                            'experience.link': {
+                                                type: 'link',
+                                                name: 'experience.link',
+                                                url: 'https://hyperfy.io/hatch',
+                                                description: 'Visit Hatch in Hyperfy'
+                                            },
+                                            'details.html': {
+                                                type: 'html',
+                                                name: 'details.html',
+                                                url: 'theater-hatch.html'
+                                            }
+                                        }
+                                    },
+                                    'Balloon': {
+                                        type: 'folder',
+                                        name: 'Balloon',
+                                        children: {
+                                            'README.txt': {
+                                                type: 'text',
+                                                name: 'README.txt',
+                                                content: 'BALLOON - Virtual Theater No:2, 05/24\n\nBalloon No. 2 is a 10-minute WebXR theater piece exploring the absurdity and depth of digital identity in metaverse culture. Accessible via Hyperfy, it places the audience in a surreal environment through VR or desktop, blending architecture, fashion, and AI-driven dialogue.\n\nThe technical architecture employs smart objects that dynamically load and unload, making it accessible across various devices. The piece challenges conventional notions of digital space and identity through theatrical performance in a virtual environment.\n\nKey Features:\n• 10-minute WebXR experience\n• AI-driven dialogue system\n• Dynamic asset loading\n• Multi-device accessibility\n• Surreal architectural design'
+                                            },
+                                            'poster.jpg': {
+                                                type: 'image',
+                                                name: 'poster.jpg',
+                                                url: 'https://static.wixstatic.com/media/54a996_c9415cfa41d943a7ae7ec18cc8a81a63~mv2.png'
+                                            },
+                                            'experience.link': {
+                                                type: 'link',
+                                                name: 'experience.link',
+                                                url: 'https://hyperfy.io/balloon',
+                                                description: 'Visit Balloon in Hyperfy'
+                                            },
+                                            'details.html': {
+                                                type: 'html',
+                                                name: 'details.html',
+                                                url: 'theater-balloon.html'
+                                            }
+                                        }
+                                    },
+                                    'Why We Exist': {
+                                        type: 'folder',
+                                        name: 'Why We Exist',
+                                        children: {
+                                            'README.txt': {
+                                                type: 'text',
+                                                name: 'README.txt',
+                                                content: 'WHY WE EXIST - Virtual Theater No:1, 11/23\n\nWhy We Exist emerges as an innovative virtual theater experience, marking a pioneering venture into the realm of digital performance art. This concept pushes the boundaries of digital creativity and immersive storytelling through two distinct modes: Cinematic and Immersive.\n\nThe experience balances philosophical depth with accessible storytelling, creating multiple layers of engagement for different audience members. It explores fundamental questions about existence, consciousness, and purpose in the digital age.\n\nExperience Modes:\n• Cinematic Mode - Guided narrative experience\n• Immersive Mode - Free exploration with VR\n• Philosophical narrative depth\n• Accessible storytelling\n• Multi-layered engagement'
+                                            },
+                                            'poster.jpg': {
+                                                type: 'image',
+                                                name: 'poster.jpg',
+                                                url: 'https://static.wixstatic.com/media/54a996_ba80e31fd25540a5b648f40640b7eaae~mv2.jpg'
+                                            },
+                                            'experience.link': {
+                                                type: 'link',
+                                                name: 'experience.link',
+                                                url: 'https://hyperfy.io/pill',
+                                                description: 'Visit Why We Exist in Hyperfy'
+                                            },
+                                            'details.html': {
+                                                type: 'html',
+                                                name: 'details.html',
+                                                url: 'theater-wwe.html'
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            'Runway': {
+                                type: 'folder',
+                                name: 'Runway',
+                                children: {
+                                    'C2W2': {
+                                        type: 'folder',
+                                        name: 'C2W2',
+                                        children: {
+                                            'README.txt': {
+                                                type: 'text',
+                                                name: 'README.txt',
+                                                content: 'C2W2 RUNWAY - Metaverse Runway Event, 2025\n\nThe C2W2 virtual runway on Hyperfy is a 30-minute metaverse event showcasing nearly 50 AI-designed avatars across six thematic parts, blending traditional art, virtual fashion, NFTs, and transhumanism.\n\nThis groundbreaking event explores the intersection of fashion, technology, and digital identity in a fully immersive virtual environment. The runway presentation reimagines fashion shows for the metaverse era.\n\nEvent Details:\n• 30-minute runtime\n• Nearly 50 AI-designed avatars\n• 6 thematic sections\n• Traditional art meets digital fashion\n• NFT integration\n• Transhuman aesthetics'
+                                            },
+                                            'poster.jpg': {
+                                                type: 'image',
+                                                name: 'poster.jpg',
+                                                url: 'https://static.wixstatic.com/media/54a996_0dcf9180991d4e49942304a01f9224c5~mv2.jpg'
+                                            },
+                                            'show.mp4': {
+                                                type: 'video',
+                                                name: 'show.mp4',
+                                                url: 'https://video.wixstatic.com/video/54a996_3228af9d616c49b58bf10884ffd7657a/1080p/mp4/file.mp4'
+                                            },
+                                            'experience.link': {
+                                                type: 'link',
+                                                name: 'experience.link',
+                                                url: 'https://hyperfy.io/c2w2',
+                                                description: 'Visit C2W2 Runway in Hyperfy'
+                                            },
+                                            'details.html': {
+                                                type: 'html',
+                                                name: 'details.html',
+                                                url: 'runway-c2w2.html'
+                                            }
+                                        }
+                                    },
+                                    'C2W': {
+                                        type: 'folder',
+                                        name: 'C2W',
+                                        children: {
+                                            'README.txt': {
+                                                type: 'text',
+                                                name: 'README.txt',
+                                                content: 'C2W RUNWAY - Metaverse Runway Event, 09/11/23\n\nThe C2W Metaverse Runway event showcased a distinctive digital fashion collection. This event provided attendees with an immersive virtual fashion show experience directly from their browsers without the need for downloads.\n\nIt represents a new paradigm in digital fashion presentation and audience engagement, demonstrating the potential of WebXR for fashion shows.\n\nFeatures:\n• Browser-based experience\n• No downloads required\n• 16 unique avatar designs\n• Code meets couture\n• Digital identity exploration'
+                                            },
+                                            'poster.jpg': {
+                                                type: 'image',
+                                                name: 'poster.jpg',
+                                                url: 'https://static.wixstatic.com/media/54a996_e049a6653d214b2f9237891d21fb05af~mv2.jpg'
+                                            },
+                                            'experience.link': {
+                                                type: 'link',
+                                                name: 'experience.link',
+                                                url: 'https://hyperfy.io/c2w',
+                                                description: 'Visit C2W Runway in Hyperfy'
+                                            },
+                                            'details.html': {
+                                                type: 'html',
+                                                name: 'details.html',
+                                                url: 'runway-c2w.html'
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    'Gallery': {
+                        type: 'folder',
+                        name: 'Gallery',
+                        children: {
+                            'Scaffold': {
+                                type: 'folder',
+                                name: 'Scaffold',
+                                children: {
+                                    'README.txt': {
+                                        type: 'text',
+                                        name: 'README.txt',
+                                        content: 'SCAFFOLD - 3D Architectural Browser, 2024\n\nA silent structure built around architectural smart objects. Explore all 50 digital topographies with a single click, or experiment with guided tours via NPCs.\n\nDrawing inspiration from the lunar landscapes in 2001: A Space Odyssey, Scaffold serves as an open museum, integrating digital models with the existing architecture of DFW. Unlike traditional 2D websites that require multiple tabs for different designs, Scaffold offers a single, immersive space.\n\nFeatures:\n• 50+ architectural works\n• Smart object system\n• NPC guided tours\n• Single immersive space\n• Lunar-inspired aesthetics'
+                                    },
+                                    'preview.jpg': {
+                                        type: 'image',
+                                        name: 'preview.jpg',
+                                        url: 'https://static.wixstatic.com/media/54a996_a4275b8206ae43d3ae134f283411acf2~mv2.jpg'
+                                    },
+                                    'tour.mp4': {
+                                        type: 'video',
+                                        name: 'tour.mp4',
+                                        url: 'https://video.wixstatic.com/video/54a996_ac819c2d59714a1e9059aa9019f8443c/1080p/mp4/file.mp4'
+                                    },
+                                    'visit.link': {
+                                        type: 'link',
+                                        name: 'visit.link',
+                                        url: 'https://hyperfy.io/scaffold',
+                                        description: 'Visit Scaffold Gallery'
+                                    },
+                                    'details.html': {
+                                        type: 'html',
+                                        name: 'details.html',
+                                        url: 'gallery-scaffold.html'
+                                    }
+                                }
+                            },
+                            'Retail': {
+                                type: 'folder',
+                                name: 'Retail',
+                                children: {
+                                    'README.txt': {
+                                        type: 'text',
+                                        name: 'README.txt',
+                                        content: 'RETAIL - 3D Beings Shop for C2W2.vrm, 2025\n\nRetail in the metaverse bridges the gap between fashion and daily life, offering a unique platform for connection and innovation. Go in, walk inside, test the garments.\n\nThis virtual retail space represents a new approach to digital commerce and fashion exploration, allowing visitors to try on avatars and experience virtual fashion in an immersive environment.\n\nExperience:\n• Virtual try-on system\n• Interactive garment testing\n• C2W2.vrm avatar collection\n• Immersive shopping environment\n• New retail paradigm'
+                                    },
+                                    'preview.jpg': {
+                                        type: 'image',
+                                        name: 'preview.jpg',
+                                        url: 'https://static.wixstatic.com/media/54a996_09c1a68b1dff4c168445589c079c6596~mv2.jpg'
+                                    },
+                                    'visit.link': {
+                                        type: 'link',
+                                        name: 'visit.link',
+                                        url: 'https://hyperfy.io/retail',
+                                        description: 'Visit Retail Space'
+                                    },
+                                    'details.html': {
+                                        type: 'html',
+                                        name: 'details.html',
+                                        url: 'gallery-retail.html'
+                                    }
+                                }
+                            },
+                            'Neue2 Dojo': {
+                                type: 'folder',
+                                name: 'Neue2 Dojo',
+                                children: {
+                                    'README.txt': {
+                                        type: 'text',
+                                        name: 'README.txt',
+                                        content: 'NEUE2 DOJO GALLERY - Independent Gallery, 2023\n\nNeue2 Dojo Gallery stands at the forefront of a cultural revolution, exemplifying how art and technology can coalesce to create entirely new paradigms for cultural expression and engagement.\n\nThis virtual gallery space pushes the boundaries of digital art curation and presentation, creating a new model for independent galleries in virtual spaces.\n\nGallery Features:\n• Independent curation\n• Cultural innovation\n• Art-tech fusion\n• New exhibition paradigms\n• Community-focused'
+                                    },
+                                    'preview.jpg': {
+                                        type: 'image',
+                                        name: 'preview.jpg',
+                                        url: 'https://static.wixstatic.com/media/54a996_6af9880c704747ee91e6760a6c6443ad~mv2.jpg'
+                                    },
+                                    'visit.link': {
+                                        type: 'link',
+                                        name: 'visit.link',
+                                        url: 'https://hyperfy.io/neue2dojo',
+                                        description: 'Visit Neue2 Dojo'
+                                    },
+                                    'details.html': {
+                                        type: 'html',
+                                        name: 'details.html',
+                                        url: 'gallery-neue2dojo.html'
+                                    }
+                                }
+                            },
+                            'Elements Store': {
+                                type: 'folder',
+                                name: 'Elements Store',
+                                children: {
+                                    'README.txt': {
+                                        type: 'text',
+                                        name: 'README.txt',
+                                        content: 'ELEMENTS STORE - Virtual Design Store, 2024\n\nThe Elements Store in Hyperfy is a futuristic, minimalist three-floor gallery showcasing DFW\'s design legacy, offering 15,625 unique spatial variations through customizable layouts, materials, and colors.\n\nExperience the future of design retail in a fully immersive virtual environment where architecture, furniture, and art converge.\n\nStore Features:\n• Three-floor gallery\n• 15,625+ spatial variations\n• Customizable layouts\n• Material variations\n• Color customization\n• Design legacy showcase'
+                                    },
+                                    'preview.jpg': {
+                                        type: 'image',
+                                        name: 'preview.jpg',
+                                        url: 'https://static.wixstatic.com/media/54a996_249824f6849b4fd78d4ac6b9691b226e~mv2.jpg'
+                                    },
+                                    'visit.link': {
+                                        type: 'link',
+                                        name: 'visit.link',
+                                        url: 'https://hyperfy.io/dfw',
+                                        description: 'Visit Elements Store'
+                                    },
+                                    'details.html': {
+                                        type: 'html',
+                                        name: 'details.html',
+                                        url: 'gallery-elements.html'
+                                    }
+                                }
+                            },
+                            'Black City': {
+                                type: 'folder',
+                                name: 'Black City',
+                                children: {
+                                    'README.txt': {
+                                        type: 'text',
+                                        name: 'README.txt',
+                                        content: 'BLACK CITY - Decentralized Virtual ROOMscape, 2023\n\nA virtual city with 8 independent museums (MOCA ROOMS), designed by DFW and curated on-chain by their citizens. This decentralized approach to virtual space represents a new model for community-driven digital environments.\n\nBlack City explores the intersection of architecture, community governance, and blockchain technology in virtual space design.\n\nCity Features:\n• 8 independent museums\n• On-chain curation\n• Community governance\n• MOCA ROOMS integration\n• Decentralized model'
+                                    },
+                                    'preview.jpg': {
+                                        type: 'image',
+                                        name: 'preview.jpg',
+                                        url: 'https://static.wixstatic.com/media/54a996_d7c0f7edddad4724bf78fa801b49da3a~mv2.jpg'
+                                    },
+                                    'visit.link': {
+                                        type: 'link',
+                                        name: 'visit.link',
+                                        url: 'https://hyperfy.io/blackcity',
+                                        description: 'Visit Black City'
+                                    },
+                                    'details.html': {
+                                        type: 'html',
+                                        name: 'details.html',
+                                        url: 'gallery-blackcity.html'
+                                    }
+                                }
+                            },
+                            'Forge': {
+                                type: 'folder',
+                                name: 'Forge',
+                                children: {
+                                    'README.txt': {
+                                        type: 'text',
+                                        name: 'README.txt',
+                                        content: 'FORGE - NoiseDao Audio Museumworld\n\nNoiseDAO World Design: A Decentralized Approach to Music and Art. An immersive audio-visual experience in the metaverse that explores the intersection of sound, space, and blockchain technology.\n\nForge creates a new paradigm for music venues and art spaces in virtual environments, combining spatial audio with architectural design.\n\nMuseum Features:\n• Audio-visual immersion\n• NoiseDAO collaboration\n• Spatial audio design\n• Blockchain integration\n• Decentralized curation'
+                                    },
+                                    'preview.jpg': {
+                                        type: 'image',
+                                        name: 'preview.jpg',
+                                        url: 'https://static.wixstatic.com/media/54a996_3e3a8b5e493a43f1b40c296812393a7e~mv2.jpg'
+                                    },
+                                    'visit.link': {
+                                        type: 'link',
+                                        name: 'visit.link',
+                                        url: 'https://hyperfy.io/noise',
+                                        description: 'Visit Forge'
+                                    },
+                                    'details.html': {
+                                        type: 'html',
+                                        name: 'details.html',
+                                        url: 'gallery-forge.html'
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    'Design': {
+                        type: 'folder',
+                        name: 'Design',
+                        children: {
+                            'Space': {
+                                type: 'folder',
+                                name: 'Space',
+                                children: {
+                                    'Digital Topographies': {
+                                        type: 'folder',
+                                        name: 'Digital Topographies',
+                                        children: {
+                                            'README.txt': {
+                                                type: 'text',
+                                                name: 'README.txt',
+                                                content: 'DIGITAL TOPOGRAPHIES - 3D Architectural Works\n\nDigital Topographies redefines architecture by liberating it from gravity, weather, and material limits. Conceived as immersive 3D models, it spans galleries, arenas, pavilions, workplaces, and retail spaces designed for avatars.\n\nThis collection represents a new language of spatial design freed from physical constraints, exploring the possibilities of architecture in virtual environments.\n\nCollection:\n• 50+ architectural works\n• Galleries and arenas\n• Pavilions and workplaces\n• Retail spaces\n• Avatar-scale design\n• Physics-free architecture'
+                                            },
+                                            'preview.jpg': {
+                                                type: 'image',
+                                                name: 'preview.jpg',
+                                                url: 'https://static.wixstatic.com/media/54a996_3243206499e746e99f403f1865458700~mv2.jpg'
+                                            },
+                                            'gallery.link': {
+                                                type: 'link',
+                                                name: 'gallery.link',
+                                                url: 'https://v2.oncyber.io/digitaltopographies',
+                                                description: 'View Digital Topographies Gallery'
+                                            },
+                                            'details.html': {
+                                                type: 'html',
+                                                name: 'details.html',
+                                                url: 'space-dt.html'
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            'Avatar': {
+                                type: 'folder',
+                                name: 'Avatar',
+                                children: {
+                                    'C2W2 Avatars': {
+                                        type: 'folder',
+                                        name: 'C2W2 Avatars',
+                                        children: {
+                                            'README.txt': {
+                                                type: 'text',
+                                                name: 'README.txt',
+                                                content: 'C2W2 AVATARS - VRM Collection for Virtual Net Runners, 2025\n\nC2W2 celebrates human culture in a shape of a gateway to premium virtual identity: avatars forged for net runners, digital agents, sparring partners, or facades across social networks.\n\n+60 VRM avatars ready to represent you in the metaverse. Each avatar is a carefully crafted digital persona designed for maximum expression and technical compatibility.\n\nCollection:\n• 60+ VRM avatars\n• Net runner personas\n• Digital agent ready\n• Cross-platform compatible\n• Premium virtual identity\n• AI-designed aesthetics'
+                                            },
+                                            'preview.jpg': {
+                                                type: 'image',
+                                                name: 'preview.jpg',
+                                                url: 'https://static.wixstatic.com/media/54a996_8ea705af2b04470db99ed4122b5bbb5a~mv2.jpg'
+                                            },
+                                            'showcase.mp4': {
+                                                type: 'video',
+                                                name: 'showcase.mp4',
+                                                url: 'https://video.wixstatic.com/video/54a996_2aaaafa5eaaa45db90f654f6266f3520/1080p/mp4/file.mp4'
+                                            },
+                                            'collection.link': {
+                                                type: 'link',
+                                                name: 'collection.link',
+                                                url: 'https://hyperfy.io/c2w2',
+                                                description: 'View C2W2 Avatar Collection'
+                                            },
+                                            'details.html': {
+                                                type: 'html',
+                                                name: 'details.html',
+                                                url: 'avatar-c2w2.html'
+                                            }
+                                        }
+                                    },
+                                    'C2W Avatars': {
+                                        type: 'folder',
+                                        name: 'C2W Avatars',
+                                        children: {
+                                            'README.txt': {
+                                                type: 'text',
+                                                name: 'README.txt',
+                                                content: 'C2W AVATARS - VRM Avatars x16, 11/23\n\nA conversation between code and couture, between the avatar and the individual. These 16 personas are not mere 3D pixels; they are the new expression of self.\n\nEach avatar represents a unique digital identity crafted at the intersection of fashion and technology, combining artistic vision with technical precision.\n\nCollection:\n• 16 unique avatars\n• Code meets couture\n• VRM format\n• Fashion-forward design\n• Digital self-expression\n• Technical precision'
+                                            },
+                                            'preview.jpg': {
+                                                type: 'image',
+                                                name: 'preview.jpg',
+                                                url: 'https://static.wixstatic.com/media/54a996_800a41f3b5cb4005a25b8d14eabbad45~mv2.jpg'
+                                            },
+                                            'showcase.mp4': {
+                                                type: 'video',
+                                                name: 'showcase.mp4',
+                                                url: 'https://video.wixstatic.com/video/54a996_ec462c493fd541a6801a7b1e1ccd59fb/1080p/mp4/file.mp4'
+                                            },
+                                            'collection.link': {
+                                                type: 'link',
+                                                name: 'collection.link',
+                                                url: 'https://hyperfy.io/c2w',
+                                                description: 'View C2W Avatar Collection'
+                                            },
+                                            'details.html': {
+                                                type: 'html',
+                                                name: 'details.html',
+                                                url: 'avatar-c2w.html'
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            'Collections': {
+                                type: 'folder',
+                                name: 'Collections',
+                                children: {
+                                    'All Designs': {
+                                        type: 'folder',
+                                        name: 'All Designs',
+                                        children: {
+                                            'README.txt': {
+                                                type: 'text',
+                                                name: 'README.txt',
+                                                content: 'DFW DESIGN MARKET - On-chain Design Collection\n\nFurniture, Sculpture, Automobile design for virtual habitats, on-chain glb files. Browse and collect digital design assets.\n\nThis marketplace represents the future of design ownership and digital collectibles, offering a comprehensive catalog of virtual objects for metaverse spaces.\n\nMarket Features:\n• On-chain ownership\n• GLB file format\n• Furniture collection\n• Sculpture pieces\n• Automobile designs\n• Virtual habitat ready'
+                                            },
+                                            'preview.jpg': {
+                                                type: 'image',
+                                                name: 'preview.jpg',
+                                                url: 'https://static.wixstatic.com/media/54a996_2598bd0a3bab4c419b1939d8cee8b485~mv2.png'
+                                            },
+                                            'marketplace.link': {
+                                                type: 'link',
+                                                name: 'marketplace.link',
+                                                url: 'https://opensea.io/collection/dfw-design',
+                                                description: 'Visit DFW Design Market'
+                                            },
+                                            'details.html': {
+                                                type: 'html',
+                                                name: 'details.html',
+                                                url: 'design-all.html'
+                                            }
+                                        }
+                                    },
+                                    'Furniture': {
+                                        type: 'folder',
+                                        name: 'Furniture',
+                                        children: {
+                                            'README.txt': {
+                                                type: 'text',
+                                                name: 'README.txt',
+                                                content: 'FURNITURE COLLECTION\n\nVirtual furniture designed for metaverse spaces, combining aesthetic innovation with functional design principles adapted for digital environments.\n\nExplore chairs, sofas, tables, and more - each piece crafted for virtual habitats and avatar-scale interactions.'
+                                            },
+                                            'details.html': {
+                                                type: 'html',
+                                                name: 'details.html',
+                                                url: 'design-furniture.html'
+                                            }
+                                        }
+                                    },
+                                    'Chairs': {
+                                        type: 'folder',
+                                        name: 'Chairs',
+                                        children: {
+                                            'README.txt': {
+                                                type: 'text',
+                                                name: 'README.txt',
+                                                content: 'MERMAID CHAIR - Virtual Chair, 2021\n\nThis is furniture for the post-physical age, designed for spaces that may exist only in collective imagination, yet somehow more real than anything we can touch.\n\nThe first chair ever minted on Ethereum. A landmark piece in the history of digital design and NFT art.\n\nSignificance:\n• First chair minted on Ethereum\n• Post-physical design\n• NFT art landmark\n• Digital collectible\n• Virtual furniture pioneer'
+                                            },
+                                            'preview.jpg': {
+                                                type: 'image',
+                                                name: 'preview.jpg',
+                                                url: 'https://static.wixstatic.com/media/54a996_1bb979e7beeb40caa7e8b9455e1688bb~mv2.jpg'
+                                            },
+                                            'view.link': {
+                                                type: 'link',
+                                                name: 'view.link',
+                                                url: 'https://app.vectary.com/p/4JF24dDWQEjfgAUUwPZTLZ',
+                                                description: 'View Mermaid Chair in 3D'
+                                            },
+                                            'details.html': {
+                                                type: 'html',
+                                                name: 'details.html',
+                                                url: 'design-chair.html'
+                                            }
+                                        }
+                                    },
+                                    'Sofas': {
+                                        type: 'folder',
+                                        name: 'Sofas',
+                                        children: {
+                                            'README.txt': {
+                                                type: 'text',
+                                                name: 'README.txt',
+                                                content: 'SOFA COLLECTION\n\nVirtual sofas and seating designed for digital lounges and social spaces in the metaverse. Each piece explores new forms freed from gravitational and material constraints.'
+                                            },
+                                            'details.html': {
+                                                type: 'html',
+                                                name: 'details.html',
+                                                url: 'design-sofa.html'
+                                            }
+                                        }
+                                    },
+                                    'Tables': {
+                                        type: 'folder',
+                                        name: 'Tables',
+                                        children: {
+                                            'README.txt': {
+                                                type: 'text',
+                                                name: 'README.txt',
+                                                content: 'TABLE COLLECTION\n\nVirtual tables for workspaces, galleries, and social environments. Functional design reimagined for digital spaces where traditional constraints no longer apply.'
+                                            },
+                                            'details.html': {
+                                                type: 'html',
+                                                name: 'details.html',
+                                                url: 'design-table.html'
+                                            }
+                                        }
+                                    },
+                                    'Sculpture': {
+                                        type: 'folder',
+                                        name: 'Sculpture',
+                                        children: {
+                                            'README.txt': {
+                                                type: 'text',
+                                                name: 'README.txt',
+                                                content: 'SCULPTURE COLLECTION\n\nDigital sculptures exploring form, space, and meaning in virtual environments. Art pieces designed for metaverse galleries and public spaces.'
+                                            },
+                                            'details.html': {
+                                                type: 'html',
+                                                name: 'details.html',
+                                                url: 'design-sculpture.html'
+                                            }
+                                        }
+                                    },
+                                    'Automobiles': {
+                                        type: 'folder',
+                                        name: 'Automobiles',
+                                        children: {
+                                            'README.txt': {
+                                                type: 'text',
+                                                name: 'README.txt',
+                                                content: 'ZEN BUBBLE RIDER - Virtual Automobile, 2022\n\nRiver stones learned patience, surrendering sharp edges to water and time. From these quiet forms emerged the Bubble Rider - a vessel that breathes, floating in gentle constellation.\n\nA meditation on form, function, and the poetics of virtual transport. This vehicle design explores new possibilities for movement in digital spaces.\n\nDesign Philosophy:\n• Nature-inspired forms\n• Floating constellation\n• Virtual transport poetry\n• Zen aesthetics\n• Breathing geometry'
+                                            },
+                                            'preview.jpg': {
+                                                type: 'image',
+                                                name: 'preview.jpg',
+                                                url: 'https://static.wixstatic.com/media/54a996_d84a54e9f05e454a92cc8df1c0d72209~mv2.jpg'
+                                            },
+                                            'view.link': {
+                                                type: 'link',
+                                                name: 'view.link',
+                                                url: 'https://app.vectary.com/p/5IJ3fz7ZRSeZiqOq17WLeZ',
+                                                description: 'View Zen Bubble Rider in 3D'
+                                            },
+                                            'details.html': {
+                                                type: 'html',
+                                                name: 'details.html',
+                                                url: 'design-auto.html'
+                                            }
+                                        }
+                                    },
+                                    'Music': {
+                                        type: 'folder',
+                                        name: 'Music',
+                                        children: {
+                                            'README.txt': {
+                                                type: 'text',
+                                                name: 'README.txt',
+                                                content: 'MUSIC DESIGN COLLECTION\n\nInstruments, sound installations, and audio-visual objects designed for virtual performance spaces and music venues in the metaverse.'
+                                            },
+                                            'details.html': {
+                                                type: 'html',
+                                                name: 'details.html',
+                                                url: 'design-music.html'
+                                            }
+                                        }
+                                    },
+                                    'Carpets': {
+                                        type: 'folder',
+                                        name: 'Carpets',
+                                        children: {
+                                            'README.txt': {
+                                                type: 'text',
+                                                name: 'README.txt',
+                                                content: 'CARPET COLLECTION\n\nVirtual carpets and floor coverings that define spaces in digital environments. Pattern, color, and texture reimagined for metaverse interiors.'
+                                            },
+                                            'details.html': {
+                                                type: 'html',
+                                                name: 'details.html',
+                                                url: 'design-carpet.html'
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    'Info': {
+                        type: 'folder',
+                        name: 'Info',
+                        children: {
+                            'About.txt': {
+                                type: 'text',
+                                name: 'About.txt',
+                                content: 'DIGITAL FORGERY WORKSHOP\n\nDFW operates at the intersection of architecture, fashion, art, and technology, creating immersive experiences for virtual environments.\n\nWe design:\n• Virtual theater productions\n• Metaverse fashion shows\n• Digital architecture\n• VRM avatars\n• Virtual galleries and museums\n• On-chain design objects\n\nOur work explores the possibilities of digital space, freed from physical constraints, creating new paradigms for creative expression in the metaverse.'
+                            },
+                            'Services.html': {
+                                type: 'html',
+                                name: 'Services.html',
+                                url: 'info-services.html'
+                            },
+                            'Manifesto.html': {
+                                type: 'html',
+                                name: 'Manifesto.html',
+                                url: 'info-manifesto.html'
+                            },
+                            'Contact.link': {
+                                type: 'link',
+                                name: 'Contact.link',
+                                url: 'https://calendly.com/d--f--w/meeting',
+                                description: 'Schedule a meeting with DFW'
+                            },
+                            'Order.link': {
+                                type: 'link',
+                                name: 'Order.link',
+                                url: 'https://www.digitalforgerywork.shop/order-acquire',
+                                description: 'Order or acquire DFW works'
+                            },
+                            'Files.html': {
+                                type: 'html',
+                                name: 'Files.html',
+                                url: 'info-files.html'
+                            }
+                        }
+                    }
+                }
+            }
+        };
+
+        // Navigation State
+        let currentPath = '/';
+        let history = ['/'];
+        let historyIndex = 0;
+
+        // Initialize
+        function init() {
+            renderCurrentPath();
+            setupSidebar();
+            setupToolbar();
+            setupModal();
+        }
+
+        // Get current directory
+        function getCurrentDir() {
+            const parts = currentPath.split('/').filter(p => p);
+            let current = fileSystem['/'];
+
+            for (const part of parts) {
+                if (current.children && current.children[part]) {
+                    current = current.children[part];
+                }
+            }
+
+            return current;
+        }
+
+        // Render current path
+        function renderCurrentPath() {
+            const dir = getCurrentDir();
+            const grid = document.getElementById('file-grid');
+            grid.innerHTML = '';
+
+            if (!dir.children) return;
+
+            Object.entries(dir.children).forEach(([name, item]) => {
+                const fileItem = createFileItem(name, item);
+                grid.appendChild(fileItem);
+            });
+
+            renderBreadcrumb();
+        }
+
+        // Create file item
+        function createFileItem(name, item) {
+            const div = document.createElement('div');
+            div.className = 'file-item';
+
+            let iconHTML = '';
+
+            if (item.type === 'folder') {
+                iconHTML = '<div class="file-icon folder">📁</div>';
+            } else if (item.type === 'text') {
+                iconHTML = '<div class="file-icon text">📄</div>';
+            } else if (item.type === 'image') {
+                if (item.url) {
+                    iconHTML = `<img src="${item.url}" class="file-thumbnail" alt="${name}">`;
+                } else {
+                    iconHTML = '<div class="file-icon image">🖼️</div>';
+                }
+            } else if (item.type === 'video') {
+                iconHTML = '<div class="file-icon video">🎬</div>';
+            } else if (item.type === 'link') {
+                iconHTML = '<div class="file-icon link">🔗</div>';
+            } else if (item.type === 'html') {
+                iconHTML = '<div class="file-icon html">🌐</div>';
+            }
+
+            div.innerHTML = `
+                ${iconHTML}
+                <div class="file-name">${name}</div>
+            `;
+
+            div.addEventListener('click', () => {
+                if (item.type === 'folder') {
+                    navigateTo(currentPath === '/' ? `/${name}` : `${currentPath}/${name}`);
+                } else {
+                    openFile(name, item);
+                }
+            });
+
+            return div;
+        }
+
+        // Navigate to path
+        function navigateTo(path) {
+            currentPath = path;
+            history = history.slice(0, historyIndex + 1);
+            history.push(path);
+            historyIndex = history.length - 1;
+            renderCurrentPath();
+        }
+
+        // Render breadcrumb
+        function renderBreadcrumb() {
+            const breadcrumb = document.getElementById('breadcrumb');
+            const parts = currentPath === '/' ? ['C:/'] : ['C:/', ...currentPath.split('/').filter(p => p)];
+
+            breadcrumb.innerHTML = parts.map((part, index) => {
+                const path = index === 0 ? '/' : '/' + parts.slice(1, index + 1).join('/');
+                const separator = index < parts.length - 1 ? '<span class="breadcrumb-separator">›</span>' : '';
+                return `<span class="breadcrumb-item" data-path="${path}">${part}</span>${separator}`;
+            }).join('');
+
+            breadcrumb.querySelectorAll('.breadcrumb-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    navigateTo(item.dataset.path);
+                });
+            });
+        }
+
+        // Setup sidebar
+        function setupSidebar() {
+            document.querySelectorAll('.sidebar-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+                    navigateTo(item.dataset.path);
+                });
+            });
+        }
+
+        // Setup toolbar
+        function setupToolbar() {
+            document.getElementById('back-btn').addEventListener('click', () => {
+                if (historyIndex > 0) {
+                    historyIndex--;
+                    currentPath = history[historyIndex];
+                    renderCurrentPath();
+                }
+            });
+
+            document.getElementById('forward-btn').addEventListener('click', () => {
+                if (historyIndex < history.length - 1) {
+                    historyIndex++;
+                    currentPath = history[historyIndex];
+                    renderCurrentPath();
+                }
+            });
+        }
+
+        // Open file
+        function openFile(name, item) {
+            if (item.type === 'link') {
+                window.open(item.url, '_blank');
+            } else if (item.type === 'html') {
+                window.location.href = item.url;
+            } else {
+                showModal(name, item);
+            }
+        }
+
+        // Show modal
+        function showModal(name, item) {
+            const modal = document.getElementById('modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalBody = document.getElementById('modal-body');
+
+            modalTitle.textContent = name;
+
+            let bodyHTML = '';
+
+            if (item.type === 'text') {
+                bodyHTML = `<pre style="white-space: pre-wrap; font-family: monospace; line-height: 1.6;">${item.content}</pre>`;
+            } else if (item.type === 'image') {
+                bodyHTML = `
+                    <div class="modal-media">
+                        <img src="${item.url}" alt="${name}">
+                    </div>
+                `;
+            } else if (item.type === 'video') {
+                bodyHTML = `
+                    <div class="modal-media">
+                        <video src="${item.url}" controls autoplay muted></video>
+                    </div>
+                `;
+            }
+
+            modalBody.innerHTML = bodyHTML;
+            modal.classList.add('active');
+        }
+
+        // Setup modal
+        function setupModal() {
+            const modal = document.getElementById('modal');
+            const modalClose = document.getElementById('modal-close');
+
+            modalClose.addEventListener('click', () => {
+                modal.classList.remove('active');
+            });
+
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('active');
+                }
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    modal.classList.remove('active');
+                }
+            });
+        }
+
+        // Start
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
