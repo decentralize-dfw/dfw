@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en" oncontextmenu="return false;" onselectstart="return false" ondragstart="return false">
+<head>
+    <meta charset="UTF-8">
+    <title>Digital Forgery Work 3D Viewer - Sculptures</title>
+    
+    <!-- Original meta tags and CSS remain unchanged -->
+    <meta name="description" content="Digital Forgery Work 3D Viewer - View exclusive 3D sculpture designs.">
+    <meta name="keywords" content="digital forgery, 3D design, digital art, NFT, sculpture">
+    <meta property="og:title" content="Digital Forgery Work 3D Viewer - Sculptures">
+    <meta property="og:type" content="website">
+    <meta property="og:description" content="Explore and interact with exclusive 3D digital sculptures.">
+    
+    <style>
+        /* Your original CSS remains exactly the same */
+        html, body {
+            margin: 0;
+            padding: 0;
+            scrollbar-width: none !important;
+            -ms-overflow-style: none !important;
+            overflow: -moz-scrollbars-none;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            background: transparent;
+        }
+        
+        html::-webkit-scrollbar,
+        body::-webkit-scrollbar {
+            width: 0 !important;
+            height: 0 !important;
+            display: none !important;
+            background: transparent !important;
+        }
+
+        body { 
+            height: 1000vh;
+            overflow-y: scroll;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+            pointer-events: auto;
+        }
+        
+        * {
+            scrollbar-width: none !important;
+            -ms-overflow-style: none !important;
+        }
+        
+        *::-webkit-scrollbar {
+            display: none !important;
+        }
+
+        #canvas-container {
+            width: 100%;
+            height: 740px;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            overflow: hidden;
+            background: transparent;
+        }
+
+        canvas { 
+            display: block;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+        }
+
+        .object-info {
+            position: fixed;
+            right: 50px;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 0;
+            text-align: right;
+            pointer-events: none;
+            z-index: 1000;
+            padding: 10px;
+        }
+
+        .object-name {
+            font-family: Lucida Console", monospace;
+            font-weight: bold;
+            font-size: 25px;
+            letter-spacing: -0.25px;
+            color: black;
+            margin-bottom: 7px;
+            white-space: nowrap;
+        }
+
+        .object-type {
+            font-family: "Times New Roman", Times, serif;
+            font-weight: 500;
+            font-size: 15px;
+            letter-spacing: -0.05px;
+            color: black;
+            margin-bottom: 7px;
+            white-space: nowrap;
+        }
+
+        .object-colorways {
+            font-family: "Times New Roman", Times, serif;
+            font-weight: 500;
+            font-style: italic;
+            font-size: 12px;
+            letter-spacing: -0.15px;
+            color: #595959;
+            margin-bottom: 7px;
+            white-space: nowrap;
+        }
+
+        .object-link {
+            font-family: Lucida Console", monospace;
+            font-weight: 500;
+            font-style: italic;
+            font-size: 12px;
+            letter-spacing: -0.15px;
+            color: rgb(9, 7, 102);
+            text-decoration: none;
+            cursor: pointer;
+            white-space: nowrap;
+            pointer-events: none;
+        }
+
+        .market-button {
+            font-family: Lucida Console", monospace;
+            font-weight: 500;
+            font-style: italic;
+            font-size: 11px;
+            letter-spacing: -0.15px;
+            color: black;
+            padding: 7px 14px;
+            background-color: rgba(255, 255, 255, 0.7);
+            border: 1px solid #000000;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            pointer-events: auto;
+            margin-top: 10px;
+        }
+
+        .market-button:hover {
+            background-color: rgba(0, 0, 0, 0.6);
+            color: white;
+            border-color: transparent;
+        }
+
+        
+    </style>
+</head>
+<body>
+    <div id="canvas-container"></div>
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/DRACOLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/RGBELoader.js"></script>
+    <script>
+    // Security and protection scripts
+    (function() {
+        const preventDefault = (e) => e.preventDefault();
+
+        document.addEventListener('contextmenu', preventDefault);
+        document.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey && (e.key === 'u' || e.key === 'U' || e.key === 'i' || e.key === 'I' || e.key === 's' || e.key === 'S')) ||
+                e.key === 'F12' || 
+                (e.ctrlKey && e.shiftKey && (e.key === 'i' || e.key === 'I' || e.key === 'j' || e.key === 'J' || e.key === 'c' || e.key === 'C'))) {
+                preventDefault(e);
+            }
+        });
+
+        ['keypress', 'mousedown', 'keydown'].forEach(event => {
+            document.addEventListener(event, (e) => {
+                if (e.keyCode === 123) preventDefault(e);
+            });
+        });
+
+        ['selectstart', 'dragstart'].forEach(event => {
+            window.addEventListener(event, preventDefault);
+        });
+    })();
+
+    // Main application
+    (function initializeViewer() {
+        // Object data
+        const objectData = {
+            "1": {
+         "name": "xvptos",
+        "type": "Torso: butterfly jacket\nPants: yoga pants\nFace Acc.: -\nBody Acc.: dfw chain\nKix: Elephant Punch Shoe",
+        "colorways": "owned by: colborn",
+        "link": "https://monaverse.com/collections/1/0xdd0df57dbbf9dc804e778fd907e5a7f5d3051d60/11"
+    },
+    "2": {
+        "name": "sinister",
+        "type": "Torso: wavy tabard\nPants: -\nFace Acc.: secretary 2-blu\nBody Acc.: -\nKix: white sox",
+        "colorways": "owned by: PabloFM",
+        "link": "https://monaverse.com/collections/1/0xdd0df57dbbf9dc804e778fd907e5a7f5d3051d60/3"
+    },
+    "3": {
+        "name": "glixeir",
+        "type": "Torso: davinci punks\nPants: -\nFace Acc.: -\nBody Acc.: dfw chain\nKix: zzze 3 monza",
+        "colorways": "owned by: colborn",
+        "link": "https://monaverse.com/collections/1/0xdd0df57dbbf9dc804e778fd907e5a7f5d3051d60/5"
+    },
+    "4": {
+       "name": "yes playable character",
+        "type": "Torso: jersey\nPants: -\nFace Acc.: -\nBody Acc.: -\nKix: crampoon",
+        "colorways": "mint of 0.1 eth",
+        "link": "https://monaverse.com/collections/1/0xdd0df57dbbf9dc804e778fd907e5a7f5d3051d60/7"
+    },
+    "5": {
+        "name": "0xthello albino",
+        "type": "Torso: 0xthello jack.\nPants: yoga pants\nFace Acc.: unicorn inv. googles\nBody Acc.: dfw chain\nKix: Elephant Punch Shoe",
+        "colorways": "mint of 0.1 eth",
+        "link": "https://monaverse.com/collections/1/0xdd0df57dbbf9dc804e778fd907e5a7f5d3051d60/4"
+    },
+    "6": {
+         "name": "when the darkness surrounds",
+        "type": "Torso: painting tee\nPants: flame trou\nFace Acc.: axcaban mask\nBody Acc.: -\nKix: white sox",
+        "colorways": "owned by: sashaku",
+        "link": "https://monaverse.com/collections/1/0xdd0df57dbbf9dc804e778fd907e5a7f5d3051d60/15"
+    },
+    "7": {
+         "name": "xeus",
+        "type": "Torso: zeus unbody\nPants: -\nFace Acc.: decons-unicorn inv. googles\nBody Acc.: -\nKix: zzze 3 monza",
+        "colorways": "mint of 0.1 eth",
+        "link": "https://monaverse.com/collections/1/0xdd0df57dbbf9dc804e778fd907e5a7f5d3051d60/9"
+    },
+    "8": {
+        "name": "muzzy the 2nd",
+        "type": "Torso: gridline suit\nPants: grid\nFace Acc.: pitbull mask\nBody Acc.: -\nKix: zzze 2 zebra",
+        "colorways": "owned by: untitledxyz_build",
+        "link": "https://monaverse.com/collections/1/0xdd0df57dbbf9dc804e778fd907e5a7f5d3051d60/14"
+    },
+    "9": {
+         "name": "xibalba",
+        "type": "Torso: rr dress\nPants: -\nFace Acc.: unicorn inv. googles\nBody Acc.: -\nKix: zzze 3 forge",
+        "colorways": "mint of 0.1 eth",
+        "link": "https://monaverse.com/collections/1/0xdd0df57dbbf9dc804e778fd907e5a7f5d3051d60/1"
+    },
+    "10": {
+        "name": "xermes",
+        "type": "Torso: cage corset-myth -red\nPants: -\nFace Acc.: red pitbull mask\nBody Acc.: -\nKix: Elephant Punch Shoe",
+        "colorways": "owned by: Lebanna",
+        "link": "https://monaverse.com/collections/1/0xdd0df57dbbf9dc804e778fd907e5a7f5d3051d60/2"
+    },
+
+    
+    "11": {
+        "name": "GX.FUP3",
+        "type": "Torso: exploded spandex\nPants: -\nFace Acc.: -\nBody Acc.: -\nKix: zzze 3 none",
+        "colorways": "owned by: reneil1337",
+        "link": "https://monaverse.com/collections/1/0xdd0df57dbbf9dc804e778fd907e5a7f5d3051d60/8"
+    },
+    "12": {
+        "name": "gray daisy butterfly",
+        "type": "Torso: butterfly jacket\nPants: yoga pants\nFace Acc.: -\nBody Acc.: dfw chain\nKix: Elephant Punch Shoe",
+        "colorways": "mint of 0.1 eth",
+        "link": "https://monaverse.com/collections/1/0xdd0df57dbbf9dc804e778fd907e5a7f5d3051d60/10"
+    },
+    "13": {
+        "name": "dogtooth venom",
+        "type": "Torso: tornado\nPants: yoga pants\nFace Acc.: -\nBody Acc.: -\nKix: crampoon",
+        "colorways": "owned by: colborn",
+        "link": "https://monaverse.com/collections/1/0xdd0df57dbbf9dc804e778fd907e5a7f5d3051d60/6"
+    },
+    "14": {
+       "name": "hunna mein black",
+        "type": "Torso: hunnamein suit\nPants: -\nFace Acc.: -\nBody Acc.: -\nKix: -",
+        "colorways": "mint of 0.1 eth",
+        "link": "https://monaverse.com/collections/1/0xdd0df57dbbf9dc804e778fd907e5a7f5d3051d60/12"
+    },
+    "15": {
+        "name": "void black",
+        "type": "Torso: blvk voitee\nPants: black leather pants\nFace Acc.: axcaban chrome\nBody Acc.: -\nKix: -",
+        "colorways": "owned by: ashxn",
+        "link": "https://monaverse.com/collections/1/0xdd0df57dbbf9dc804e778fd907e5a7f5d3051d60/16"
+    },
+    "16": {
+        "name": "muzzy red",
+        "type": "Torso: evline suit\nPants: burgundy\nFace Acc.: secretary 2\nBody Acc.: chrome\nKix: zzze 2 zebra",
+        "colorways": "owned by: voxvienne",
+        "link": "https://monaverse.com/collections/1/0xdd0df57dbbf9dc804e778fd907e5a7f5d3051d60/13"
+    }
+
+};
+
+        // Configuration
+        const config = {
+            model: {
+                url: 'https://raw.githubusercontent.com/decentralize-dfw/3dwebhome/main/C2W-OPT-rotated_256-v5.glb'
+            },
+            animation: {
+                frameCount: 150,
+                speedMultiplier: .1
+            },
+            camera: {
+                start: { x:.4, y: 7.3, z: 6 },
+                end: { x: .4, y: 97.3, z: 6 },
+                rotation: { x: -45, y: 0, z: 0 },
+                orthographicScale: 2
+            },
+            dimensions: {
+                width: 1590,
+                height: 740
+            }
+        };
+
+        // Scene setup
+        const scene = new THREE.Scene();
+        
+        // Camera setup
+        const aspect = config.dimensions.width / config.dimensions.height;
+        const camera = new THREE.OrthographicCamera(
+            -config.camera.orthographicScale * aspect,
+            config.camera.orthographicScale * aspect,
+            config.camera.orthographicScale,
+            -config.camera.orthographicScale,
+            0.1,
+            1000
+        );
+
+        // Enhanced renderer settings
+        const renderer = new THREE.WebGLRenderer({ 
+            antialias: true,
+            alpha: true,
+            premultipliedAlpha: false,
+            logarithmicDepthBuffer: true,
+            powerPreference: 'high-performance',
+            preserveDrawingBuffer: true
+        });
+
+        renderer.setSize(config.dimensions.width, config.dimensions.height);
+        renderer.setClearColor(0x000000, 0);
+        renderer.physicallyCorrectLights = true;
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.2;
+        renderer.outputEncoding = THREE.sRGBEncoding;
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.debug.checkShaderErrors = false;
+
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+        camera.position.set(config.camera.start.x, config.camera.start.y, config.camera.start.z);
+        camera.rotation.set(
+            THREE.MathUtils.degToRad(config.camera.rotation.x),
+            THREE.MathUtils.degToRad(config.camera.rotation.y),
+            THREE.MathUtils.degToRad(config.camera.rotation.z)
+        );
+
+        // Enhanced lighting setup
+        const ambientLight = new THREE.AmbientLight(0xffffff, 1.0);
+        scene.add(ambientLight);
+
+        const mainLight = new THREE.DirectionalLight(0xffffff, 1.5);
+        mainLight.position.set(0, 10, 10);
+        mainLight.castShadow = true;
+        scene.add(mainLight);
+
+        const frontFill = new THREE.DirectionalLight(0xffffff, 1.0);
+        frontFill.position.set(0, 0, 5);
+        scene.add(frontFill);
+
+        const topFill = new THREE.DirectionalLight(0xffffff, 1.5);
+        topFill.position.set(0, 5, 0);
+        scene.add(topFill);
+
+        const backFill = new THREE.DirectionalLight(0xffffff, 1.2);
+        backFill.position.set(0, 0, -5);
+        scene.add(backFill);
+
+        const pointLights = [
+            { pos: [5, 5, 5] },
+            { pos: [-5, 5, -5] },
+            { pos: [0, -5, 0] },
+            { pos: [0, 5, -5] }
+        ].forEach(light => {
+            const pointLight = new THREE.PointLight(0xffffff, 1.0);
+            pointLight.position.set(...light.pos);
+            scene.add(pointLight);
+        });
+
+        
+        // Model loading setup
+        const dracoLoader = new THREE.DRACOLoader();
+        dracoLoader.setDecoderPath('https://www.gstatic.com/draco/v1/decoders/');
+
+        const loader = new THREE.GLTFLoader();
+        loader.setDRACOLoader(dracoLoader);
+
+        let mixer;
+
+        // Create info elements
+       function createObjectInfoElements() {
+    const existingElements = document.querySelectorAll('.object-info');
+    existingElements.forEach(el => el.remove());
+    
+    const mainContainer = document.createElement('div');
+    mainContainer.id = 'info-container';
+    
+    Object.entries(objectData).forEach(([objectId, objectInfo]) => {
+        const container = document.createElement('div');
+        container.className = 'object-info';
+        container.id = `object-info-${objectId}`;
+        
+        const nameElement = document.createElement('div');
+        nameElement.className = 'object-name';
+        nameElement.textContent = objectInfo.name;
+        
+        const typeElement = document.createElement('div');
+        typeElement.className = 'object-type';
+        // Replace \n with <br> tags for line breaks
+        typeElement.innerHTML = objectInfo.type.split('\n').join('<br>');
+        
+        const colorwaysElement = document.createElement('div');
+        colorwaysElement.className = 'object-colorways';
+        colorwaysElement.textContent = objectInfo.colorways;
+        
+        const marketButton = document.createElement('button');
+        marketButton.className = 'market-button';
+        marketButton.id = `market-button-${objectId}`;
+        marketButton.textContent = 'open in market';
+        marketButton.onclick = () => window.open(objectInfo.link, '_blank', 'noopener');
+        
+        container.appendChild(nameElement);
+        container.appendChild(typeElement);
+        container.appendChild(colorwaysElement);
+        container.appendChild(marketButton);
+        
+        mainContainer.appendChild(container);
+    });
+    
+    document.body.appendChild(mainContainer);
+}
+
+        // Update object info visibility
+        function updateObjectInfo(objectId, opacity) {
+            const info = document.getElementById(`object-info-${objectId}`);
+            if (info) {
+                info.style.opacity = opacity;
+                const button = document.getElementById(`market-button-${objectId}`);
+                if (button) {
+                    button.style.opacity = opacity;
+                    button.style.pointerEvents = opacity > 0.01 ? 'auto' : 'none';
+                }
+            }
+        }
+
+        // Calculate opacity based on camera position
+        function calculateOpacity(objectId, cameraY) {
+            const objectId_num = parseInt(objectId);
+            const objectCenter =7.3 + (6 * (objectId_num - 1));
+            const zeroStart = objectCenter - 1.5;
+            const oneStart = objectCenter - 1.25;
+            const oneEnd = objectCenter + 1.25;
+            const zeroEnd = objectCenter + 1.5;
+
+            if (cameraY <= zeroStart || cameraY >= zeroEnd) return 0;
+            
+            if (cameraY > zeroStart && cameraY <= objectCenter) {
+                const range = objectCenter - oneStart;
+                const distance = cameraY - oneStart;
+                return Math.max(0.01, Math.min(1, distance / range));
+            }
+            
+            if (cameraY > objectCenter && cameraY < zeroEnd) {
+                const range = oneEnd - objectCenter;
+                const distance = oneEnd - cameraY;
+                return Math.max(0.01, Math.min(1, distance / range));
+            }
+
+            return 0;
+        }
+
+        // Create info elements before loading model
+        createObjectInfoElements();
+
+        // Enhanced model loading with optimizations
+        // Enhanced model loading with optimizations
+loader.load(config.model.url, function(gltf) {
+    const model = gltf.scene;
+    currentModel = model;
+    
+    model.traverse((child) => {
+        if (child.isMesh) {
+            child.frustumCulled = false;
+            // Keep original material
+            child.matrixAutoUpdate = true;
+            child.updateMatrix();
+        }
+    });
+            
+    scene.add(model);
+    
+    if (gltf.animations && gltf.animations.length) {
+        mixer = new THREE.AnimationMixer(model);
+        gltf.animations.forEach(clip => {
+            mixer.clipAction(clip).play();
+        });
+    }
+});
+
+        // Animation and camera movement
+        let currentY = config.camera.start.y;
+        let targetY = currentY;
+        const smoothness = 0.05;
+        let lastCameraUpdate = 0;
+        const CAMERA_UPDATE_THROTTLE = 16;
+
+        function lerp(start, end, factor) {
+            return start + (factor * (end - start));
+        }
+
+        function updateCamera() {
+            const now = Date.now();
+            if (now - lastCameraUpdate < CAMERA_UPDATE_THROTTLE) return;
+            
+            const scrollFraction = window.pageYOffset / (document.documentElement.scrollHeight - window.innerHeight);
+            const currentCameraY = config.camera.start.y + (scrollFraction * (config.camera.end.y - config.camera.start.y));
+            
+            if (mixer) {
+                mixer.setTime((scrollFraction * config.animation.frameCount) * config.animation.speedMultiplier);
+            }
+
+            targetY = currentCameraY;
+            currentY = lerp(currentY, targetY, smoothness);
+            camera.position.y = currentY;
+
+            Object.keys(objectData).forEach(objectId => {
+                const opacity = calculateOpacity(objectId, currentY);
+                updateObjectInfo(objectId, opacity);
+            });
+            
+            lastCameraUpdate = now;
+        }
+
+
+
+       function animate() {
+    requestAnimationFrame(animate);
+    updateCamera();
+    renderer.render(scene, camera);
+}
+
+
+
+        animate();
+
+        // Window resize handler
+        window.addEventListener('resize', function() {
+            const aspect = config.dimensions.width / config.dimensions.height;
+            camera.left = -config.camera.orthographicScale * aspect;
+            camera.right = config.camera.orthographicScale * aspect;
+            camera.top = config.camera.orthographicScale;
+            camera.bottom = -config.camera.orthographicScale;
+            camera.updateProjectionMatrix();
+            renderer.setSize(config.dimensions.width, config.dimensions.height);
+        });
+
+    })();
+    </script>
+</body>
+</html>
