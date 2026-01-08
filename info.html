@@ -307,6 +307,17 @@
 ]
             };
 
+            // Update redirect URLs to local files
+            const localUrls = {
+                'media-btn': 'index.html',
+                'theater-btn': 'theater.html',
+                'runway-btn': 'runway.html',
+                'gallery-top-btn': 'gallery.html',
+                'space-btn': 'space.html',
+                'avatar-top-btn': 'avatar.html',
+                'design-top-btn': 'design.html'
+            };
+
             buttons.media.forEach(({ id, url, type, subButton }) => {
                 const btn = document.getElementById(id);
                 if (btn) {
@@ -314,7 +325,7 @@
                         console.log(`${id} clicked`);
                         setActiveButton(btn, 'media');
                         if (type === 'redirect') {
-                            window.top.location.href = url;
+                            window.top.location.href = localUrls[id] || url;
                         } else {
                             loadContent(url, type);
                             if (subButton) {

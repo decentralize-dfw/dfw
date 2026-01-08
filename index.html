@@ -1,332 +1,994 @@
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DFWy</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>DFW - Digital Forgery Workshop</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: "Helvetica", monospace;
         }
-        
+
+        :root {
+            --bg: #0a0a0a;
+            --bg-card: #141414;
+            --bg-card-hover: #1a1a1a;
+            --text: #ffffff;
+            --text-dim: #888888;
+            --accent: #ffffff;
+            --border: #2a2a2a;
+            --filter-active: #ffffff;
+            --filter-inactive: #444444;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
         body {
-            background-color: transparent;
-            overflow: hidden;
-            color: #000;
-        }
-        
-        .container {
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            width: 100vw;
-            margin: 0;
-            overflow: hidden;
-            position: relative;
-        }
-        
-        .top-section {
-            position: absolute;
-            top: 55px;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 500px;
-            display: flex;
-            flex-direction: column;
-            padding: 10px 15px 15px 15px;
-            background-color: rgba(255, 255, 255, 0);
-            z-index: 10;
-            gap: 10px;
+            background: var(--bg);
+            color: var(--text);
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            line-height: 1.5;
+            min-height: 100vh;
+            overflow-x: hidden;
         }
 
-        .top-controls {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            width: 500px;
-            gap: 10px;
-        }
-
-        .media-btn-container {
-            z-index: 11;
-            height: 32px;
-            display: flex;
-            gap: 8px;
-            width: 500px;
-            padding-left: 0;
-            padding-right: 0;
-        }
-
-        .collections-row {
-            display: flex;
-            width: 500px;
-            padding-left: 0;
-            padding-right: 0;
-            gap: 6px;
-            z-index: 11;
-        }
-
-        .collections {
-            display: flex;
-            gap: 6px;
-            z-index: 11;
-            height: 32px;
-            width: 100%;
-            white-space: nowrap;
-        }
-
-        .media-btn, .collection-btn {
-            padding: 5px 6px;
-            border: 1px solid rgba(0, 0, 0, 0.2);
-            border-radius: 4px;
-            background-color: rgba(255, 255, 255, 0.7);
-            cursor: pointer;
-            font-size: 10px;
-            transition: all 0.2s;
-            color: #000;
-            box-shadow: none;
-            text-shadow: none;
-            height: 32px;
-            line-height: 20px;
-            flex: 1;
-            outline: none;
-            position: relative;
-        }
-
-        .collection-btn {
-            padding: 5px 4px;
-            font-size: 9px;
-            letter-spacing: 0px;
-        }
-
-        .media-btn {
-            font-style: italic;
-            font-weight: bold;
-            letter-spacing: 0.1px;
-        }
-
-        .media-btn:hover, .collection-btn:hover {
-            background-color: rgba(240, 240, 240, 0.9);
-        }
-
-        .media-btn.active, .collection-btn.active {
-            background-color: rgba(0, 0, 0, 0.8);
-            color: white;
-            opacity: 1;
-        }
-
-        #viewerContainer {
+        /* Header */
+        .header {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100vw;
-            height: 100vh;
-            overflow: hidden;
-            z-index: 1;
+            right: 0;
+            z-index: 100;
+            background: rgba(10, 10, 10, 0.9);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 24px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
 
-        #contentViewer,
-        #htmlViewer {
+        .logo {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: var(--text);
+            text-decoration: none;
+        }
+
+        .logo span {
+            font-weight: 300;
+            opacity: 0.6;
+        }
+
+        /* Filter Bar */
+        .filter-bar {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            background: transparent;
+            color: var(--text-dim);
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .filter-btn:hover {
+            border-color: var(--text-dim);
+            color: var(--text);
+        }
+
+        .filter-btn.active {
+            background: var(--filter-active);
+            border-color: var(--filter-active);
+            color: var(--bg);
+        }
+
+        /* Main Content */
+        .main {
+            padding-top: 80px;
+            padding-bottom: 60px;
+            min-height: 100vh;
+        }
+
+        /* Projects Grid */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+            padding: 20px 24px;
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+
+        /* Project Card */
+        .project-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .project-card:hover {
+            transform: translateY(-4px);
+            background: var(--bg-card-hover);
+            border-color: var(--text-dim);
+        }
+
+        .project-card:hover .card-image img {
+            transform: scale(1.05);
+        }
+
+        .card-image {
             width: 100%;
-            height: min(100vh, 840px);
-            border: none;
+            aspect-ratio: 16/10;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .card-category {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+            top: 12px;
+            left: 12px;
+            padding: 4px 10px;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text);
+        }
+
+        .card-content {
+            padding: 16px;
+        }
+
+        .card-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            line-height: 1.3;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .card-subtitle {
+            font-size: 11px;
+            color: var(--text-dim);
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
             transition: opacity 0.3s ease;
         }
 
-        #htmlViewer {
-            display: none;
-            background: white;
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            max-width: 900px;
+            width: 100%;
+            max-height: 90vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            color: var(--text);
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close:hover {
+            background: var(--text);
+            color: var(--bg);
+        }
+
+        .modal-media {
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: #000;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .modal-media img,
+        .modal-media video,
+        .modal-media iframe {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .modal-content {
+            padding: 24px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .modal-category {
+            display: inline-block;
+            padding: 4px 12px;
+            background: var(--border);
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            line-height: 1.2;
+        }
+
+        .modal-description {
+            font-size: 14px;
+            color: var(--text-dim);
+            line-height: 1.7;
+            margin-bottom: 24px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .modal-btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .modal-btn-primary {
+            background: var(--text);
+            color: var(--bg);
+            border: none;
+        }
+
+        .modal-btn-primary:hover {
+            background: var(--text-dim);
+        }
+
+        .modal-btn-secondary {
+            background: transparent;
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .modal-btn-secondary:hover {
+            border-color: var(--text);
+        }
+
+        /* Footer */
+        .footer {
+            border-top: 1px solid var(--border);
+            padding: 24px;
+            text-align: center;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 24px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+
+        .footer-link {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 12px;
+            transition: color 0.2s ease;
+        }
+
+        .footer-link:hover {
+            color: var(--text);
+        }
+
+        .footer-copy {
+            font-size: 11px;
+            color: var(--text-dim);
+            opacity: 0.6;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header {
+                padding: 0 16px;
+                height: 56px;
+            }
+
+            .logo {
+                font-size: 16px;
+            }
+
+            .filter-bar {
+                display: none;
+            }
+
+            .filter-bar.mobile {
+                display: flex;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background: rgba(10, 10, 10, 0.95);
+                backdrop-filter: blur(20px);
+                padding: 12px 16px;
+                z-index: 100;
+                border-top: 1px solid var(--border);
+                overflow-x: auto;
+                gap: 8px;
+            }
+
+            .filter-bar.mobile::-webkit-scrollbar {
+                display: none;
+            }
+
+            .main {
+                padding-top: 72px;
+                padding-bottom: 80px;
+            }
+
+            .projects-grid {
+                grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+                gap: 12px;
+                padding: 16px;
+            }
+
+            .card-content {
+                padding: 12px;
+            }
+
+            .card-title {
+                font-size: 13px;
+            }
+
+            .card-subtitle {
+                font-size: 10px;
+            }
+
+            .modal {
+                max-height: 95vh;
+                border-radius: 12px 12px 0 0;
+                margin-top: auto;
+            }
+
+            .modal-content {
+                padding: 20px;
+            }
+
+            .modal-title {
+                font-size: 20px;
+            }
+
+            .modal-actions {
+                flex-direction: column;
+            }
+
+            .modal-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Desktop filter bar visibility */
+        @media (min-width: 769px) {
+            .filter-bar.mobile {
+                display: none !important;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .project-card {
+            animation: fadeInUp 0.4s ease forwards;
+            opacity: 0;
+        }
+
+        .project-card:nth-child(1) { animation-delay: 0.05s; }
+        .project-card:nth-child(2) { animation-delay: 0.1s; }
+        .project-card:nth-child(3) { animation-delay: 0.15s; }
+        .project-card:nth-child(4) { animation-delay: 0.2s; }
+        .project-card:nth-child(5) { animation-delay: 0.25s; }
+        .project-card:nth-child(6) { animation-delay: 0.3s; }
+        .project-card:nth-child(7) { animation-delay: 0.35s; }
+        .project-card:nth-child(8) { animation-delay: 0.4s; }
+        .project-card:nth-child(9) { animation-delay: 0.45s; }
+        .project-card:nth-child(10) { animation-delay: 0.5s; }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-dim);
+        }
+
+        .empty-state h3 {
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+        }
+
+        /* Loading */
+        .loading {
+            position: fixed;
+            inset: 0;
+            background: var(--bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            transition: opacity 0.5s ease;
+        }
+
+        .loading.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 2px solid var(--border);
+            border-top-color: var(--text);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="top-section">
-            <div class="top-controls">
-                <div class="media-btn-container">
-                    <button class="media-btn active" id="media-btn">Home</button>
-                    <button class="media-btn" id="theater-btn">Theater</button>
-                    <button class="media-btn" id="runway-btn">Runway</button>
-                    <button class="media-btn" id="gallery-top-btn">Gallery</button>
-                    <button class="media-btn" id="space-btn">Space</button>
-                    <button class="media-btn" id="avatar-top-btn">Avatar</button>
-                    <button class="media-btn" id="design-top-btn">Design</button>
-                    <button class="media-btn" id="info-btn">Info</button>
-                </div>
-            </div>
-            <div class="collections-row">
-                <div class="collections">
-                    <button class="collection-btn active" id="home-collection-btn">Home</button>
-                    <button class="collection-btn" id="media-collection-btn">Media</button>
-                </div>
-            </div>
-        </div>
+    <!-- Loading -->
+    <div class="loading" id="loading">
+        <div class="loading-spinner"></div>
+    </div>
 
-        <div id="viewerContainer">
-            <iframe id="contentViewer" src="about:blank"></iframe>
-            <iframe id="htmlViewer" src="about:blank"></iframe>
+    <!-- Header -->
+    <header class="header">
+        <a href="index.html" class="logo">DFW <span>Digital Forgery Workshop</span></a>
+        <div class="filter-bar" id="filterBar">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="theater">Theater</button>
+            <button class="filter-btn" data-filter="runway">Runway</button>
+            <button class="filter-btn" data-filter="gallery">Gallery</button>
+            <button class="filter-btn" data-filter="space">Space</button>
+            <button class="filter-btn" data-filter="avatar">Avatar</button>
+            <button class="filter-btn" data-filter="design">Design</button>
+            <button class="filter-btn" data-filter="info">Info</button>
+        </div>
+    </header>
+
+    <!-- Mobile Filter Bar -->
+    <div class="filter-bar mobile" id="mobileFilterBar">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="theater">Theater</button>
+        <button class="filter-btn" data-filter="runway">Runway</button>
+        <button class="filter-btn" data-filter="gallery">Gallery</button>
+        <button class="filter-btn" data-filter="space">Space</button>
+        <button class="filter-btn" data-filter="avatar">Avatar</button>
+        <button class="filter-btn" data-filter="design">Design</button>
+        <button class="filter-btn" data-filter="info">Info</button>
+    </div>
+
+    <!-- Main -->
+    <main class="main">
+        <div class="projects-grid" id="projectsGrid"></div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-links">
+            <a href="info-info.html" class="footer-link">About</a>
+            <a href="info-services.html" class="footer-link">Services</a>
+            <a href="info-manifesto.html" class="footer-link">Manifesto</a>
+            <a href="https://calendly.com/d--f--w/meeting" target="_blank" class="footer-link">Book a Meeting</a>
+            <a href="info-files.html" class="footer-link">Files</a>
+        </div>
+        <p class="footer-copy">Digital Forgery Workshop - Architecture, Fashion, Art & Technology</p>
+    </footer>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modalOverlay">
+        <button class="modal-close" id="modalClose">&times;</button>
+        <div class="modal" id="modal">
+            <div class="modal-media" id="modalMedia"></div>
+            <div class="modal-content">
+                <span class="modal-category" id="modalCategory"></span>
+                <h2 class="modal-title" id="modalTitle"></h2>
+                <p class="modal-description" id="modalDescription"></p>
+                <div class="modal-actions" id="modalActions"></div>
+            </div>
         </div>
     </div>
-    
+
     <script>
-        // Cache DOM elements
-        const dom = {
-            viewer: {
-                container: document.getElementById('viewerContainer'),
-                content: document.getElementById('contentViewer'),
-                html: document.getElementById('htmlViewer')
-            }
+    // Project Data
+    const PROJECTS = [
+        // THEATER
+        {
+            id: 'hatch',
+            category: 'theater',
+            name: 'HATCH',
+            subtitle: 'Virtual Theater No:3, 07/24',
+            description: 'In a nihilistic virtual setup, two digital beings and an external entity explore existence, freedom, and control. Their journey leads them to question the nature of their reality and dimensions, uncovering deeper truths that challenge their roles. The external entity faces a pivotal choice that could redefine their understanding of existence.',
+            thumbnail: 'https://static.wixstatic.com/media/54a996_657bbf289a904a829b19a01fc2acbbb2~mv2.png',
+            image: 'https://static.wixstatic.com/media/54a996_26886a672f784198b9f8af4c4c93a5b9~mv2.jpg',
+            link: 'https://hyperfy.io/hatch',
+            page: 'theater-hatch.html'
+        },
+        {
+            id: 'balloon',
+            category: 'theater',
+            name: 'BALLOON',
+            subtitle: 'Virtual Theater No:2, 05/24',
+            description: 'Balloon No. 2 is a 10-minute WebXR theater piece exploring the absurdity and depth of digital identity in metaverse culture. Accessible via Hyperfy, it places the audience in a surreal environment through VR or desktop, blending architecture, fashion, and AI-driven dialogue.',
+            thumbnail: 'https://static.wixstatic.com/media/54a996_55d49a9e02b74a76bca4a0177a9fa5df~mv2.png',
+            image: 'https://static.wixstatic.com/media/54a996_c9415cfa41d943a7ae7ec18cc8a81a63~mv2.png',
+            link: 'https://hyperfy.io/balloon',
+            page: 'theater-balloon.html'
+        },
+        {
+            id: 'wwe',
+            category: 'theater',
+            name: 'WHY WE EXIST?',
+            subtitle: 'Virtual Theater No:1, 11/23',
+            description: '"Why We Exist" emerges as an innovative virtual theater experience, marking a pioneering venture into the realm of digital performance art. This concept pushes the boundaries of digital creativity and immersive storytelling through two distinct modes: Cinematic and Immersive.',
+            thumbnail: 'https://static.wixstatic.com/media/54a996_8362a66b73ca47bd92c9ed90eef359ba~mv2.png',
+            image: 'https://static.wixstatic.com/media/54a996_ba80e31fd25540a5b648f40640b7eaae~mv2.jpg',
+            link: 'https://hyperfy.io/pill',
+            page: 'theater-wwe.html'
+        },
+
+        // RUNWAY
+        {
+            id: 'c2w2_runway',
+            category: 'runway',
+            name: 'C2W2 RUNWAY',
+            subtitle: 'Metaverse Runway Event, 2025 (TBA)',
+            description: 'The C2W2 virtual runway on Hyperfy is a 30-minute metaverse event showcasing nearly 50 AI-designed avatars across six thematic parts, blending traditional art, virtual fashion, NFTs, and transhumanism.',
+            thumbnail: 'https://static.wixstatic.com/media/54a996_488091e2766a49f084a279c37d8017c5~mv2.png',
+            image: 'https://static.wixstatic.com/media/54a996_0dcf9180991d4e49942304a01f9224c5~mv2.jpg',
+            link: 'https://video.wixstatic.com/video/54a996_3228af9d616c49b58bf10884ffd7657a/1080p/mp4/file.mp4',
+            page: 'runway-c2w2.html'
+        },
+        {
+            id: 'c2w_runway',
+            category: 'runway',
+            name: 'C2W RUNWAY',
+            subtitle: 'Metaverse Runway Event, 09/11/23',
+            description: 'The C2W Metaverse Runway event showcased a distinctive digital fashion collection. This event provided attendees with an immersive virtual fashion show experience directly from their browsers without the need for downloads.',
+            thumbnail: 'https://static.wixstatic.com/media/54a996_8b9ecdfee9b0416497b06cd601c515df~mv2.png',
+            image: 'https://static.wixstatic.com/media/54a996_e049a6653d214b2f9237891d21fb05af~mv2.jpg',
+            link: 'https://hyperfy.io/c2w',
+            page: 'runway-c2w.html'
+        },
+
+        // GALLERY
+        {
+            id: 'scaffold',
+            category: 'gallery',
+            name: 'SCAFFOLD',
+            subtitle: '3D Architectural Browser, 2024',
+            description: 'A silent structure built around architectural smart objects. Explore all 50 digital topographies with a single click, or experiment with guided tours via NPCs.',
+            thumbnail: 'https://static.wixstatic.com/media/54a996_610326d29cfd4daa96db8c86d1cb033b~mv2.png',
+            image: 'https://static.wixstatic.com/media/54a996_a4275b8206ae43d3ae134f283411acf2~mv2.jpg',
+            link: 'https://hyperfy.io/scaffold',
+            page: 'gallery-scaffold.html'
+        },
+        {
+            id: 'retail',
+            category: 'gallery',
+            name: 'RETAIL',
+            subtitle: '3D Beings Shop for C2W2.vrm, 2025',
+            description: 'Retail in the metaverse bridges the gap between fashion and daily life, offering a unique platform for connection and innovation. Go in, walk inside, test the garments.',
+            thumbnail: 'https://static.wixstatic.com/media/54a996_3a566c9262264a2490ba38ecba6e65b5~mv2.png',
+            image: 'https://static.wixstatic.com/media/54a996_09c1a68b1dff4c168445589c079c6596~mv2.jpg',
+            link: 'https://hyperfy.io/retail',
+            page: 'gallery-retail.html'
+        },
+        {
+            id: 'neue2dojo',
+            category: 'gallery',
+            name: 'NEUE2 DOJO GALLERY',
+            subtitle: 'Independent Gallery, 2023',
+            description: 'Neue2 Dojo Gallery stands at the forefront of a cultural revolution, exemplifying how art and technology can coalesce to create entirely new paradigms for cultural expression and engagement.',
+            thumbnail: 'https://static.wixstatic.com/media/54a996_e2b6353a23e14e489ee6ee3d341fdd80~mv2.png',
+            image: 'https://static.wixstatic.com/media/54a996_6af9880c704747ee91e6760a6c6443ad~mv2.jpg',
+            link: 'https://hyperfy.io/neue2dojo',
+            page: 'gallery-neue2dojo.html'
+        },
+        {
+            id: 'elements_store',
+            category: 'gallery',
+            name: 'ELEMENTS STORE',
+            subtitle: 'Virtual Design Store, 2024',
+            description: 'The Elements Store in Hyperfy is a futuristic, minimalist three-floor gallery showcasing DFW\'s design legacy, offering 15,625 unique spatial variations through customizable layouts, materials, and colors.',
+            thumbnail: 'https://static.wixstatic.com/media/54a996_2da52be408d042ce87f0ffde7f3dc15c~mv2.png',
+            image: 'https://static.wixstatic.com/media/54a996_249824f6849b4fd78d4ac6b9691b226e~mv2.jpg',
+            link: 'https://hyperfy.io/dfw',
+            page: 'gallery-elements.html'
+        },
+        {
+            id: 'blackcity',
+            category: 'gallery',
+            name: 'BLACK CITY',
+            subtitle: 'Decentralized Virtual ROOMSscape, 2023',
+            description: 'A virtual city with 8 independent museums (MOCA ROOMS), designed by DFW and curated on-chain by their citizens.',
+            thumbnail: 'https://static.wixstatic.com/media/54a996_bfaf132093d2475f9cd8da1247292760~mv2.png',
+            image: 'https://static.wixstatic.com/media/54a996_d7c0f7edddad4724bf78fa801b49da3a~mv2.jpg',
+            link: 'https://hyperfy.io/blackcity',
+            page: 'gallery-blackcity.html'
+        },
+        {
+            id: 'forge',
+            category: 'gallery',
+            name: 'FORGE',
+            subtitle: 'NoiseDao Audio Museumworld',
+            description: 'NoiseDAO World Design: A Decentralized Approach to Music and Art. An immersive audio-visual experience in the metaverse.',
+            thumbnail: 'https://static.wixstatic.com/media/54a996_5ad4cee848d04581a96d2762fd1ca332~mv2.png',
+            image: 'https://static.wixstatic.com/media/54a996_3e3a8b5e493a43f1b40c296812393a7e~mv2.jpg',
+            link: 'https://hyperfy.io/noise',
+            page: 'gallery-forge.html'
+        },
+
+        // SPACE
+        {
+            id: 'digital_topographies',
+            category: 'space',
+            name: 'DIGITAL TOPOGRAPHIES',
+            subtitle: '3D Architectural Works',
+            description: 'Digital Topographies redefines architecture by liberating it from gravity, weather, and material limits. Conceived as immersive 3D models, it spans galleries, arenas, pavilions, workplaces, and retail spaces designed for avatars.',
+            thumbnail: 'https://static.wixstatic.com/media/54a996_8a3d96c1923642aa871699aa3c7b2b9d~mv2.png',
+            image: 'https://static.wixstatic.com/media/54a996_3243206499e746e99f403f1865458700~mv2.jpg',
+            link: 'https://v2.oncyber.io/digitaltopographies',
+            page: 'space-dt.html'
+        },
+
+        // AVATAR
+        {
+            id: 'c2w2_avatars',
+            category: 'avatar',
+            name: 'C2W2 AVATARS',
+            subtitle: 'VRM Collection for Virtual Net Runners, 2025',
+            description: 'C2W2 celebrates human culture in a shape of a gateway to premium virtual identity: avatars forged for net runners, digital agents, sparring partners, or facades across social networks. +60 VRM avatars.',
+            thumbnail: 'https://static.wixstatic.com/media/54a996_488091e2766a49f084a279c37d8017c5~mv2.png',
+            image: 'https://static.wixstatic.com/media/54a996_8ea705af2b04470db99ed4122b5bbb5a~mv2.jpg',
+            link: 'https://video.wixstatic.com/video/54a996_2aaaafa5eaaa45db90f654f6266f3520/1080p/mp4/file.mp4',
+            page: 'avatar-c2w2.html'
+        },
+        {
+            id: 'c2w_avatar',
+            category: 'avatar',
+            name: 'C2W AVATARS',
+            subtitle: 'VRM Avatars x16, 11/23',
+            description: 'A conversation between code and couture, between the avatar and the individual. These 16 personas are not mere 3D pixels; they are the new expression of self.',
+            thumbnail: 'https://static.wixstatic.com/media/54a996_8b9ecdfee9b0416497b06cd601c515df~mv2.png',
+            image: 'https://static.wixstatic.com/media/54a996_800a41f3b5cb4005a25b8d14eabbad45~mv2.jpg',
+            link: 'https://video.wixstatic.com/video/54a996_ec462c493fd541a6801a7b1e1ccd59fb/1080p/mp4/file.mp4',
+            page: 'avatar-c2w.html'
+        },
+
+        // DESIGN
+        {
+            id: 'zenbubble',
+            category: 'design',
+            name: 'ZEN BUBBLE RIDER',
+            subtitle: 'Virtual Automobile, 2022',
+            description: 'River stones learned patience, surrendering sharp edges to water and time. From these quiet forms emerged the Bubble Rider - a vessel that breathes, floating in gentle constellation.',
+            thumbnail: 'https://static.wixstatic.com/media/54a996_2d2f0782942f4f6dbe6d2f8d4e29f217~mv2.png',
+            image: 'https://static.wixstatic.com/media/54a996_d84a54e9f05e454a92cc8df1c0d72209~mv2.jpg',
+            link: 'https://app.vectary.com/p/5IJ3fz7ZRSeZiqOq17WLeZ',
+            page: 'design-auto.html'
+        },
+        {
+            id: 'mermaidchair',
+            category: 'design',
+            name: 'MERMAID CHAIR',
+            subtitle: 'Virtual Chair, 2021',
+            description: 'This is furniture for the post-physical age, designed for spaces that may exist only in collective imagination, yet somehow more real than anything we can touch. The first chair ever minted on Ethereum.',
+            thumbnail: 'https://static.wixstatic.com/media/54a996_a2215b83bd6344f39ad76c5ac0707eef~mv2.png',
+            image: 'https://static.wixstatic.com/media/54a996_1bb979e7beeb40caa7e8b9455e1688bb~mv2.jpg',
+            link: 'https://app.vectary.com/p/4JF24dDWQEjfgAUUwPZTLZ',
+            page: 'design-chair.html'
+        },
+        {
+            id: 'dfw_design_market',
+            category: 'design',
+            name: 'DFW DESIGN MARKET',
+            subtitle: 'On-chain Design Collection',
+            description: 'Furniture, Sculpture, Automobile design for virtual habitats, on-chain glb files. Browse and collect digital design assets.',
+            thumbnail: 'https://static.wixstatic.com/media/54a996_922f3243f1cb44e1937da3a3c4f61488~mv2.png',
+            image: 'https://static.wixstatic.com/media/54a996_2598bd0a3bab4c419b1939d8cee8b485~mv2.png',
+            link: 'https://opensea.io/collection/dfw-design',
+            page: 'design-all.html'
+        },
+
+        // INFO
+        {
+            id: 'dfw_info',
+            category: 'info',
+            name: 'ABOUT DFW',
+            subtitle: 'Digital Forgery Workshop',
+            description: 'Digital Forgery Workshop is a design practice founded in Milan, operating at the critical intersection of architecture, fashion, art, and technology. Emerging from architectural roots, the workshop has evolved into a defining voice in virtual spatial design.',
+            thumbnail: 'https://static.wixstatic.com/media/54a996_5a17303dc4d246f1818591922f059ebe~mv2.png',
+            image: 'https://static.wixstatic.com/media/54a996_c4c2d6de38af47b099a5042ebeb14dbd~mv2.png',
+            link: 'https://video.wixstatic.com/video/54a996_e6d16d06cf7b490bbc64d936760c2dae/1080p/mp4/file.mp4',
+            page: 'info-info.html'
+        },
+        {
+            id: 'services',
+            category: 'info',
+            name: 'SERVICES',
+            subtitle: 'What We Offer',
+            description: 'Virtual architecture, digital fashion, metaverse experiences, and blockchain integration services. We design for the future of digital existence.',
+            thumbnail: 'https://static.wixstatic.com/media/54a996_c4c2d6de38af47b099a5042ebeb14dbd~mv2.png',
+            image: 'https://static.wixstatic.com/media/54a996_c4c2d6de38af47b099a5042ebeb14dbd~mv2.png',
+            link: null,
+            page: 'info-services.html'
+        },
+        {
+            id: 'manifesto',
+            category: 'info',
+            name: 'MANIFESTO',
+            subtitle: 'Our Philosophy',
+            description: 'We believe in the power of virtual spaces to transform human experience. Our manifesto outlines the principles that guide our work.',
+            thumbnail: 'https://static.wixstatic.com/media/54a996_c4c2d6de38af47b099a5042ebeb14dbd~mv2.png',
+            image: 'https://static.wixstatic.com/media/54a996_c4c2d6de38af47b099a5042ebeb14dbd~mv2.png',
+            link: null,
+            page: 'info-manifesto.html'
+        }
+    ];
+
+    // DOM Elements
+    const loading = document.getElementById('loading');
+    const projectsGrid = document.getElementById('projectsGrid');
+    const filterBar = document.getElementById('filterBar');
+    const mobileFilterBar = document.getElementById('mobileFilterBar');
+    const modalOverlay = document.getElementById('modalOverlay');
+    const modal = document.getElementById('modal');
+    const modalClose = document.getElementById('modalClose');
+    const modalMedia = document.getElementById('modalMedia');
+    const modalCategory = document.getElementById('modalCategory');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalDescription = document.getElementById('modalDescription');
+    const modalActions = document.getElementById('modalActions');
+
+    let currentFilter = 'all';
+    let currentProject = null;
+
+    // Initialize
+    function init() {
+        renderProjects(PROJECTS);
+        setupFilters();
+        setupModal();
+
+        // Hide loading after a short delay
+        setTimeout(() => {
+            loading.classList.add('hidden');
+        }, 500);
+    }
+
+    // Render Projects
+    function renderProjects(projects) {
+        projectsGrid.innerHTML = '';
+
+        const filtered = currentFilter === 'all'
+            ? projects
+            : projects.filter(p => p.category === currentFilter);
+
+        if (filtered.length === 0) {
+            projectsGrid.innerHTML = `
+                <div class="empty-state">
+                    <h3>No projects found</h3>
+                    <p>Try selecting a different category</p>
+                </div>
+            `;
+            return;
+        }
+
+        filtered.forEach((project, index) => {
+            const card = document.createElement('div');
+            card.className = 'project-card';
+            card.style.animationDelay = `${Math.min(index * 0.05, 0.5)}s`;
+            card.innerHTML = `
+                <div class="card-image">
+                    <img src="${project.thumbnail}" alt="${project.name}" loading="lazy">
+                    <span class="card-category">${project.category}</span>
+                </div>
+                <div class="card-content">
+                    <h3 class="card-title">${project.name}</h3>
+                    <p class="card-subtitle">${project.subtitle}</p>
+                </div>
+            `;
+            card.addEventListener('click', () => openModal(project));
+            projectsGrid.appendChild(card);
+        });
+    }
+
+    // Setup Filters
+    function setupFilters() {
+        const handleFilter = (btn) => {
+            const filter = btn.dataset.filter;
+            currentFilter = filter;
+
+            // Update active state for both filter bars
+            document.querySelectorAll('.filter-btn').forEach(b => {
+                b.classList.toggle('active', b.dataset.filter === filter);
+            });
+
+            renderProjects(PROJECTS);
         };
 
-        // Function to set active state on a button
-        function setActiveButton(button, buttonType) {
-            const selector = buttonType === 'media' ? '.media-btn' : '.collection-btn';
-            document.querySelectorAll(selector).forEach(btn => {
-                btn.classList.remove('active');
-            });
-            if (button) {
-                button.classList.add('active');
-            }
-        }
-
-        // Load content function
-        async function loadContent(url) {
-            const htmlViewer = dom.viewer.html;
-
-            // Clear existing content
-            dom.viewer.content.src = 'about:blank';
-            htmlViewer.srcdoc = '';
-            dom.viewer.content.style.display = 'none';
-            htmlViewer.style.display = 'block';
-
-            // Brief delay to ensure clean slate
-            await new Promise(resolve => setTimeout(resolve, 50));
-
-            // Load new content
-            try {
-                const response = await fetch(url);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                const html = await response.text();
-                htmlViewer.srcdoc = html;
-
-                // Wait for load completion
-                await new Promise((resolve, reject) => {
-                    htmlViewer.onload = resolve;
-                    htmlViewer.onerror = reject;
-                });
-            } catch (error) {
-                console.error('Loading error:', error);
-                htmlViewer.srcdoc = `<p>Error loading content: ${error.message}</p>`;
-            }
-        }
-
-        function setupEventListeners() {
-            // Top menu buttons (navigate to external URLs)
-            const mediaBtn = document.getElementById('media-btn');
-            const theaterBtn = document.getElementById('theater-btn');
-            const runwayBtn = document.getElementById('runway-btn');
-            const galleryTopBtn = document.getElementById('gallery-top-btn');
-            const spaceBtn = document.getElementById('space-btn');
-            const avatarTopBtn = document.getElementById('avatar-top-btn');
-            const designTopBtn = document.getElementById('design-top-btn');
-            const infoBtn = document.getElementById('info-btn');
-
-            if (mediaBtn) {
-                mediaBtn.addEventListener('click', () => {
-                    console.log('Home button clicked');
-                    setActiveButton(mediaBtn, 'media');
-                    window.top.location.href = 'https://www.digitalforgerywork.shop/dojjo';
-                });
-            }
-            if (theaterBtn) {
-                theaterBtn.addEventListener('click', () => {
-                    console.log('Theater button clicked');
-                    setActiveButton(theaterBtn, 'media');
-                    window.top.location.href = 'https://www.digitalforgerywork.shop/theater';
-                });
-            }
-            if (runwayBtn) {
-                runwayBtn.addEventListener('click', () => {
-                    console.log('Runway button clicked');
-                    setActiveButton(runwayBtn, 'media');
-                    window.top.location.href = 'https://www.digitalforgerywork.shop/runway';
-                });
-            }
-            if (galleryTopBtn) {
-                galleryTopBtn.addEventListener('click', () => {
-                    console.log('Gallery button clicked');
-                    setActiveButton(galleryTopBtn, 'media');
-                    window.top.location.href = 'https://www.digitalforgerywork.shop/gallery';
-                });
-            }
-            if (spaceBtn) {
-                spaceBtn.addEventListener('click', () => {
-                    console.log('Space button clicked');
-                    setActiveButton(spaceBtn, 'media');
-                    window.top.location.href = 'https://www.digitalforgerywork.shop/space';
-                });
-            }
-            if (avatarTopBtn) {
-                avatarTopBtn.addEventListener('click', () => {
-                    console.log('Avatar button clicked');
-                    setActiveButton(avatarTopBtn, 'media');
-                    window.top.location.href = 'https://www.digitalforgerywork.shop/avatar';
-                });
-            }
-            if (designTopBtn) {
-                designTopBtn.addEventListener('click', () => {
-                    console.log('Design button clicked');
-                    setActiveButton(designTopBtn, 'media');
-                    window.top.location.href = 'https://www.digitalforgerywork.shop/design';
-                });
-            }
-            if (infoBtn) {
-                infoBtn.addEventListener('click', () => {
-                    console.log('Info button clicked');
-                    setActiveButton(infoBtn, 'media');
-                    window.top.location.href = 'https://www.digitalforgerywork.shop/info';
-                });
-            }
-
-            // Second menu buttons (load GitHub HTML content into viewer)
-            const homeCollectionBtn = document.getElementById('home-collection-btn');
-            const mediaCollectionBtn = document.getElementById('media-collection-btn');
-
-            if (homeCollectionBtn) {
-                homeCollectionBtn.addEventListener('click', () => {
-                    console.log('Home collection button clicked');
-                    setActiveButton(homeCollectionBtn, 'collection');
-                    loadContent('https://raw.githubusercontent.com/decentralize-dfw/dfw/main/home.html');
-                });
-            }
-            if (mediaCollectionBtn) {
-                mediaCollectionBtn.addEventListener('click', () => {
-                    console.log('Media collection button clicked');
-                    setActiveButton(mediaCollectionBtn, 'collection');
-                    loadContent('https://raw.githubusercontent.com/decentralize-dfw/dfw/main/media.html');
-                });
-            }
-
-            // Automatically load the "Home" collection on page load
-            if (homeCollectionBtn) {
-                console.log('Page loaded, triggering Home collection button click');
-                homeCollectionBtn.click();
-            } else {
-                console.error('Home collection button not found on page load');
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log('DOM fully loaded, setting up event listeners');
-            setupEventListeners();
+        filterBar.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => handleFilter(btn));
         });
+
+        mobileFilterBar.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => handleFilter(btn));
+        });
+    }
+
+    // Setup Modal
+    function setupModal() {
+        modalClose.addEventListener('click', closeModal);
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) closeModal();
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+    }
+
+    // Open Modal
+    function openModal(project) {
+        currentProject = project;
+
+        // Set media
+        const isVideo = project.link && (project.link.includes('.mp4') || project.link.includes('video.wix'));
+        if (isVideo) {
+            modalMedia.innerHTML = `<video src="${project.link}" autoplay muted loop playsinline></video>`;
+        } else {
+            modalMedia.innerHTML = `<img src="${project.image}" alt="${project.name}">`;
+        }
+
+        // Set content
+        modalCategory.textContent = project.category.toUpperCase();
+        modalTitle.textContent = `${project.name} - ${project.subtitle}`;
+        modalDescription.textContent = project.description;
+
+        // Set actions
+        let actionsHTML = '';
+        if (project.page) {
+            actionsHTML += `<a href="${project.page}" class="modal-btn modal-btn-primary">Open Page</a>`;
+        }
+        if (project.link && !isVideo) {
+            actionsHTML += `<a href="${project.link}" target="_blank" rel="noopener" class="modal-btn modal-btn-secondary">Enter Experience</a>`;
+        }
+        modalActions.innerHTML = actionsHTML;
+
+        // Show modal
+        modalOverlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    // Close Modal
+    function closeModal() {
+        modalOverlay.classList.remove('active');
+        document.body.style.overflow = '';
+        currentProject = null;
+
+        // Stop video if playing
+        const video = modalMedia.querySelector('video');
+        if (video) video.pause();
+    }
+
+    // Start app
+    document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
+</html>
