@@ -821,13 +821,52 @@
         #circular-breadcrumb {
             position: fixed;
             bottom: 30px;
-            left: 30px;
+            left: 90px; /* Space for toggle buttons */
             font-size: 12px;
             color: rgba(255,255,255,0.7);
             text-shadow: 0 1px 2px rgba(0,0,0,0.5);
             z-index: 10;
             pointer-events: none;
             font-family: monospace;
+        }
+
+        /* Layout Toggle Buttons */
+        #layout-toggle-container {
+            position: fixed;
+            bottom: 26px;
+            left: 30px;
+            display: flex;
+            gap: 6px;
+            z-index: 10;
+        }
+
+        .layout-toggle-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .layout-toggle-btn:hover {
+            background: rgba(255,255,255,0.25);
+        }
+
+        .layout-toggle-btn.active {
+            background: rgba(255,255,255,0.35);
+            border-color: rgba(255,255,255,0.5);
+        }
+
+        .layout-toggle-btn svg {
+            width: 16px;
+            height: 16px;
+            color: white;
         }
 
         /* Back Button */
@@ -911,7 +950,7 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: transform 0.3s ease;
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1); /* Smooth transition for layout changes */
         }
 
         .circular-item:hover {
@@ -1049,6 +1088,27 @@
         <div id="circular-sidebar">
             <div id="circular-sidebar-title">DFW website ui</div>
             <div id="circular-sidebar-description">Decentralized Fashion Week - Navigate through files and folders</div>
+        </div>
+
+        <!-- Layout Toggle Buttons -->
+        <div id="layout-toggle-container">
+            <div class="layout-toggle-btn active" id="layout-circle-btn" title="Circle Layout">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10" stroke-width="2"></circle>
+                    <circle cx="12" cy="7" r="1.5" fill="currentColor"></circle>
+                    <circle cx="17" cy="12" r="1.5" fill="currentColor"></circle>
+                    <circle cx="12" cy="17" r="1.5" fill="currentColor"></circle>
+                    <circle cx="7" cy="12" r="1.5" fill="currentColor"></circle>
+                </svg>
+            </div>
+            <div class="layout-toggle-btn" id="layout-grid-btn" title="Grid Layout">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <rect x="3" y="3" width="7" height="7" stroke-width="2" rx="1"></rect>
+                    <rect x="14" y="3" width="7" height="7" stroke-width="2" rx="1"></rect>
+                    <rect x="3" y="14" width="7" height="7" stroke-width="2" rx="1"></rect>
+                    <rect x="14" y="14" width="7" height="7" stroke-width="2" rx="1"></rect>
+                </svg>
+            </div>
         </div>
 
         <!-- Breadcrumb Path -->
@@ -6143,12 +6203,16 @@ function getIcon(item) {
         // ======== CIRCULAR NAVIGATION SYSTEM ======== //
         // ============================================= //
 
+        // GLOBAL ICON SCALE PARAMETER (adjust this to scale all icons/text)
+        const ICON_SCALE = 0.7; // 1.0 = base size, 0.7 = 70% smaller
+
         // Circular navigation state
         const circularNav = {
             history: [],
             currentIndex: -1,
             currentFolder: 'root',
-            currentFolderData: null
+            currentFolderData: null,
+            layoutMode: 'circle' // 'circle' or 'grid'
         };
 
         // Main categories for root level
@@ -6204,9 +6268,10 @@ function getIcon(item) {
             const totalSlots = count * 2; // count items + count spaces
             const slotSize = circumference / totalSlots;
 
-            // Icon size is 2x of slot size (as per user's formula)
-            const iconSize = Math.min(Math.max(slotSize * 2, 40), 100); // min 40px, max 100px
-            const fontSize = Math.max(iconSize * 0.14, 10); // 14% of icon size, min 10px
+            // Icon size is 2x of slot size, then apply ICON_SCALE
+            const baseIconSize = Math.min(Math.max(slotSize * 2, 40), 100);
+            const iconSize = baseIconSize * ICON_SCALE; // Apply global scale
+            const fontSize = Math.max(iconSize * 0.14, 8); // 14% of icon size, min 8px
 
             return { iconSize, fontSize, radius: circleRadius };
         }
@@ -6235,6 +6300,73 @@ function getIcon(item) {
             }
 
             return positions;
+        }
+
+        function getGridPositions(count, iconSize) {
+            const positions = [];
+            const padding = 40;
+            const gap = iconSize * 0.5; // Gap between icons
+
+            // Calculate how many columns fit
+            const availableWidth = window.innerWidth - padding * 2;
+            const itemWidth = iconSize + gap;
+            const cols = Math.max(3, Math.floor(availableWidth / itemWidth));
+
+            // Calculate starting position to center the grid
+            const rows = Math.ceil(count / cols);
+            const totalWidth = (cols * itemWidth) - gap;
+            const totalHeight = (rows * itemWidth) - gap;
+            const startX = (window.innerWidth - totalWidth) / 2;
+            const startY = (window.innerHeight - totalHeight) / 2;
+
+            for (let i = 0; i < count; i++) {
+                const row = Math.floor(i / cols);
+                const col = i % cols;
+                const x = startX + col * itemWidth + iconSize / 2;
+                const y = startY + row * itemWidth + iconSize / 2;
+                positions.push({ x, y });
+            }
+
+            return positions;
+        }
+
+        function switchLayout(mode) {
+            if (circularNav.layoutMode === mode) return;
+
+            circularNav.layoutMode = mode;
+
+            // Update toggle buttons
+            document.getElementById('layout-circle-btn').classList.toggle('active', mode === 'circle');
+            document.getElementById('layout-grid-btn').classList.toggle('active', mode === 'grid');
+
+            // Re-render current scene with new layout
+            const container = document.getElementById('circular-container');
+            const activeScene = container.querySelector('.circular-scene.active');
+            if (activeScene) {
+                const sceneId = activeScene.dataset.sceneId;
+                const isRoot = sceneId === 'root';
+                const items = isRoot ? mainCategories : (fileSystemDB[sceneId] || []);
+                rerenderLayoutPositions(activeScene, items, isRoot);
+            }
+        }
+
+        function rerenderLayoutPositions(scene, items, isRoot) {
+            const { iconSize } = calculateDynamicSizes(items.length);
+            const { radius } = calculateDynamicSizes(items.length);
+
+            // Get new positions based on layout mode
+            const positions = circularNav.layoutMode === 'circle'
+                ? getCircularPositions(items.length, radius)
+                : getGridPositions(items.length, iconSize);
+
+            // Update positions of existing items smoothly
+            const itemElements = scene.querySelectorAll('.circular-item');
+            itemElements.forEach((itemEl, index) => {
+                if (positions[index]) {
+                    itemEl.style.left = `${positions[index].x}px`;
+                    itemEl.style.top = `${positions[index].y}px`;
+                }
+            });
         }
 
         function renderCircularScene(sceneId, items, isRoot = false, targetX = null, targetY = null) {
@@ -6267,7 +6399,10 @@ function getIcon(item) {
                 scene.style.transformOrigin = 'center center';
             }
 
-            const positions = getCircularPositions(items.length, radius);
+            // Get positions based on current layout mode
+            const positions = circularNav.layoutMode === 'circle'
+                ? getCircularPositions(items.length, radius)
+                : getGridPositions(items.length, iconSize);
 
             items.forEach((item, index) => {
                 const itemEl = document.createElement('div');
@@ -6459,6 +6594,10 @@ function getIcon(item) {
         function initCircularNavigation() {
             // Setup back button
             document.getElementById('circular-back-button').addEventListener('click', navigateBackCircular);
+
+            // Setup layout toggle buttons
+            document.getElementById('layout-circle-btn').addEventListener('click', () => switchLayout('circle'));
+            document.getElementById('layout-grid-btn').addEventListener('click', () => switchLayout('grid'));
 
             // Render root scene
             navigateToCircularRoot();
