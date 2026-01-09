@@ -1,0 +1,259 @@
+"Experience": [
+                {
+                    id: 'exp-theater',
+                    type: 'folder',
+                    name: 'Theater',
+                    folderKey: 'Theater', // -> "Theater" dizisine gider
+                    created: '2025',
+                    size: '-',
+                    links: []
+                },
+                {
+                    id: 'exp-runway',
+                    type: 'folder',
+                    name: 'Runway',
+                    folderKey: 'Runway', // -> Aşağıdaki "Runway" dizisine gider
+                    created: '2025',
+                    size: '-',
+                    links: []
+                }
+            ],
+
+"Theater": [
+                {
+                    id: 'th-wwe',
+                    type: 'folder',
+                    name: 'Why We Exist?',
+                    folderKey: 'Why We Exist?', // -> Önceki "Why We Exist?" içeriğine bağlanır
+                    description: 'Virtual Theater No:1 (11.23)',
+                    created: '11/2023',
+                    size: 'Multi',
+                    links: []
+                },
+                {
+                    id: 'th-balloon',
+                    type: 'folder',
+                    name: 'Balloon',
+                    folderKey: 'Balloon', // -> Az önceki "Balloon" içeriğine bağlanır
+                    description: 'Virtual Theater No:2 (05.24)',
+                    created: '05/2024',
+                    size: 'Multi',
+                    links: []
+                },
+                {
+                    id: 'th-hatch',
+                    type: 'folder',
+                    name: 'Hatch',
+                    folderKey: 'Hatch', // -> Az önceki "Hatch" içeriğine bağlanır
+                    description: 'Virtual Theater No:3 (07.24)',
+                    created: '07/2024',
+                    size: 'Multi',
+                    links: []
+                }
+            ],
+
+            "Runway": [
+                {
+                    id: 'rw-c2w',
+                    type: 'folder',
+                    name: 'C2W Runway',
+                    folderKey: 'C2W Runway', // -> Season 1 içeriklerine bağlanır (Recents vb. ile eşleşebilir)
+                    description: 'Season 1 (2023)',
+                    created: '11/2023',
+                    size: 'Multi',
+                    links: []
+                },
+                {
+                    id: 'rw-c2w2',
+                    type: 'folder',
+                    name: 'C2W2 Runway',
+                    folderKey: 'C2W2 Runway', // -> Season 2 içeriklerine bağlanır (RealDesktop vb. ile eşleşebilir)
+                    description: 'Season 2 (2025)',
+                    created: '2025',
+                    size: 'Multi',
+                    links: []
+                }
+            ],
+
+"Gallery": [
+    {
+        id: 'gal-1',
+        type: 'folder',
+        name: 'Scaffold',
+        folderKey: 'Scaffold', // -> Scaffold içeriğine gider
+        description: '3D Architectural Browser. Explore 50 digital topographies.',
+        created: '2025',
+        size: 'Multi',
+        links: []
+    },
+    {
+        id: 'gal-2',
+        type: 'folder',
+        name: 'Retail',
+        folderKey: 'Retail', // -> Retail içeriğine gider
+        description: '3D beings shop for c2w2.vrm.',
+        created: '2025',
+        size: 'Multi',
+        links: []
+    },
+    {
+        id: 'gal-3',
+        type: 'folder',
+        name: 'Neue² Dojo',
+        folderKey: 'Neue² Dojo', // -> Neue² Dojo içeriğine gider
+        description: 'Virtual Art Space & Gallery.',
+        created: '2023',
+        size: 'Multi',
+        links: []
+    },
+    {
+        id: 'gal-4',
+        type: 'folder',
+        name: 'Elements Store',
+        folderKey: 'Elements Store', // -> Elements Store içeriğine gider
+        description: 'Virtual Furniture Gallery for DFW Designs.',
+        created: '2025',
+        size: 'Multi',
+        links: []
+    },
+    {
+        id: 'gal-5',
+        type: 'folder',
+        name: 'Black City',
+        folderKey: 'Black City', // -> Black City içeriğine gider
+        description: 'Decentralized Virtual Roomscape & MOCA ROOMS.',
+        created: '2023',
+        size: 'Multi',
+        links: []
+    },
+    {
+        id: 'gal-6',
+        type: 'folder',
+        name: 'Forge',
+        folderKey: 'Forge', // -> Forge içeriğine gider
+        description: 'NoiseDAO World Design: Music and Art.',
+        created: '2025',
+        size: 'Multi',
+        links: []
+    }
+],
+
+"Item": [
+    {
+        id: 'item-space',
+        type: 'folder',
+        name: 'Space',
+        folderKey: 'Space', // -> Aşağıdaki "Space" listesine gider
+        description: 'Virtual Spaces.',
+        created: '2025',
+        size: '-',
+        links: []
+    },
+    {
+        id: 'item-avatar',
+        type: 'folder',
+        name: 'Avatar',
+        folderKey: 'Avatar', // -> Aşağıdaki "Avatar" listesine gider
+        description: 'Digital Identities.',
+        created: '2025',
+        size: '-',
+        links: []
+    },
+    {
+        id: 'item-design',
+        type: 'folder',
+        name: 'Design',
+        folderKey: 'Design', // -> Aşağıdaki "Design" listesine gider (Önceki tasklarda hazırladığımız)
+        description: 'Furniture, Sculptures, Automobiles and more.',
+        created: '2025',
+        size: 'Multi',
+        links: []
+    }
+],
+
+
+
+
+// --- ANA DESIGN KLASÖRÜ ---
+"Design": [
+    {
+        id: 'des-cat-1',
+        type: 'folder',
+        name: 'FURNITURE',
+        folderKey: 'des_furniture',
+        description: 'Collection of Chairs, Sofas, Tables, Carpets and Music units.',
+        created: '2025',
+        size: 'Multi',
+        links: []
+    },
+    {
+        id: 'des-cat-2',
+        type: 'folder',
+        name: 'SCULPTURE',
+        folderKey: 'des_sculpture',
+        description: 'Abstract and digital sculptures.',
+        created: '2025',
+        size: 'Multi',
+        links: []
+    },
+    {
+        id: 'des-cat-3',
+        type: 'folder',
+        name: 'AUTOMOBILE',
+        folderKey: 'des_automobile',
+        description: 'Digital vehicles and concept cars.',
+        created: '2025',
+        size: 'Multi',
+        links: []
+    },
+    {
+        id: 'des-cat-4',
+        type: 'folder',
+        name: 'CHAIR',
+        folderKey: 'des_chair',
+        description: 'Seating units.',
+        created: '2025',
+        size: 'Multi',
+        links: []
+    },
+    {
+        id: 'des-cat-5',
+        type: 'folder',
+        name: 'SOFA',
+        folderKey: 'des_sofa',
+        description: 'Lounge and comfort units.',
+        created: '2025',
+        size: 'Multi',
+        links: []
+    },
+    {
+        id: 'des-cat-6',
+        type: 'folder',
+        name: 'TABLE',
+        folderKey: 'des_table',
+        description: 'Surfaces and tables.',
+        created: '2025',
+        size: 'Multi',
+        links: []
+    },
+    {
+        id: 'des-cat-7',
+        type: 'folder',
+        name: 'MUSIC',
+        folderKey: 'des_music',
+        description: 'DJ sets and audio units.',
+        created: '2025',
+        size: 'Multi',
+        links: []
+    },
+    {
+        id: 'des-cat-8',
+        type: 'folder',
+        name: 'CARPET',
+        folderKey: 'des_carpet',
+        description: 'Floor designs.',
+        created: '2025',
+        size: 'Multi',
+        links: []
+    }
+],
