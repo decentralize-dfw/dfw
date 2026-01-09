@@ -5546,69 +5546,61 @@ function getIcon(item) {
         function getGridPositions(count, iconSize) {
             const positions = [];
 
-            // Use 60% of screen width (20% margins on each side)
-            const availableWidth = window.innerWidth * 0.6;
-            // Use parametric vertical margins (default 10%, adjustable via GRID_MARGIN_VERTICAL)
-            const verticalMarginTotal = GRID_MARGIN_VERTICAL * 2; // Top + bottom
+            // Available space (with margins)
+            const availableWidth = window.innerWidth * 0.6; // 20% margins each side
+            const verticalMarginTotal = GRID_MARGIN_VERTICAL * 2;
             const availableHeight = window.innerHeight * (1 - verticalMarginTotal);
 
-            // Estimate optimal column count based on aspect ratio
-            const aspectRatio = availableWidth / availableHeight;
-            let cols = Math.max(3, Math.round(Math.sqrt(count * aspectRatio)));
+            // PACKED GRID APPROACH: Always centered, tight layout
+            // Gap is ALWAYS equal to icon size (1:1 ratio) for both horizontal and vertical
 
-            // Ensure we don't have too many columns
-            cols = Math.min(cols, Math.floor(availableWidth / (iconSize * 1.5))); // At least 50% gap between items
+            // Start with a base icon size (reasonable default)
+            let baseIconSize = Math.min(window.innerWidth, window.innerHeight) * 0.08; // 8% of screen
+            baseIconSize = Math.max(60, Math.min(120, baseIconSize)); // Clamp between 60-120px
 
-            // Calculate rows needed
-            const rows = Math.ceil(count / cols);
+            // Calculate optimal columns for a square-ish grid (packed in center)
+            // For 4 items -> 2 cols, 9 items -> 3 cols, 16 items -> 4 cols, etc.
+            let cols = Math.ceil(Math.sqrt(count));
+            let rows = Math.ceil(count / cols);
 
-            // Calculate icon size and gap to fit perfectly in available space
-            // We want: (cols * iconSize) + ((cols - 1) * gap) = availableWidth
-            // AND: gap should be at least 40% of iconSize for good spacing
-            // Let's solve for gap first, ensuring minimum spacing
+            // Gap is ALWAYS equal to icon size (1:1 ratio)
+            let currentIconSize = baseIconSize;
+            let gap = currentIconSize; // 1:1 ratio
 
-            // Total width for all icons
-            const totalIconWidth = availableWidth - (iconSize * 0.4 * (cols - 1)); // Reserve minimum gap
-            const calculatedIconSize = totalIconWidth / cols;
+            // Calculate grid dimensions with 1:1 gap ratio
+            // Width = (cols * iconSize) + ((cols - 1) * gap) = iconSize * (2*cols - 1)
+            let gridWidth = currentIconSize * (2 * cols - 1);
+            let gridHeight = currentIconSize * (2 * rows - 1);
 
-            // Use the smaller of provided iconSize or calculated size
-            let finalIconSize = Math.min(iconSize, calculatedIconSize);
+            // If grid doesn't fit, scale down icon size proportionally
+            if (gridWidth > availableWidth || gridHeight > availableHeight) {
+                const scaleWidth = availableWidth / gridWidth;
+                const scaleHeight = availableHeight / gridHeight;
+                const scale = Math.min(scaleWidth, scaleHeight);
 
-            // Calculate gap - minimum 50% of icon size for proper spacing
-            let gap = Math.max((availableWidth - (cols * finalIconSize)) / (cols - 1), finalIconSize * 0.5);
+                currentIconSize = baseIconSize * scale * 0.95; // 95% to add safety margin
+                gap = currentIconSize; // Maintain 1:1 ratio
 
-            // Calculate actual grid dimensions
-            let actualGridWidth = (cols * finalIconSize) + ((cols - 1) * gap);
-            let actualGridHeight = (rows * finalIconSize) + ((rows - 1) * gap);
-
-            // CRITICAL: Ensure grid fits within available height (respects vertical margins)
-            // If grid is too tall, scale down the icon size to fit
-            if (actualGridHeight > availableHeight) {
-                // Calculate max icon size that fits within available height
-                // With minimum gap of 50% of icon size, height = iconSize * (1.5*rows - 0.5)
-                const maxIconSizeForHeight = availableHeight / (1.5 * rows - 0.5);
-                finalIconSize = Math.min(finalIconSize, maxIconSizeForHeight);
-
-                // Recalculate with scaled icon size
-                gap = Math.max(finalIconSize * 0.5, (availableWidth - (cols * finalIconSize)) / (cols - 1));
-                actualGridWidth = (cols * finalIconSize) + ((cols - 1) * gap);
-                actualGridHeight = (rows * finalIconSize) + ((rows - 1) * gap);
+                gridWidth = currentIconSize * (2 * cols - 1);
+                gridHeight = currentIconSize * (2 * rows - 1);
             }
 
-            // Margins for centering
-            const marginLeft = window.innerWidth * 0.2; // 20% left margin
-            const marginTop = window.innerHeight * GRID_MARGIN_VERTICAL; // Parametric top margin
+            // Center the packed grid on screen
+            const marginLeft = window.innerWidth * 0.2;
+            const marginTop = window.innerHeight * GRID_MARGIN_VERTICAL;
 
-            // Center the grid within available area
-            const startX = marginLeft + (availableWidth - actualGridWidth) / 2;
-            const startY = marginTop + (availableHeight - actualGridHeight) / 2;
+            const startX = marginLeft + (availableWidth - gridWidth) / 2;
+            const startY = marginTop + (availableHeight - gridHeight) / 2;
 
-            // Position items
+            // Position items in packed grid (gap = iconSize everywhere)
             for (let i = 0; i < count; i++) {
                 const row = Math.floor(i / cols);
                 const col = i % cols;
-                const x = startX + col * (finalIconSize + gap) + finalIconSize / 2;
-                const y = startY + row * (finalIconSize + gap) + finalIconSize / 2;
+
+                // With 1:1 gap ratio: spacing = iconSize + gap = 2 * iconSize
+                const x = startX + col * (currentIconSize + gap) + currentIconSize / 2;
+                const y = startY + row * (currentIconSize + gap) + currentIconSize / 2;
+
                 positions.push({ x, y });
             }
 
