@@ -809,9 +809,10 @@
             margin-bottom: 16px;
             line-height: 1.2;
             max-width: 350px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+            /* Allow title to wrap to next line - no truncation */
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+            white-space: normal;
         }
 
         #circular-sidebar-description {
@@ -820,8 +821,36 @@
             text-shadow: 0 1px 4px rgba(0,0,0,0.5);
             line-height: 1.6;
             max-width: 350px;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            max-height: 200px;
+            /* Vertical scrollbar for long descriptions */
+            overflow-y: auto;
+            overflow-x: hidden;
+            /* Paragraph formatting with justify */
+            text-align: justify;
+            text-align-last: left; /* Last line left-aligned */
+            white-space: normal;
+            word-wrap: break-word;
+            /* Custom scrollbar styling */
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255,255,255,0.3) transparent;
+        }
+
+        /* WebKit scrollbar for description */
+        #circular-sidebar-description::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        #circular-sidebar-description::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        #circular-sidebar-description::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.3);
+            border-radius: 10px;
+        }
+
+        #circular-sidebar-description::-webkit-scrollbar-thumb:hover {
+            background: rgba(255,255,255,0.5);
         }
 
         /* Breadcrumb Path */
@@ -1008,9 +1037,13 @@
             color: white;
             text-shadow: 0 2px 4px rgba(0,0,0,0.5);
             text-align: center;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+            /* Allow multiline wrapping - no ellipsis truncation */
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+            hyphens: auto;
+            line-height: 1.3;
+            /* Remove truncation styles */
+            white-space: normal;
         }
     </style>
 </head>
@@ -5050,7 +5083,7 @@ links: [
         // --- GLOBAL STATE ---
         let currentFolder = '';
         let selectedItemId = null;
-        let zIndexCounter = 10;
+        let zIndexCounter = 1000; // Start at 1000 to ensure windows are always above desktop icons (z-index: 100)
         let openWindows = [];
         let currentViewMode = 'grid'; // 'grid', 'list', 'gallery'
         let navHistory = [];
@@ -5339,53 +5372,27 @@ function getIcon(item) {
                 const innerRadius = radius * 0.65;
                 const outerRadius = radius;
 
-                // Create inner circle angles
-                const innerAngles = [];
+                // Position inner circle items - PERFECT CIRCLE (no randomness)
                 for (let i = 0; i < innerCount; i++) {
-                    innerAngles.push((Math.PI * 2 * i) / innerCount);
-                }
-                const shuffledInner = shuffleArray(innerAngles);
-
-                // Create outer circle angles
-                const outerAngles = [];
-                for (let i = 0; i < outerCount; i++) {
-                    outerAngles.push((Math.PI * 2 * i) / outerCount);
-                }
-                const shuffledOuter = shuffleArray(outerAngles);
-
-                // Position inner circle items
-                for (let i = 0; i < innerCount; i++) {
-                    const angle = shuffledInner[i];
-                    const radiusVar = innerRadius + (Math.random() - 0.5) * 20;
-                    const x = centerX + Math.cos(angle) * radiusVar;
-                    const y = centerY + Math.sin(angle) * radiusVar;
+                    const angle = (Math.PI * 2 * i) / innerCount - Math.PI / 2; // Start from top
+                    const x = centerX + Math.cos(angle) * innerRadius;
+                    const y = centerY + Math.sin(angle) * innerRadius;
                     positions.push({ x, y });
                 }
 
-                // Position outer circle items
+                // Position outer circle items - PERFECT CIRCLE (no randomness)
                 for (let i = 0; i < outerCount; i++) {
-                    const angle = shuffledOuter[i];
-                    const radiusVar = outerRadius + (Math.random() - 0.5) * 30;
-                    const x = centerX + Math.cos(angle) * radiusVar;
-                    const y = centerY + Math.sin(angle) * radiusVar;
+                    const angle = (Math.PI * 2 * i) / outerCount - Math.PI / 2; // Start from top
+                    const x = centerX + Math.cos(angle) * outerRadius;
+                    const y = centerY + Math.sin(angle) * outerRadius;
                     positions.push({ x, y });
                 }
             } else {
-                // Single circle for 20 or fewer items
-                const angles = [];
+                // Single PERFECT circle for 20 or fewer items
                 for (let i = 0; i < count; i++) {
-                    angles.push((Math.PI * 2 * i) / count);
-                }
-
-                // Shuffle angles for random positioning
-                const shuffledAngles = shuffleArray(angles);
-
-                for (let i = 0; i < count; i++) {
-                    const angle = shuffledAngles[i];
-                    // Add slight random variation to radius for more organic feel
-                    const radiusVar = radius + (Math.random() - 0.5) * 30;
-                    const x = centerX + Math.cos(angle) * radiusVar;
-                    const y = centerY + Math.sin(angle) * radiusVar;
+                    const angle = (Math.PI * 2 * i) / count - Math.PI / 2; // Start from top (-90 degrees)
+                    const x = centerX + Math.cos(angle) * radius;
+                    const y = centerY + Math.sin(angle) * radius;
                     positions.push({ x, y });
                 }
             }
@@ -5395,31 +5402,41 @@ function getIcon(item) {
 
         function getGridPositions(count, iconSize) {
             const positions = [];
-            const cols = 7; // Always 7 columns
-            const gap = iconSize * 0.5; // Gap between icons
-            const itemWidth = iconSize + gap;
 
             // Use 60% of screen width (20% margins on each side)
             const availableWidth = window.innerWidth * 0.6;
-            // Use 80% of screen height (10% margins top and bottom)
-            const availableHeight = window.innerHeight * 0.8;
+            // Use 90% of screen height (5% margins top and bottom)
+            const availableHeight = window.innerHeight * 0.9;
 
-            // Calculate starting position to center the grid
+            // Parametric gap - responsive to icon size and screen size
+            const minGap = Math.max(iconSize * 0.3, 20); // Minimum 30% of icon size or 20px
+            const gap = Math.min(minGap, window.innerWidth * 0.02); // Max 2% of screen width
+
+            // Calculate optimal number of columns based on available width
+            const itemWidthWithGap = iconSize + gap;
+            const cols = Math.max(3, Math.floor((availableWidth + gap) / itemWidthWithGap));
+
+            // Calculate actual rows needed
             const rows = Math.ceil(count / cols);
-            const totalWidth = (cols * itemWidth) - gap;
-            const totalHeight = (rows * itemWidth) - gap;
 
-            // Center in the available area (which is already centered)
+            // Calculate actual grid dimensions
+            const actualGridWidth = (cols * iconSize) + ((cols - 1) * gap);
+            const actualGridHeight = (rows * iconSize) + ((rows - 1) * gap);
+
+            // Margins for centering
             const marginLeft = window.innerWidth * 0.2; // 20% left margin
-            const marginTop = window.innerHeight * 0.1; // 10% top margin
-            const startX = marginLeft + (availableWidth - totalWidth) / 2;
-            const startY = marginTop + (availableHeight - totalHeight) / 2;
+            const marginTop = window.innerHeight * 0.05; // 5% top margin
 
+            // Center the grid within available area
+            const startX = marginLeft + (availableWidth - actualGridWidth) / 2;
+            const startY = marginTop + (availableHeight - actualGridHeight) / 2;
+
+            // Position items
             for (let i = 0; i < count; i++) {
                 const row = Math.floor(i / cols);
                 const col = i % cols;
-                const x = startX + col * itemWidth + iconSize / 2;
-                const y = startY + row * itemWidth + iconSize / 2;
+                const x = startX + col * (iconSize + gap) + iconSize / 2;
+                const y = startY + row * (iconSize + gap) + iconSize / 2;
                 positions.push({ x, y });
             }
 
@@ -7091,11 +7108,11 @@ if (thumbnailsEl) {
 
             // Mobile dock folders (5 items)
             const mobileDockFolders = [
-                { key: 'Cdrive', name: 'C:/', icon: 'drive' },
-                { key: 'Documents', name: 'Documents', icon: 'document' },
-                { key: 'Applications', name: 'Applications', icon: 'app' },
-                { key: 'Recents', name: 'Season 1', icon: 'clock' },
-                { key: 'AirDrop', name: 'DFW', icon: 'bolt' }
+                { key: 'RealDesktop', name: 'Desktop', icon: 'drive' },
+                { key: 'DFW', name: 'DFW', icon: 'bolt' },
+                { key: 'Experience', name: 'Experience', icon: 'app' },
+                { key: 'Gallery', name: 'Gallery', icon: 'document' },
+                { key: 'Item', name: 'Item', icon: 'clock' }
             ];
 
             // Global page tracking - all sections rendered side by side
