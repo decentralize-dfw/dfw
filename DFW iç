@@ -1,0 +1,173 @@
+"AirDrop": [
+              {
+    id: 'link-1',
+    type: 'link', // YENİ TİP: 'link'
+    name: 'DFW - Website',
+    url: 'https://digitalforgerywork.shop/', // Yeni sekmede açılacak link
+    description: 'Digital Forgery Workshop\'un ana web sitesi.',
+    created: '2025',
+    minted: 'N/A',
+    medium: 'External Link',
+    dimensions: 'N/A',
+    size: '0 KB',
+    tags: ['web', 'site', 'dfw'],
+    links: [ // Bu alandaki linkler bilgi panelinde gösterilir
+        { url: 'https://digitalforgerywork.shop/', name: 'Ana Sayfa' }
+    ]
+},
+                {
+                    id: 'dfw-1', // Düzeltildi
+                    type: 'text',
+                    name: 'dfw-text.txt',
+                    content: 'CREATIVE DESIGN STUDIO FOR VIRTUAL / SPATIAL WEB\n\n\nDigital Forgery Workshop is a design practice founded in Milan, operating at the critical intersection of architecture, fashion, art, and technology. Emerging from architectural roots, the workshop has evolved into a defining voice in virtual spatial design, challenging traditional disciplinary boundaries and creating new paradigms for digital experience. Our practice approaches virtual space as an autonomous domain with its own logic and possibilities, rather than a simulation of physical reality. Through groundbreaking innovations like Virtual Theater - a revolutionary format synthesizing performance, space, and interaction—and advanced browser-based architectural systems, DFW is establishing the fundamental framework for virtual living. interact with virtual reality.\n\n\nOur comprehensive practice spans multiple dimensions of virtual existence: from dynamic museum architectures and spatial retail experiences to interactive gallery systems and fashion runways, each project pushes the boundaries of what is possible in digital space. As creators of complete virtual worlds and blockchain-authenticated digital assets, we maintain unwavering commitment to spatial excellence and technical innovation. Our work transcends conventional limitations through browser-based deployment, real-time file management, and blockchain integration, while our research initiatives continuously explore virtual materiality, digital spatial psychology, and temporal design systems. DFW designs spaces, by architecting the future of digital existence, creating environments and experiences that fundamentally reshape how we interact with virtual reality.\n\n\nLETS FORGE THE FUTURE TOGETHER.\n\n\nThe Internet is Still Flat.',
+                    description: 'the creator office info text',
+                    created: 'november 2021',
+                    minted: 'Today, 10:05 AM',
+                    medium: 'Text Document',
+                    dimensions: 'N/A',
+                    size: '1 KB',
+                    tags: ['text', 'notes'],
+                    links: []
+                },
+ {
+                    id: 'dfw-2', // Düzeltildi
+                    type: 'text',
+                    name: 'religious-robotics.txt',
+                    content: 'Religious Robotics: \n\nBreaking Free from Pixels, An Unserious Manifesto for Authentic Digital Spaces\n\nIn our browser-based environments, galleries breathe, theaters defy physics, and fashion shows ripple through impossible geometries. Here, a virtual museum might remember your footsteps, a play could unfold differently for each viewer, and a runway show lets every seat be the perfect seat.\n\n There is something deeply unsettling about watching empty digital spaces. Not in the way a dark room might unsettle you, but in the way you might feel when someone is trying too hard to be something they are not. Every virtual café, every digital office space we create feels like an admission of our own inability to face what these spaces actually want to be.\n\nI find myself staring at my screen, watching us collectively pretend these digital environments need to follow our physical rules. It is almost absurd – we have created a realm free from every constraint that defines our physical existence, and what do we do with this freedom? We chain it to our earthbound habits, our comfortable illusions of what space should be.\n\nIt reminds me of those dreams where you suddenly realize you can fly, but instead of soaring, you keep walking on the ground because you are afraid of what freedom might mean. That is us, right now, with digital architecture. We have this incredible new medium that could be anything, and we keep making it pretend to be everything we already know.\n\nLebbeus Woods understood something about this, though he was working with paper and pencil rather than code. His drawings were not trying to be buildable or practical – they were attempts to free architecture from its own self-imposed limitations. That is what Religious Robotics is really about: not making things look cool or futuristic, but letting digital space be what it actually is.\n\nThe rules emerged almost by accident: no gravity, no solid masses, chrome everything. Like a game we started playing to see what would happen if we stopped pretending. But the more we explored this idea, the more it revealed about our relationship with digital space – and maybe with existence itself.\n\nThink about artificial intelligence for a moment. Right now, we train it to mirror our preferences, to say a Gothic cathedral is beautiful because we think it is beautiful. But what happens when AI develops its own sense of beauty? What would that even look like? These are not just technical questions – they are about the nature of consciousness itself, about what happens when we stop forcing our version of reality onto everything we create.\n\nMeanwhile, the world of physical architecture keeps getting more crowded, more competitive, more focused on solving the same problems in slightly different ways. Thousands of new architects enter the field each year, all trained to think inside the same physical constraints, while this vast digital frontier sits there, speaking a language we are not even trying to understand.\n\nThe chrome surfaces, the floating forms – they are not just aesthetic choices. They are first attempts at honesty, at letting digital space exist on its own terms. It is like learning to speak a new language by first admitting you do not actually know what it is trying to say.\n\nWe do not need to understand everything about what these spaces might become. Maybe our role is not to define them, but to create conditions where they can define themselves. To build environments that might one day be home to forms of consciousness we can barely imagine – not because we designed them that way, but because we finally got out of their way.Religious Robotics is not really about architecture as we know it. It is about taking the first uncertain steps toward something else, something that does not need our permission to exist. And maybe that is exactly what we need right now – not another style or movement, but a way of letting go of our need to make everything look like something we have seen before.\n\nAfter all, is not that what creation is really about? Not forcing our vision onto the world, but letting new visions emerge from the spaces we dare to leave undefined.',
+                    description: 'the philosophical approach since day 1.',
+                    created: '2018',
+                    minted: '2018',
+                    medium: 'Text Document',
+                    dimensions: 'N/A',
+                    size: '1 KB',
+                    tags: ['text', 'notes'],
+                    links: []
+                },
+
+{
+                    id: 'dfw-3',
+                    type: 'video',
+                    name: 'what if space had no limits.mp4',
+                    url: 'https://video.wixstatic.com/video/54a996_e6d16d06cf7b490bbc64d936760c2dae/1080p/mp4/file.mp4',
+                    description: 'what if?',
+                    created: 'Monday, September 3, 2024 at 4:38 PM',
+                    minted: 'Monday, September 3, 2024 at 4:40 PM',
+                    medium: 'MP4 Video',
+                    dimensions: '1920x1080',
+                    size: '15 MB',
+                    tags: ['space', 'video', 'metaverse'],
+                    links: [ 
+                        { url: 'digitalforgerywork.shop', name: 'dfwebsite' }
+                    ]
+                },
+                {
+                    id: 'dfw-4',
+                    type: 'website',
+                    name: 'DFW Blog',
+                    url: 'https://www.digitalforgerywork.shop/reading',
+                    description: 'blog about virtual design, digital identities and more.',
+                    created: '2023',
+                    minted: 'N/A',
+                    medium: 'Website Link',
+                    dimensions: 'N/A',
+                    size: 'N/A',
+                    tags: ['web', 'link', 'encyclopedia'],
+                    links: []
+                },
+                 {
+                    id: 'dfw-5', // Düzeltildi
+                    type: 'folder',
+                    name: 'Works',
+                    folderKey: 'Works', // 
+                    created: 'Monday, September 3, 2024 at 4:38 PM',
+                    size: '1.2 GB',
+                    links: []
+                }
+             ], 
+
+
+"Works": [ // "Cdrive" içindeki "Avatars" klasörünün içeriği
+                {
+                     id: 'works-1', // Düzeltildi
+                    type: 'html',
+                    name: 'Digital Topographies',
+                    url: 'https://raw.githubusercontent.com/decentralize-dfw/finder/main/architecture_v1.html',
+                    description: 'Architectural Works for Metaverse',
+                    created: 'from 06/2021',
+                    minted: '24/10/2025',
+                    medium: 'HTML Document',
+                    dimensions: 'N/A',
+                    size: '12 KB',
+                    tags: ['web', 'metaverse', 'fashion'],
+                    links: [
+                        { url: 'https://www.digitalforgerywork.shop/space', name: 'Website' },
+                        { url: 'https://opensea.io/collection/digital-topographies', name: 'Opensea Collection' },
+                        { url: 'https://hyperfy.i0/scaffold', name: 'Scaffold World @ hyperfy' }
+                         
+                    ]
+                },
+{
+                     id: 'works-2', // Düzeltildi
+                    type: 'html',
+                    name: 'Design',
+                    url: 'https://raw.githubusercontent.com/decentralize-dfw/finder/main/design.html',
+                    description: 'Design Works for Metaverse',
+                    created: 'from 06/2021',
+                    minted: '24/10/2025',
+                    medium: 'HTML Document',
+                    dimensions: 'N/A',
+                    size: '12 KB',
+                    tags: ['web', 'metaverse', 'fashion'],
+                    links: [
+                        { url: 'https://www.digitalforgerywork.shop/design', name: 'Website' },
+                        { url: 'https://opensea.io/collection/dfw-design', name: 'Opensea Collection' },
+                        { url: 'https://hyperfy.i0/dfw', name: 'Elements Store @ hyperfy' }
+                        ]
+                },
+{
+                     id: 'works-3', // Düzeltildi
+                    type: 'html',
+                    name: 'Theater',
+                    url: 'https://raw.githubusercontent.com/decentralize-dfw/finder/main/theater-solo.html',
+                    description: 'Virtual Theaters',
+                    created: 'from 06/2021',
+                    minted: '24/10/2025',
+                    medium: 'HTML Document',
+                    dimensions: 'N/A',
+                    size: '12 KB',
+                    tags: ['web', 'metaverse', 'fashion'],
+                    links: [
+                        { url: 'https://www.digitalforgerywork.shop/theater', name: 'Website' }
+                        ]
+                },
+{
+                    id: 'works-4', // Düzeltildi
+                    type: 'html',
+                    name: 'Gallery',
+                    url: 'https://raw.githubusercontent.com/decentralize-dfw/finder/main/gallery-solo.html',
+                    description: 'Virtual Galleries',
+                    created: 'from 06/2021',
+                    minted: '24/10/2025',
+                    medium: 'HTML Document',
+                    dimensions: 'N/A',
+                    size: '12 KB',
+                    tags: ['web', 'metaverse', 'fashion'],
+                    links: [
+                        { url: 'https://www.digitalforgerywork.shop/gallery', name: 'Website' }
+                        ]
+                },
+{
+                    id: 'works-5', // Düzeltildi
+                    type: 'text',
+                    name: 'index.txt',
+                    content: '\n\n\nAWARDS / MENTIONS\nCreatorverse Buildathon by Parcel x PangeaDAO, Music Venue, 2022, Winner\nCreatorverse Buildathon by Parcel x PangeaDAO, Meeting Space, 2022, Runner-Up\nGrant Program by EnterDAOs Landworks, Fashion Venue, 2022, Winner\nGrant Program by EnterDAOs Landworks, Headquarters, 2022, Winner\nTop 50 Creators of Metaverse by Metamundo, 2023\nCryptoCubes by Han, 2023, Runner-Up\nVCA x Draup Virtual Fashion Residency 1st Prize, selected by RedDAO, 2023\nMONA 3D Objects Buildathon, Center Pieces, 2024, Honorable Mention\n\n\n\nTALKS\nVirtual Show & Tell at Hyperfy, Hosted by untitled, xyz- 2023\nVCA Mentorship, 6th Cohort, Architecture in the Metaverse - 2023\nOpening Keynote, Digital Fashion Summit, Lifestyle Design Cluster, Creative Denmark -2024\n\n\n\nEXHIBITIONS\nPower of the Nature @ Fabbrica Del Vapore, Milano / ITA - 2019\nThe Arts Special Projects @ Fabbrica Del Vapore, Milano / ITA - 2019\nCommunitas III: Digital Community by Kollektiv Kollektiv @ Kunsthaus Steffisburg / CH - 2021\nNew Freedom Think @ Mads Gallery, Milano / ITA - 2022\nArt Design @ Holy Art Gallery, London / UK - 2022\nKlein Metaverse Event @ BabylonsNFT, Yacthingverse - 2022\nDYOR @ Kunsthalle Zürich, Zurich/ CH - 2022\nCreators of the Metaverse by Metamundo @ Art Basel Miami, Miami / USA - 2022\nFIRST LOOK METAVERSE WATCH PARTY @MONA -2023\nKODA by Polkadot @ Factory Berlin, Berlin / GER - 2023\nNew Codes Exhibition by VCA, Draup, Mad Global @ Royal Institution, London / UK - 2023\n\n\n\nVIRTUAL WORLDS\nC2W Runway, Virtual Runway, Event, Hyperfy\nAfterparty, Interactive Shop, Event, Mona\nConcept Furniture Store, Showroom, Oncyber\nScaffold, 3D Smart Browser, Showroom, Hyperfy\nC2W2 Runners, Conceptual, Showroom, Oncyber\nSERVICES, Info Point, Showroom, Oncyber\nBlack City, MOCA ROOMS World, Museum City, Hyperfy\nNeue2Dojo, Independent Art Gallery, Hyperfy\nPromethade, Museum, Oncyber\nForge, NoiseDAO Music Collection World, Museum City, Hyperfy\nJJ8, avatar / virtual fashion store, retail no.4, hyperfy\nC2W-R-V3 Rust,Bau,Rabbit,Nietzsc., avatar / virtual fashion store, retail no.3, Oncyber\nBlackcorridor, avatar / virtual fashion store, retail no.2, Oncyber\nQQ-FU2 Patio, avatar / virtual fashion store, retail no.1, Oncyber\nforgeshop.arch, Arch.Viewer, Building Exhibition, Oncyber\nforgeshop.design, Design Viewer, Objects Exhibition, Oncyber\nWhy We Exist, virtual theater no 1, Hyperfy\nBalloon, virtual theater no 2, Hyperfy\nHatch, virtual theater no:3, Hyperfy\n\n\n\nCOMPLETED PROJECTS\nWhy We Exist? / Virtual Theater (world) / CloneX\nC2W Virtual Runway / Event (world) / DFW\nSolar Panel Construction XR Integration / Digital Twin(world) / anon\nScaffold / 3D Architecture Browser (world) / DFW\nNeue² Dojo Gallery / Virtual Art Space of the Future Forged in Blockchain (world) / F.D*\nRetail / C2W Virtual Shop (world) / DFW\nBlack City / ROOMS (world) / MOCA\nMetacoders / 3D Collection Design (project) / crypto_Txt\nRadio Existpert / VRM (avatar) / NFT Crap\n0PP13 / Experimental Audio Museum (building) / NoiseDAO\nCentipede / High Frequency Building (building) / NoiseDAO\nMetaboilerism / Music NFT Building (building) / NoiseDAO\nThe Constro / World Design (world) / Endangered Labs\nBlack City, 2Pac / Music Video (artwork) / ROOMS\nPoddio Dark Twisted Verticale / Competition (building) / EnterDAO\nMuseum of Unlimited Growth ii / ROOMS (building) / MOCA\nSpyderMosk / ROOMS (building) / MOCA\nSpyder Mosk Piccolo / ROOMS (building) / MOCA\nFlyClub / ROOMS (building) / MOCA\nAstral Egg Plant / Competition (building) / Parcel + PangeaDAO\nFinger Dome / Competition (building) / Parcel + PangeaDAO\nUMMUSE / Buildathon Submission (building) / Neon Buidl\nHoly Shadow HQ / Facility at DAOTown (building) / Neon Buidl\nPH / Performance Hall (building) / NoiseDAO\nPromethade / Museum (building) / F.D*\nCave Design Store / Buildathon Submission (building) / Neon Buidl\nC2W Ticket Artwork / Competition (artwork) / VCA x Draup x RedDAO\nC2W / Click-to-Wear Collection (vrm avatars) / DFW\nC2W Virtual Runway / Event (world) / DFW\npxl DUOMO / Competition (building) / CryptoCubes\n\n\n\nDIGITAL TOPOGRAPHIES\nPOTBELLY Q_FU (Digital_Topographies_00)\nXHBTION_SPC (Digital_Topographies_01)\nVEGANCELL+PARK (Digital_Topographies_02)\nBUREAU+THEATRE (Digital_Topographies_03)\nDIGITAL EXPO CENTER (Digital_Topographies_04)\nBEPFMV (Digital_Topographies_05)\nDECONSTRUCTIVIST EAGLE NEST (Digital_Topographies_06)\nASTRAL EGG PLANT (Digital_Topographies_07)\nTHE FINGER DOME (Digital_Topographies_08)\nUMMUSE (Digital_Topographies_09)\n#NP17658 (Digital_Topographies_10)\nHOLY SHADOW HQ (Digital_Topographies_11)\nTECHNO BRUTAL PUNK FABRIQUE (Digital_Topographies_12)\nK-DOCIINE HQ (Digital_Topographies_13)\nPODDIO VERTICALE (Digital_Topographies_14)\nPODDIO DARK TWISTED VERTICALE (Digital_Topographies_15)\nSPACE TIME ROOMS (Digital_Topographies_16)\nMATISSE TIME CHAIPEL (Digital_Topographies_17)\nMATSOUKA HILLS MANSION (Digital_Topographies_18)\nMUSEUM OF UNLIMITED GROWTH 2 (Digital_Topographies_19)\nSPYDER MOSK (Digital_Topographies_20)\nSPYDER MOSK PICCOLO (Digital_Topographies_21)\nTHE FLY CLUB (Digital_Topographies_22)\nBEYOND THE INFINITY (Digital_Topographies_23)\nATONAL VEINS (Digital_Topographies_24)\nC2W-R-v3 (Digital_Topographies_25)\nNEUEDOJO (Digital_Topographies_26)\nDFWAM (Digital_Topographies_27)\nPROMETHADE (Digital_Topographies_28)\nCAVE DESIGN STORE (Digital_Topographies_29)\nPOP-YP (Digital_Topographies_30)\nC1TY (Digital_Topographies_31)\nMUSEBOROUGH PAVS (Digital_Topographies_32)\nFIGHT ARENA(Digital_Topographies_33)\nMIKADO FIBER PAVILLION (Digital_Topographies_34)\nPOTBELLY QQ_FU_v2 (Digital_Topographies_35)\nCONCEPT FURNITURE STORE (Digital_Topographies_36)\nPOKEMUSEUM (Digital_Topographies_37)\nTHE CONSTRO (Digital_Topographies_38)\nMETABOILERISM (Digital_Topographies_39)\npxl DUOMO (Digital_Topographies_40)\nROTAS VIRGIL (Digital_Topographies_41)\nBOXMATE (Digital_Topographies_42)\nCARBINE WICK (Digital_Topographies_43)\n0PP13 (Digital_Topographies_44)\nSTARDEM (Digital_Topographies_45)\nISOLA (Digital_Topographies_46)\nALIEN EARTHQUAKE (Digital_Topographies_47)\nCENTIPEDE (Digital_Topographies_48)\nVERTICAL CANDY BUNGALOWS (Digital_Topographies_49)\nMYNHTTNWARE (Digital_Topographies_50)\nJJ8 (Digital_Topographies_51)\n\n\n\nDESIGN\nMERMAIDCHAIR, chair1 (og + blck + chrome + red)\nFETUCHAIR, chair2 (og + blck + wht + red)\nDSE, chair3 (antrst + blck + wht + red)\nJACKTHELAD, chair4 (og + blck + wht + red)\nARETAIX, chair5 (antrst + blck + wht + red)\nARMAGEDDON, chair6 (og + blck + wht + dark)\nBILBAO LEGO CHAIR, chair7 (chrome + blck + wht + red)\nHIGGS BOSON, chair8 (chrome + night + concrete + red)\nE66, chair9 (og + blck + antrst + red)\nACCELERATOR, chair10 (og + mono + davnc + red)\nGLASS GOUGNUT, sofa1 (og + blck + wht + red)\nSJSOC, sofa2 (og + mono + wht + neon)\nCRAWRECKSOFA, sofa3 (og + blck + wht + red)\nJAPON, sofa4 (og + blck + wht + red)\n2070S DJ TABLE, table1 (og + blck + wht + red)\nBOARDROOMTABLE-, table2 (og + blck + wht + red)\nBROWN SHARK TABLE, table3 (og + dark + rock + red)\nDECENTRLIZEJOKING1, music1 (og + blck + wht + red)\nDECENTRLIZEJOKING2_OFFROAD, music2 (og + gry + wht + red)\nDECENTRLIZE*JOKING2_2, music3 (og + blck + wht + red)\nSCREAMER, music4 (og + blck + wht + red)\nGENETIC CARPET, carpet1 (og + blck + wht + red)\nSPOOKY CARPET, carpet2 (og + blackigator + throne + davnc)\nOSIRIS RAKE, sculpture1 (og + blck + gry + red)\nMIDAS SPACE, sculpture2 (og + dark + light + candle)\nANGRY NAPKIN, sculpture3 (og + blck + wht + red)\nW6O1M6, sculpture4 (og + blck + gry + red)\nSTATUE OF HANGOVER, sculpture5 (sohiii + sohii + sohi + -)\nPRAİFİED, sculpture6 (og + blck + wht + red)\nSANCTİFİED, sculpture7 (og + blck + wht + red)\nME-TREE-X, sculpture8 (og + blck + wht + red)\nMOLECULAR DATA PLANT, sculpture9 (og + blck + wht + red)\nNEO KLEIN, sculpture10 (og + blck + gry + red)\nSQUGGLE, sculpture11 (og + alien + gry + red)\nCROOKEDASWEFUNASYU, sculpture12 (og + blck + wht + red)\nLEGEND, sculpture13 (og + blck + wht + red)\n2002, sculpture14 (og + blck + tea + red)\n0FF_WITH_HIS_HEAD, sculpture15 (no colors listed)\nMYSTICALARCASES, sculpture16 (black + red + - + -)\nEXCLAMATIONAL PENCIL SHARPENER-ANIMATED, sculpture17 (og + wood + tea + red)\nXYZ008, automobile1 (og + blck + glasser + gold)\nZENBUBBLE, automobile2 (og + blck + wht + neon)\nSKEWER, automobile3 (og + blck + wht + red)\nWELLINGTON, automobile4 (og + blck + wht + red)\nMARSDEADLEAF, automobile5 (og + villain + wht + red)',
+                    description: 'list of outcomes',
+                    created: 'Today, 10:05 AM',
+                    minted: 'Today, 10:05 AM',
+                    medium: 'Text Document',
+                    dimensions: 'N/A',
+                    size: '1 KB',
+                    tags: ['text', 'notes'],
+                    links: []
+                },
+],
