@@ -1,0 +1,402 @@
+"C2W2 Runway": [
+    // --- C:/ (Cdrive) Temel İçerikleri ---
+    {
+        id: 'c2w2-0',
+        type: 'text',
+        name: 'README.txt',
+        content: 'README\n\nTo run the experience, please go to Applications, and open "runway".\n\nSame as marketview, it is frame version, with fixed cameras.\nTo walk / run freely inside, please open its link from a new tab, in PC or VR.\nCheck links on Applications folder for further.\n\n\nINDEX:\nDFW: : Introduction of the creator studio, and a glimpse of completed works. \nSeason 1 (C2W, 2023) : The files of 1st season of the runway + avatars \nApplications : Runway applications, and links \nC:/ : Introduction \nDocuments : All related media and 3d models of runway and avatars. \n\nThis is a folder interface for C2W2. All relevant files and info are available.\n\nC2W2 stands for click-to-wear 2 runway and avatars.\n\n\n\n\nmail: main@d--f--w.com',
+        description: 'Introduction information',
+        created: '2*25',
+        minted: '2*25',
+        medium: 'Text Document',
+        dimensions: 'N/A',
+        size: '1 KB',
+        tags: ['text', 'notes'],
+        links: []
+    },
+    {
+        id: 'c2w2-1',
+        type: 'pdf',
+        name: 'C2W2.pdf',
+        url: 'https://raw.githubusercontent.com/decentralize-dfw/c2w2/refs/heads/main/PDF_v2-5mbs.pdf',
+        description: 'resume',
+        created: 'Today, 1:00 PM',
+        minted: 'Today, 1:00 PM',
+        medium: 'PDF Document',
+        dimensions: 'N/A',
+        size: '13 KB',
+        tags: ['pdf', 'document', 'example'],
+        links: []
+    },
+    {
+        id: 'c2w2-2',
+        type: 'video',
+        name: 'C2W2-PDF.mp4',
+        url: 'https://www.youtube.com/embed/acVopmUyAD8?si=d2lqkBGPCNokB_y-',
+        description: '10 min Video of PDF Info. Please open C2W2.PDF Info for the complete booklet.',
+        created: 'Friday, October 10, 2024 at 11:00 AM',
+        minted: 'Friday, October 10, 2024 at 11:01 AM',
+        medium: 'MP4 Video',
+        dimensions: '1920x1080',
+        size: '22 MB',
+        tags: ['skate', 'park', 'video'],
+        links: []
+    },
+    {
+        id: 'c2w2-3',
+        type: 'image',
+        name: 'abstract.jpg',
+        url: 'https://raw.githubusercontent.com/decentralize-dfw/c2w2-pdf2/main/C2W2_Page_42.jpg',
+        description: 'merged images of avatars',
+        created: '-',
+        minted: '-',
+        medium: 'PNG Image',
+        dimensions: '3840x2169',
+        size: '4.2 MB',
+        tags: ['bike', 'sports', 'report'],
+        links: []
+    },
+    {
+        id: 'c2w2-4',
+        type: 'video',
+        name: 'MEDITATION [CREATORS NOTE].mp4',
+        url: 'https://www.youtube.com/embed/nyEjJ9KvnQc',
+        description: '10 minute long freeflow mind storm of ideas that constructs and deconstructs the runway and the collection.',
+        created: '2*25',
+        minted: '2*25',
+        medium: 'MP4 Video',
+        dimensions: '1920x1080',
+        size: '22 MB',
+        tags: ['zen', 'ai', 'render'],
+        links: []
+    },
+    {
+        id: 'c2w2-5',
+        type: 'folder',
+        name: 'quick texts',
+        folderKey: 'c_text',
+        created: 'Monday, September 3, 2024 at 4:38 PM',
+        size: '1.2 GB',
+        links: []
+    },
+    {
+        id: 'c2w2-6',
+        type: 'folder',
+        name: '3D Sample Files',
+        folderKey: 'Sample_3d',
+        created: 'Monday, September 3, 2024 at 4:38 PM',
+        size: '1.2 GB',
+        links: []
+    },
+    {
+        id: 'c2w2-7',
+        type: 'video',
+        name: 'AvatarSelector.mp4',
+        url: 'https://video.wixstatic.com/video/54a996_a3c74604f08941e59e6d4e8d3b77f8a3/1080p/mp4/file.mp4',
+        description: 'street coder layout of avatar picking',
+        created: '-',
+        minted: '-',
+        medium: 'Video Image',
+        dimensions: '3840x2169',
+        size: '4.2 MB',
+        tags: ['bike', 'sports', 'report'],
+        links: []
+    },
+    {
+        id: 'c2w2-8',
+        type: 'image',
+        name: 'Runway_screenshots.jpg',
+        url: 'https://raw.githubusercontent.com/decentralize-dfw/c2w2-pdf/main/C2W2%20Runway%20by%20DFW%2C%202025_Page_08.jpg',
+        description: 'merged images of walk screenshots',
+        created: '-',
+        minted: '-',
+        medium: 'PNG Image',
+        dimensions: '3840x2169',
+        size: '3.1 MB',
+        tags: ['bike', 'sports', 'report'],
+        links: []
+    },
+
+    // --- DOCUMENTS'tan Eklenenler ---
+    {
+        id: 'c2w2-9',
+        type: 'image',
+        name: 'Runway_cover_finalfinalfinallll.jpg',
+        url: 'https://arweave.net/hK2CvVgwuA2FGvtYHB7-EYRB1mOcGusxOiWrNYAN9Xk',
+        description: 'experience cover',
+        created: '-',
+        minted: '-',
+        medium: 'PNG Image',
+        dimensions: '3840x2169',
+        size: '14.1 MB',
+        tags: ['bike', 'sports', 'report'],
+        links: []
+    },
+    {
+        id: 'c2w2-10',
+        type: 'image',
+        name: 'avatars-frontW.jpg',
+        url: 'https://raw.githubusercontent.com/decentralize-dfw/c2w2-pdf/main/C2W2%20Runway%20by%20DFW%2C%202025_Page_07.jpg',
+        description: 'merged images of avatars',
+        created: '-',
+        minted: '-',
+        medium: 'PNG Image',
+        dimensions: '3840x2169',
+        size: '4.2 MB',
+        tags: ['bike', 'sports', 'report'],
+        links: []
+    },
+    {
+        id: 'c2w2-11',
+        type: 'folder',
+        name: 'Live Recordings',
+        folderKey: 'hyperfy_mp4',
+        created: '2024',
+        size: '1.2 GB',
+        links: []
+    },
+    {
+        id: 'c2w2-12',
+        type: 'video',
+        name: 'pitchtalk.mp4',
+        url: 'https://www.youtube.com/embed/nEvDjGkuvnk',
+        description: 'Why it matters? 3 minutes.',
+        created: '-',
+        minted: '-',
+        medium: 'MP4 Video',
+        dimensions: '1920x1080',
+        size: '15 MB',
+        tags: ['space', 'video', 'metaverse'],
+        links: []
+    },
+
+    // --- APPS'ten Eklenenler ---
+    {
+        id: 'c2w2-13',
+        type: 'html',
+        name: 'Runway.exe',
+        iconUrl: 'https://raw.githubusercontent.com/decentralize-dfw/c2w2-thumb/main/logo_evo_08.png',
+        url: 'https://raw.githubusercontent.com/decentralize-dfw/c2w2/main/runway.html',
+        description: 'C2W2 Runway 2025. Web version with 3 fixed cameras.',
+        created: 'from 06/2024',
+        minted: '24/10/2025',
+        medium: 'HTML Document',
+        dimensions: 'N/A',
+        size: '12 KB',
+        tags: ['web', 'metaverse', 'fashion'],
+        links: [
+            { url: 'https://opensea.io/item/ethereum/0xf688f59da001827bc8658622557ba33ffd6262a7/1', name: 'Opensea' },
+            { url: 'https://manifold.xyz/@dfw/contract/166699248/1', name: 'Manifold' },
+            { url: 'https://brzkifj7njg63eihluhkxuwxfncwuczr3kakz2wbabhyv2n232jq.arweave.net/DHKkFT9qTe2RB10Oq9LXK0VqCzHagKzqwQBPium63pM', name: 'On-chain' },
+            { url: 'https://hyperfy.io/c2w2', name: 'Hyperfy_v1' }
+        ]
+    },
+    {
+        id: 'c2w2-14',
+        type: 'html',
+        name: 'RunwayModel_Viewer.exe',
+        iconUrl: 'https://raw.githubusercontent.com/decentralize-dfw/c2w2-thumb/main/0-MODELVIEWER2.png',
+        url: 'https://raw.githubusercontent.com/decentralize-dfw/c2w2/main/runwaymodelviewer.html',
+        description: 'Runway Model Simulation interface to explore each design in the context.',
+        created: '2025',
+        minted: 'N/A',
+        medium: 'External Link',
+        dimensions: 'N/A',
+        size: '0 KB',
+        tags: ['web', 'site', 'dfw'],
+        links: [
+            { url: 'https://c2w2.world/runwaymodelviewer', name: 'New Tab' }
+        ]
+    },
+
+    // --- ALL FILES Linki ---
+    {
+        id: 'c2w2-15',
+        type: 'link',
+        name: 'ALL FILES',
+        url: 'https://c2w2.art',
+        description: 'Access to all files and artworks.',
+        created: '2025',
+        minted: 'N/A',
+        medium: 'External Link',
+        dimensions: 'N/A',
+        size: '0 KB',
+        tags: ['web', 'archive', 'all'],
+        links: [
+            { url: 'https://c2w2.art', name: 'C2W2.ART' }
+        ]
+    }
+],
+
+"c_text": [
+{
+                    id: 'cd-4', // Düzeltildi
+                    type: 'text',
+                    name: 'Concept Summary.txt',
+                    content: 'Concept Summary:\nHumanity evolves from touch to clicks, from atoms to codes, transforming knowledge and identity. In that transmission phase, via design, C2W2 Runway tells a six-chapter story about our relationship with tech: how it first changes art, then devalues it through mass production, and finally forces a search for new meaning and identity. The click is the new biology.',
+                    description: 'Why?',
+                    created: 'Today, 10:05 AM',
+                    minted: 'Today, 10:05 AM',
+                    medium: 'Text Document',
+                    dimensions: 'N/A',
+                    size: '1 KB',
+                    tags: ['text', 'notes'],
+                    links: []
+                },
+{
+                    id: 'cd-5', // Düzeltildi
+                    type: 'text',
+                    name: 'Overview.txt',
+                    content: 'Overview:\nC2W2 is a 30-minute browser-based runway. No downloads, no logins. Out of seventy-five, selected forty-eight avatars appear in a six-chapter sequence, with hyper-real textile simulations and a clear narrative spine.\n\nThe work merges digital fashion, architecture, and performance into one continuous environment. Each chapter marks a step in the evolution of identity, material, and medium in virtual culture.\n\n\nWhat it is (at a glance)\n• 30-minute experience\n• Runs fully in a web browser on-chain\n• Desktop version should be opened in a new tab.\n• If not, users will see the iframe version, with fixed cam views. \n• Optimized for VR headsets, use the same link\n• Features 48 garments (out of 75), all in VRM format\n• Created using Clo3D, Blender\n• Originally built on Hyperfy v1\n• Rebuilt using Three.js\n• Mintable as an HTML-based NFT\n• All files used in the show are stored on Arweave,\nwith the NFT minted on Ethereum.',
+                    description: 'How?',
+                    created: 'Today, 10:05 AM',
+                    minted: 'Today, 10:05 AM',
+                    medium: 'Text Document',
+                    dimensions: 'N/A',
+                    size: '1 KB',
+                    tags: ['text', 'notes'],
+                    links: []
+                },
+{
+                    id: 'cd-6', // Düzeltildi
+                    type: 'text',
+                    name: 'World Insights.txt',
+                    content: 'World Insights:\nThe metaverse space is a minimalist, dark environment with dramatic circular lighting, evoking a digital void where avatars evolve. Avatars rotate 360 degrees and walk in 15 meter radius loops during 30 seconds each, and each has a central object related to the design. Each chapter builds on the last: starting with AI-reimagined art classics, shifting to experimental digital fashion, blending NFTs and figures, resetting with pure AI generation, ascending minimally, and rebirth through transformed echoes. ',
+                   description: 'What? Description of the environment and the experience',
+                    created: 'Today, 10:05 AM',
+                    minted: 'Today, 10:05 AM',
+                    medium: 'Text Document',
+                    dimensions: 'N/A',
+                    size: '1 KB',
+                    tags: ['text', 'notes'],
+                    links: []
+                },
+{
+                    id: 'cd-7', // Düzeltildi
+                    type: 'text',
+                    name: 'Runway Parts.txt',
+                    content: '1- Evolution Of Medium Of Traditional Art\n2- Virtual Fashion\n3- Evolution Of Medium Of Art As Nft\n4- AI Powered Design\n5- Transhumanism\n6- Evolution Of Art As Mutant Meaning',
+                   description: '6 Parts, 1 life.',                    
+                    created: 'Today, 10:05 AM',
+                    minted: 'Today, 10:05 AM',
+                    medium: 'Text Document',
+                    dimensions: 'N/A',
+                    size: '1 KB',
+                    tags: ['text', 'notes'],
+                    links: []
+                },
+   ],
+
+"Sample_3d": [ //pilesolo-opt-v3.glb
+                              //xokufupsuitanim-opt-v1.glb
+                {
+    id: 'sample-1',
+    type: 'glb',
+    name: 'BoneonAir-RW1000.glb',
+    url: 'https://raw.githubusercontent.com/decentralize-dfw/c2w2runwayglbmodels1000/main/samspratt-1000-comms-opt-v34.glb',
+    description: 'Space monkey! Ready to sacrifice himself for the greater good.',
+    created: '-',
+    minted: '-',
+    medium: 'RW1000',
+    dimensions: '-',
+    size: '-',
+    tags: ['avatar', 'agent', 'design', 'vrm', 'runway'],
+    links: []
+  },
+                {
+    id: 'sample2',
+    type: 'glb',
+    name: 'Xokufup.glb',
+    url: 'https://raw.githubusercontent.com/decentralize-dfw/c2w2-glb/main/xokufupsuitanim-opt-v1.glb',
+    description: 'Fit No: 22; Runway: Evolution of 2D Art (Part 1).',
+    created: '-',
+    minted: '-',
+    medium: 'VRM',
+    dimensions: '-',
+    size: '-',
+    tags: ['avatar', 'agent', 'design', 'vrm', 'runway'],
+    links: []
+  },
+    {
+    id: 'sample3',
+    type: 'glb',
+    name: 'davicni-RW1000.glb',
+    url: 'https://raw.githubusercontent.com/decentralize-dfw/c2w2runwayglbmodels1000/main/davicni-1000-opt-v13.glb',
+    description: 'Revival',
+    created: '-',
+    minted: '-',
+    medium: 'RW1000',
+    dimensions: '-',
+    size: '-',
+    tags: ['avatar', 'agent', 'design', 'vrm', 'runway'],
+    links: []
+  } ,
+  // lydiaobejct-opt-v1.glb  lydiaobejct-opt.glb
+{
+    id: 'sample4',
+    type: 'glb',
+    name: 'lydia_centerobject.glb',
+    url: 'https://raw.githubusercontent.com/decentralize-dfw/c2w2-glb/main/lydiaobejct-opt-v1.glb',
+    description: 'Fit No: 36; Runway: Evolution of 2D Art (Part 1).',
+    created: '-',
+    minted: '-',
+    medium: 'VRM',
+    dimensions: '-',
+    size: '-',
+    tags: ['avatar', 'agent', 'design', 'vrm', 'runway'],
+    links: []
+  },
+// seize-centerobject-opt-v1.glb    seize-centerobject-opt.glb
+{
+    id: 'sample5',
+    type: 'glb',
+    name: 'seize_centerobject.glb',
+    url: 'https://raw.githubusercontent.com/decentralize-dfw/c2w2-glb/main/seize-centerobject-opt-v1.glb',
+    description: 'Remix of the SZN8 | Card 273 - First Contact by Kostas Giannopoulos ',
+    created: '-',
+    minted: '-',
+    medium: 'VRM',
+    dimensions: '-',
+    size: '-',
+    tags: ['avatar', 'agent', 'design', 'vrm', 'runway'],
+    links: [[{ url: 'https://6529.io/the-memes/273?focus=live', name: 'See the Original Artwork here from 6529.io' }]
+
+      
+    ]
+  },
+
+            ],
+
+"hyperfy_mp4": [ 
+{
+                    id: 'hypmp4-1',
+                    type: 'video',
+                    name: 'C2W2-Recording[SHOW_VERSION].mp4',
+                    url: 'https://www.youtube.com/embed/KeH--53RYxA',
+                    description: 'Runway live recording from web browser. Show version includes copyrighted items and has only exhibition purposes.',
+                    created: '2025',
+                    minted: '2025',
+                    medium: 'Live Recording',
+                    dimensions: '4K  ',
+                    size: '8 GB',
+                    tags: ['space', 'video', 'wix'],
+                    links: [ 
+                        ]
+                },
+                {
+                   id: 'hypmp4-2',
+                    type: 'video',
+                    name: 'C2W2-Recording[MINTED].mp4',
+                    url: 'https://www.youtube.com/embed/FJeMDH-w7PA',
+                    description: 'Runway live recording from web browser. Commercial version includes non-copyrighted items and has allowed to be distibuted.',
+                    created: '2025',
+                    minted: '2025',
+                    medium: 'Live Recording',
+                    dimensions: '4K  ',
+                    size: '8 GB',
+                    tags: ['space', 'video', 'wix'],
+                    links: [ 
+                        ]
+                },
+
+],
