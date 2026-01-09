@@ -5370,6 +5370,26 @@ function getIcon(item) {
             layoutMode: 'circle' // 'circle' or 'grid'
         };
 
+        // Circle rotation state
+        const rotationState = {
+            outer: {
+                angle: 0,          // Current rotation angle in radians
+                velocity: 0,       // Angular velocity (rad/s)
+                isDragging: false,
+                lastMouseAngle: 0,
+                lastTime: 0
+            },
+            inner: {
+                angle: 0,
+                velocity: 0,
+                isDragging: false,
+                lastMouseAngle: 0,
+                lastTime: 0
+            },
+            friction: 0.95,        // Friction coefficient (0-1, higher = less friction)
+            minVelocity: 0.001     // Minimum velocity before stopping
+        };
+
         // Main categories for root level
         // Main categories for root level (Circular Menu)
         const mainCategories = [
@@ -5430,9 +5450,16 @@ function getIcon(item) {
         }
 
         function calculateDynamicSizes(count) {
-            // Circle is 70% of screen (diameter), radius is 35%
+            // Maximum circle is 70% of screen (diameter), radius is 35%
             const screenSize = Math.min(window.innerWidth, window.innerHeight);
-            const circleRadius = screenSize * 0.35;
+            const maxCircleRadius = screenSize * 0.35;
+
+            // Calculate optimal radius based on item count
+            // For fewer items, use a smaller circle
+            // Minimum 8 items for full circle, scale down for fewer
+            const optimalItems = Math.max(count, 4); // At least consider 4 items for sizing
+            const radiusScale = Math.min(1, optimalItems / 12); // Scale up to 12 items for full size
+            const circleRadius = maxCircleRadius * (0.5 + radiusScale * 0.5); // 50% to 100% of max
 
             // Calculate circumference and divide by items (with spacing)
             const circumference = 2 * Math.PI * circleRadius;
@@ -5462,26 +5489,26 @@ function getIcon(item) {
 
                 // Position inner circle items - PERFECT CIRCLE (no randomness)
                 for (let i = 0; i < innerCount; i++) {
-                    const angle = (Math.PI * 2 * i) / innerCount - Math.PI / 2; // Start from top
-                    const x = centerX + Math.cos(angle) * innerRadius;
-                    const y = centerY + Math.sin(angle) * innerRadius;
-                    positions.push({ x, y });
+                    const baseAngle = (Math.PI * 2 * i) / innerCount - Math.PI / 2; // Start from top
+                    const x = centerX + Math.cos(baseAngle) * innerRadius;
+                    const y = centerY + Math.sin(baseAngle) * innerRadius;
+                    positions.push({ x, y, circle: 'inner', baseAngle, radius: innerRadius });
                 }
 
                 // Position outer circle items - PERFECT CIRCLE (no randomness)
                 for (let i = 0; i < outerCount; i++) {
-                    const angle = (Math.PI * 2 * i) / outerCount - Math.PI / 2; // Start from top
-                    const x = centerX + Math.cos(angle) * outerRadius;
-                    const y = centerY + Math.sin(angle) * outerRadius;
-                    positions.push({ x, y });
+                    const baseAngle = (Math.PI * 2 * i) / outerCount - Math.PI / 2; // Start from top
+                    const x = centerX + Math.cos(baseAngle) * outerRadius;
+                    const y = centerY + Math.sin(baseAngle) * outerRadius;
+                    positions.push({ x, y, circle: 'outer', baseAngle, radius: outerRadius });
                 }
             } else {
                 // Single PERFECT circle for 20 or fewer items
                 for (let i = 0; i < count; i++) {
-                    const angle = (Math.PI * 2 * i) / count - Math.PI / 2; // Start from top (-90 degrees)
-                    const x = centerX + Math.cos(angle) * radius;
-                    const y = centerY + Math.sin(angle) * radius;
-                    positions.push({ x, y });
+                    const baseAngle = (Math.PI * 2 * i) / count - Math.PI / 2; // Start from top (-90 degrees)
+                    const x = centerX + Math.cos(baseAngle) * radius;
+                    const y = centerY + Math.sin(baseAngle) * radius;
+                    positions.push({ x, y, circle: 'outer', baseAngle, radius });
                 }
             }
 
@@ -5625,6 +5652,13 @@ function getIcon(item) {
                 itemEl.style.left = `${positions[index].x}px`;
                 itemEl.style.top = `${positions[index].y}px`;
                 itemEl.style.transform = 'translate(-50%, -50%)';
+
+                // Store position data for rotation
+                if (positions[index].circle) {
+                    itemEl.dataset.circle = positions[index].circle;
+                    itemEl.dataset.baseAngle = positions[index].baseAngle;
+                    itemEl.dataset.radius = positions[index].radius;
+                }
 
                 const iconContainer = document.createElement('div');
                 iconContainer.className = 'circular-item-icon';
@@ -5817,6 +5851,183 @@ function getIcon(item) {
             }
         }
 
+        // ========== CIRCLE ROTATION SYSTEM ==========
+
+        // Get mouse angle relative to center
+        function getMouseAngle(clientX, clientY) {
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+            return Math.atan2(clientY - centerY, clientX - centerX);
+        }
+
+        // Get distance from center
+        function getDistanceFromCenter(clientX, clientY) {
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+            const dx = clientX - centerX;
+            const dy = clientY - centerY;
+            return Math.sqrt(dx * dx + dy * dy);
+        }
+
+        // Determine which circle was clicked (inner/outer)
+        function getClickedCircle(clientX, clientY) {
+            if (circularNav.layoutMode !== 'circle') return null;
+
+            const distance = getDistanceFromCenter(clientX, clientY);
+            const container = document.getElementById('circular-container');
+            const scene = container?.querySelector('.circular-scene.active');
+            if (!scene) return null;
+
+            // Check if there are inner circle items
+            const innerItems = scene.querySelectorAll('[data-circle="inner"]');
+            const outerItems = scene.querySelectorAll('[data-circle="outer"]');
+
+            if (innerItems.length === 0) {
+                // Single circle - treat all as outer
+                return 'outer';
+            }
+
+            // Get radius from first items
+            const innerRadius = innerItems.length > 0 ? parseFloat(innerItems[0].dataset.radius) : 0;
+            const outerRadius = parseFloat(outerItems[0].dataset.radius);
+
+            // Determine which circle based on distance
+            const threshold = (innerRadius + outerRadius) / 2;
+            return distance < threshold ? 'inner' : 'outer';
+        }
+
+        // Update item positions based on rotation
+        function updateCircleRotation() {
+            const container = document.getElementById('circular-container');
+            const scene = container?.querySelector('.circular-scene.active');
+            if (!scene || circularNav.layoutMode !== 'circle') return;
+
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+
+            const items = scene.querySelectorAll('.circular-item[data-circle]');
+            items.forEach(item => {
+                const circle = item.dataset.circle;
+                const baseAngle = parseFloat(item.dataset.baseAngle);
+                const radius = parseFloat(item.dataset.radius);
+
+                // Apply rotation offset
+                const rotationOffset = circle === 'inner' ? rotationState.inner.angle : rotationState.outer.angle;
+                const finalAngle = baseAngle + rotationOffset;
+
+                // Calculate new position
+                const x = centerX + Math.cos(finalAngle) * radius;
+                const y = centerY + Math.sin(finalAngle) * radius;
+
+                // Update position
+                item.style.left = `${x}px`;
+                item.style.top = `${y}px`;
+            });
+        }
+
+        // Physics animation loop
+        let physicsAnimationId = null;
+        function startPhysicsLoop() {
+            if (physicsAnimationId) return; // Already running
+
+            function physicsLoop() {
+                let needsUpdate = false;
+
+                // Update inner circle
+                if (Math.abs(rotationState.inner.velocity) > rotationState.minVelocity && !rotationState.inner.isDragging) {
+                    rotationState.inner.angle += rotationState.inner.velocity;
+                    rotationState.inner.velocity *= rotationState.friction;
+                    needsUpdate = true;
+                } else if (!rotationState.inner.isDragging) {
+                    rotationState.inner.velocity = 0;
+                }
+
+                // Update outer circle
+                if (Math.abs(rotationState.outer.velocity) > rotationState.minVelocity && !rotationState.outer.isDragging) {
+                    rotationState.outer.angle += rotationState.outer.velocity;
+                    rotationState.outer.velocity *= rotationState.friction;
+                    needsUpdate = true;
+                } else if (!rotationState.outer.isDragging) {
+                    rotationState.outer.velocity = 0;
+                }
+
+                if (needsUpdate) {
+                    updateCircleRotation();
+                }
+
+                // Continue loop if there's any motion or dragging
+                if (needsUpdate || rotationState.inner.isDragging || rotationState.outer.isDragging) {
+                    physicsAnimationId = requestAnimationFrame(physicsLoop);
+                } else {
+                    physicsAnimationId = null; // Stop loop
+                }
+            }
+
+            physicsLoop();
+        }
+
+        // Mouse/touch event handlers
+        function handleRotationStart(clientX, clientY) {
+            if (circularNav.layoutMode !== 'circle') return;
+
+            const clickedCircle = getClickedCircle(clientX, clientY);
+            if (!clickedCircle) return;
+
+            const state = clickedCircle === 'inner' ? rotationState.inner : rotationState.outer;
+            state.isDragging = true;
+            state.lastMouseAngle = getMouseAngle(clientX, clientY);
+            state.lastTime = Date.now();
+            state.velocity = 0; // Stop any momentum
+
+            startPhysicsLoop();
+        }
+
+        function handleRotationMove(clientX, clientY) {
+            const draggingInner = rotationState.inner.isDragging;
+            const draggingOuter = rotationState.outer.isDragging;
+
+            if (!draggingInner && !draggingOuter) return;
+
+            const currentAngle = getMouseAngle(clientX, clientY);
+            const currentTime = Date.now();
+
+            if (draggingInner) {
+                const angleDelta = currentAngle - rotationState.inner.lastMouseAngle;
+                const timeDelta = currentTime - rotationState.inner.lastTime;
+
+                rotationState.inner.angle += angleDelta;
+                if (timeDelta > 0) {
+                    rotationState.inner.velocity = angleDelta / timeDelta * 16; // Normalize to 60fps
+                }
+
+                rotationState.inner.lastMouseAngle = currentAngle;
+                rotationState.inner.lastTime = currentTime;
+            }
+
+            if (draggingOuter) {
+                const angleDelta = currentAngle - rotationState.outer.lastMouseAngle;
+                const timeDelta = currentTime - rotationState.outer.lastTime;
+
+                rotationState.outer.angle += angleDelta;
+                if (timeDelta > 0) {
+                    rotationState.outer.velocity = angleDelta / timeDelta * 16; // Normalize to 60fps
+                }
+
+                rotationState.outer.lastMouseAngle = currentAngle;
+                rotationState.outer.lastTime = currentTime;
+            }
+
+            updateCircleRotation();
+        }
+
+        function handleRotationEnd() {
+            rotationState.inner.isDragging = false;
+            rotationState.outer.isDragging = false;
+            startPhysicsLoop(); // Continue with momentum
+        }
+
+        // ========== END CIRCLE ROTATION SYSTEM ==========
+
         // Initialize circular navigation
         function initCircularNavigation() {
             // Setup back button
@@ -5848,6 +6059,48 @@ function getIcon(item) {
                         renderCircularScene(circularNav.currentFolder, items, false);
                     }
                 }, 300);
+            });
+
+            // Setup rotation event listeners
+            const container = document.getElementById('circular-container');
+
+            // Mouse events
+            container.addEventListener('mousedown', (e) => {
+                // Only start rotation if clicking on empty space (not on items)
+                if (e.target.id === 'circular-container' || e.target.classList.contains('circular-scene')) {
+                    e.preventDefault();
+                    handleRotationStart(e.clientX, e.clientY);
+                }
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (rotationState.inner.isDragging || rotationState.outer.isDragging) {
+                    e.preventDefault();
+                    handleRotationMove(e.clientX, e.clientY);
+                }
+            });
+
+            document.addEventListener('mouseup', () => {
+                handleRotationEnd();
+            });
+
+            // Touch events
+            container.addEventListener('touchstart', (e) => {
+                if (e.target.id === 'circular-container' || e.target.classList.contains('circular-scene')) {
+                    const touch = e.touches[0];
+                    handleRotationStart(touch.clientX, touch.clientY);
+                }
+            }, { passive: true });
+
+            document.addEventListener('touchmove', (e) => {
+                if (rotationState.inner.isDragging || rotationState.outer.isDragging) {
+                    const touch = e.touches[0];
+                    handleRotationMove(touch.clientX, touch.clientY);
+                }
+            }, { passive: true });
+
+            document.addEventListener('touchend', () => {
+                handleRotationEnd();
             });
         }
 
@@ -7238,6 +7491,7 @@ if (thumbnailsEl) {
             let mobileFolderTotalPages = 1;
             let mobileCurrentFolderItems = [];
             let mobileAppViewerSwipeStartY = 0;
+            let mobileFolderHistory = []; // Stack to track folder navigation
 
             // Get dock icon SVG
             function getMobileDockIconSVG(iconType) {
@@ -7371,7 +7625,7 @@ if (thumbnailsEl) {
                             <div class="mobile-app-icon-image">${getMobileIconHTML(item)}</div>
                             <div class="mobile-app-icon-name">${item.name}</div>
                         `;
-                        iconEl.addEventListener('click', () => handleMobileItemClick(item));
+                        iconEl.addEventListener('click', () => handleMobileItemClick(item, true)); // true = from main screen
                         pageEl.appendChild(iconEl);
                     });
 
@@ -7392,9 +7646,9 @@ if (thumbnailsEl) {
             }
 
             // Handle item click
-            function handleMobileItemClick(item) {
+            function handleMobileItemClick(item, isFromMainScreen = false) {
                 if (item.type === 'folder') {
-                    openMobileFolder(item);
+                    openMobileFolder(item, isFromMainScreen);
                 } else if (item.type === 'link') {
                     window.open(item.url, '_blank');
                 } else {
@@ -7403,7 +7657,7 @@ if (thumbnailsEl) {
             }
 
             // Open folder overlay
-            function openMobileFolder(item) {
+            function openMobileFolder(item, isFirstLevel = false) {
                 const folderKey = item.folderKey || item.name;
                 mobileCurrentFolderItems = fileSystemDB[folderKey] || [];
                 mobileFolderTotalPages = Math.max(1, Math.ceil(mobileCurrentFolderItems.length / MOBILE_FOLDER_ITEMS_PER_PAGE));
@@ -7413,8 +7667,20 @@ if (thumbnailsEl) {
                 const title = document.getElementById('mobile-folder-title');
                 const pagesContainer = document.getElementById('mobile-folder-pages');
                 const dotsContainer = document.getElementById('mobile-folder-dots');
+                const backBtn = document.getElementById('mobile-folder-back-btn');
 
-                if (!overlay || !title || !pagesContainer || !dotsContainer) return;
+                if (!overlay || !title || !pagesContainer || !dotsContainer || !backBtn) return;
+
+                // Add to history only if overlay is already visible (nested folder navigation)
+                if (overlay.classList.contains('visible')) {
+                    mobileFolderHistory.push(item);
+                } else if (isFirstLevel) {
+                    // First level folder from main screen - don't show back button
+                    mobileFolderHistory = [];
+                }
+
+                // Show/hide back button based on history
+                backBtn.style.display = mobileFolderHistory.length > 0 ? 'flex' : 'none';
 
                 title.textContent = item.name;
 
@@ -7463,11 +7729,33 @@ if (thumbnailsEl) {
                 setTimeout(() => overlay.classList.add('visible'), 10);
             }
 
+            // Navigate back in mobile folder
+            function navigateMobileFolderBack() {
+                if (mobileFolderHistory.length > 0) {
+                    // Go back to previous folder
+                    mobileFolderHistory.pop();
+
+                    if (mobileFolderHistory.length > 0) {
+                        // Open the previous folder in history
+                        const previousFolder = mobileFolderHistory[mobileFolderHistory.length - 1];
+                        mobileFolderHistory.pop(); // Remove it so openMobileFolder will add it back
+                        openMobileFolder(previousFolder);
+                    } else {
+                        // No more history, close the overlay
+                        closeMobileFolder();
+                    }
+                } else {
+                    // No history, just close
+                    closeMobileFolder();
+                }
+            }
+
             // Close folder overlay
             function closeMobileFolder() {
                 const overlay = document.getElementById('mobile-folder-overlay');
                 if (!overlay) return;
 
+                mobileFolderHistory = []; // Clear history
                 overlay.classList.remove('visible');
                 setTimeout(() => {
                     overlay.style.display = 'none';
@@ -8081,7 +8369,7 @@ if (thumbnailsEl) {
                 // Mobile folder back button
                 const folderBackBtn = document.getElementById('mobile-folder-back-btn');
                 if (folderBackBtn) {
-                    folderBackBtn.addEventListener('click', closeMobileFolder);
+                    folderBackBtn.addEventListener('click', navigateMobileFolderBack);
                 }
 
                 // Close app viewer button
