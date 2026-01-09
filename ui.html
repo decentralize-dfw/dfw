@@ -890,6 +890,7 @@
             font-size: 14px;
             color: rgba(255,255,255,0.85);
             max-width: 350px;
+            pointer-events: auto; /* LİNKLERE TIKLANABİLMESİ İÇİN ŞART */
         }
 
         .sidebar-link-item {
@@ -1207,8 +1208,8 @@
     <div id="circular-navigation">
         <!-- Left Sidebar with Title & Description -->
         <div id="circular-sidebar">
-            <div id="circular-sidebar-title">DFW</div>
-            <div id="circular-sidebar-description">Digital Forgery Workshop \n\nLETS FORGE THE FUTURE TOGETHER.\n CREATIVE DESIGN STUDIO FOR SPATIAL WEB,  MILAN 2021-2026</div>
+            <div id="circular-sidebar-title">DFW website ui</div>
+            <div id="circular-sidebar-description">Decentralized Fashion Week - Navigate through files and folders</div>
             <div id="circular-sidebar-links"></div>
         </div>
 
@@ -1411,7 +1412,7 @@
           //beyler
             const fileSystemDB = {
         // --- MASAÜSTÜ İKONLARI ---
-        "RealDesktop": [
+         "RealDesktop": [
             { 
                 id: 'rd-info', 
                 type: 'text', 
@@ -5449,8 +5450,17 @@ function getIcon(item) {
         // ======== CIRCULAR NAVIGATION SYSTEM ======== //
         // ============================================= //
 
-        // GLOBAL ICON SCALE PARAMETER (adjust this to scale all icons/text)
+        // ========== GLOBAL PARAMETERS ========== //
+        // ICON SCALE (adjust this to scale all icons/text)
         const ICON_SCALE = 0.7; // 1.0 = base size, 0.7 = 70% smaller
+
+        // GRID LAYOUT MARGINS (adjust top/bottom spacing in grid mode)
+        const GRID_MARGIN_VERTICAL = 0.15; // 0.10 = 10%, 0.15 = 15%, 0.40 = 40%
+
+        // CIRCLE SIZE SCALING (adjust how circle size responds to item count)
+        const CIRCLE_MIN_SCALE = 0.3; // Minimum circle size (30% of max) for few items
+        const CIRCLE_MAX_ITEMS_FOR_FULL_SIZE = 12; // Items needed for full-size circle
+        // ======================================= //
 
         // Circular navigation state
         const circularNav = {
@@ -5555,12 +5565,10 @@ function getIcon(item) {
             const screenSize = Math.min(window.innerWidth, window.innerHeight);
             const maxCircleRadius = screenSize * 0.35;
 
-            // Calculate optimal radius based on item count
-            // For fewer items, use a smaller circle
-            // Minimum 8 items for full circle, scale down for fewer
-            const optimalItems = Math.max(count, 4); // At least consider 4 items for sizing
-            const radiusScale = Math.min(1, optimalItems / 12); // Scale up to 12 items for full size
-            const circleRadius = maxCircleRadius * (0.5 + radiusScale * 0.5); // 50% to 100% of max
+            // Calculate optimal radius based on item count (PARAMETRIC)
+            // Uses CIRCLE_MIN_SCALE and CIRCLE_MAX_ITEMS_FOR_FULL_SIZE
+            const radiusScale = Math.min(1, count / CIRCLE_MAX_ITEMS_FOR_FULL_SIZE);
+            const circleRadius = maxCircleRadius * (CIRCLE_MIN_SCALE + radiusScale * (1 - CIRCLE_MIN_SCALE));
 
             // Calculate circumference and divide by items (with spacing)
             const circumference = 2 * Math.PI * circleRadius;
@@ -5621,54 +5629,61 @@ function getIcon(item) {
         function getGridPositions(count, iconSize) {
             const positions = [];
 
-            // Use 60% of screen width (20% margins on each side)
-            const availableWidth = window.innerWidth * 0.6;
-            // Use 80% of screen height (10% margins top and bottom)
-            const availableHeight = window.innerHeight * 0.8;
+            // Available space (with margins)
+            const availableWidth = window.innerWidth * 0.6; // 20% margins each side
+            const verticalMarginTotal = GRID_MARGIN_VERTICAL * 2;
+            const availableHeight = window.innerHeight * (1 - verticalMarginTotal);
 
-            // Estimate optimal column count based on aspect ratio
-            const aspectRatio = availableWidth / availableHeight;
-            let cols = Math.max(3, Math.round(Math.sqrt(count * aspectRatio)));
+            // PACKED GRID APPROACH: Always centered, tight layout
+            // Gap is ALWAYS equal to icon size (1:1 ratio) for both horizontal and vertical
 
-            // Ensure we don't have too many columns
-            cols = Math.min(cols, Math.floor(availableWidth / (iconSize * 1.5))); // At least 50% gap between items
+            // Start with a base icon size (reasonable default)
+            let baseIconSize = Math.min(window.innerWidth, window.innerHeight) * 0.08; // 8% of screen
+            baseIconSize = Math.max(60, Math.min(120, baseIconSize)); // Clamp between 60-120px
 
-            // Calculate rows needed
-            const rows = Math.ceil(count / cols);
+            // Calculate optimal columns for a square-ish grid (packed in center)
+            // For 4 items -> 2 cols, 9 items -> 3 cols, 16 items -> 4 cols, etc.
+            let cols = Math.ceil(Math.sqrt(count));
+            let rows = Math.ceil(count / cols);
 
-            // Calculate icon size and gap to fit perfectly in available space
-            // We want: (cols * iconSize) + ((cols - 1) * gap) = availableWidth
-            // AND: gap should be at least 40% of iconSize for good spacing
-            // Let's solve for gap first, ensuring minimum spacing
+            // Gap is ALWAYS equal to icon size (1:1 ratio)
+            let currentIconSize = baseIconSize;
+            let gap = currentIconSize; // 1:1 ratio
 
-            // Total width for all icons
-            const totalIconWidth = availableWidth - (iconSize * 0.4 * (cols - 1)); // Reserve minimum gap
-            const calculatedIconSize = totalIconWidth / cols;
+            // Calculate grid dimensions with 1:1 gap ratio
+            // Width = (cols * iconSize) + ((cols - 1) * gap) = iconSize * (2*cols - 1)
+            let gridWidth = currentIconSize * (2 * cols - 1);
+            let gridHeight = currentIconSize * (2 * rows - 1);
 
-            // Use the smaller of provided iconSize or calculated size
-            const finalIconSize = Math.min(iconSize, calculatedIconSize);
+            // If grid doesn't fit, scale down icon size proportionally
+            if (gridWidth > availableWidth || gridHeight > availableHeight) {
+                const scaleWidth = availableWidth / gridWidth;
+                const scaleHeight = availableHeight / gridHeight;
+                const scale = Math.min(scaleWidth, scaleHeight);
 
-            // Calculate gap - minimum 50% of icon size for proper spacing
-            const gap = Math.max((availableWidth - (cols * finalIconSize)) / (cols - 1), finalIconSize * 0.5);
+                currentIconSize = baseIconSize * scale * 0.95; // 95% to add safety margin
+                gap = currentIconSize; // Maintain 1:1 ratio
 
-            // Calculate actual grid dimensions
-            const actualGridWidth = (cols * finalIconSize) + ((cols - 1) * gap);
-            const actualGridHeight = (rows * finalIconSize) + ((rows - 1) * gap);
+                gridWidth = currentIconSize * (2 * cols - 1);
+                gridHeight = currentIconSize * (2 * rows - 1);
+            }
 
-            // Margins for centering
-            const marginLeft = window.innerWidth * 0.2; // 20% left margin
-            const marginTop = window.innerHeight * 0.1; // 10% top margin
+            // Center the packed grid on screen
+            const marginLeft = window.innerWidth * 0.2;
+            const marginTop = window.innerHeight * GRID_MARGIN_VERTICAL;
 
-            // Center the grid within available area
-            const startX = marginLeft + (availableWidth - actualGridWidth) / 2;
-            const startY = marginTop + (availableHeight - actualGridHeight) / 2;
+            const startX = marginLeft + (availableWidth - gridWidth) / 2;
+            const startY = marginTop + (availableHeight - gridHeight) / 2;
 
-            // Position items
+            // Position items in packed grid (gap = iconSize everywhere)
             for (let i = 0; i < count; i++) {
                 const row = Math.floor(i / cols);
                 const col = i % cols;
-                const x = startX + col * (finalIconSize + gap) + finalIconSize / 2;
-                const y = startY + row * (finalIconSize + gap) + finalIconSize / 2;
+
+                // With 1:1 gap ratio: spacing = iconSize + gap = 2 * iconSize
+                const x = startX + col * (currentIconSize + gap) + currentIconSize / 2;
+                const y = startY + row * (currentIconSize + gap) + currentIconSize / 2;
+
                 positions.push({ x, y });
             }
 
@@ -5789,11 +5804,15 @@ function getIcon(item) {
 
                 // Mouse hover handler - update sidebar
                 itemEl.addEventListener('mouseenter', () => {
+                    // Eğer bir pencere açıksa HOVER İŞLEMEZ
+                    if (circularNav.openWindowItem) return;
                     updateSidebarForWindow(item);
                 });
 
                 // Mouse leave handler - restore folder info
                 itemEl.addEventListener('mouseleave', () => {
+                    // Eğer bir pencere açıksa RESETLEME İŞLEMEZ (Bilgi kalmalı)
+                    if (circularNav.openWindowItem) return;
                     restoreFolderSidebar();
                 });
 
@@ -5875,7 +5894,14 @@ function getIcon(item) {
         }
 
         function navigateBackCircular() {
-            // Clear open window state when navigating back
+            // Close all open windows when navigating back
+            const existingWindows = document.querySelectorAll('.floating-window');
+            existingWindows.forEach(win => {
+                const winId = win.id;
+                closeWindow(winId, true); // true = skip sidebar restore (we're navigating)
+            });
+
+            // Clear open window state
             circularNav.openWindowItem = null;
 
             if (circularNav.currentIndex > 0) {
@@ -5900,7 +5926,14 @@ function getIcon(item) {
         }
 
         function navigateToCircularRoot() {
-            // Clear open window state when returning to root
+            // Close all open windows when returning to root
+            const existingWindows = document.querySelectorAll('.floating-window');
+            existingWindows.forEach(win => {
+                const winId = win.id;
+                closeWindow(winId, true); // true = skip sidebar restore
+            });
+
+            // Clear open window state
             circularNav.openWindowItem = null;
 
             circularNav.currentIndex = -1;
@@ -5908,8 +5941,8 @@ function getIcon(item) {
             circularNav.currentFolder = 'root';
             circularNav.currentFolderData = null;
 
-            document.getElementById('circular-sidebar-title').textContent = 'DFW';
-            document.getElementById('circular-sidebar-description').textContent = 'Digital Forgery Workshop \n\nLETS FORGE THE FUTURE TOGETHER.\n CREATIVE DESIGN STUDIO FOR SPATIAL WEB,  MILAN 2021-2026';
+            document.getElementById('circular-sidebar-title').textContent = 'DFW website ui';
+            document.getElementById('circular-sidebar-description').textContent = 'Decentralized Fashion Week - Navigate through files and folders';
             document.getElementById('circular-breadcrumb').textContent = 'DFW/';
             document.getElementById('circular-back-button').classList.remove('visible');
 
@@ -5929,16 +5962,15 @@ function getIcon(item) {
         }
 
         function updateSidebarForWindow(item, isWindowOpening = false) {
-            // If a window is already open and we're just hovering, don't update sidebar
+            // KRİTİK KONTROL: 
+            // Eğer bir pencere açıksa (circularNav.openWindowItem doluysa)
+            // VE bu fonksiyon sadece hover ile çağrıldıysa (isWindowOpening false ise)
+            // HİÇBİR ŞEY YAPMA, FONKSİYONU DURDUR.
             if (circularNav.openWindowItem && !isWindowOpening) {
                 return;
             }
 
-            // If opening a window, mark it as open
-            if (isWindowOpening) {
-                circularNav.openWindowItem = item;
-            }
-
+            // Eğer pencere açılıyorsa veya kilit yoksa bilgileri güncelle:
             document.getElementById('circular-sidebar-title').textContent = item.name;
             document.getElementById('circular-sidebar-description').textContent = item.description || 'No description available';
 
@@ -5964,11 +5996,11 @@ function getIcon(item) {
                 document.getElementById('circular-sidebar-title').textContent = circularNav.currentFolderData.name;
                 document.getElementById('circular-sidebar-description').textContent = circularNav.currentFolderData.description;
             } else if (circularNav.currentFolder === 'root') {
-                document.getElementById('circular-sidebar-title').textContent = 'DFW';
-                document.getElementById('circular-sidebar-description').textContent = 'Digital Forgery Workshop \n\nLETS FORGE THE FUTURE TOGETHER.\n CREATIVE DESIGN STUDIO FOR SPATIAL WEB,  MILAN 2021-2026';
+                document.getElementById('circular-sidebar-title').textContent = 'DFW website ui';
+                document.getElementById('circular-sidebar-description').textContent = 'Decentralized Fashion Week - Navigate through files and folders';
             } else {
-                document.getElementById('circular-sidebar-title').textContent = 'DFW';
-                document.getElementById('circular-sidebar-description').textContent = 'Digital Forgery Workshop \n\nLETS FORGE THE FUTURE TOGETHER.\n CREATIVE DESIGN STUDIO FOR SPATIAL WEB,  MILAN 2021-2026';
+                document.getElementById('circular-sidebar-title').textContent = 'DFW website ui';
+                document.getElementById('circular-sidebar-description').textContent = 'Decentralized Fashion Week - Navigate through files and folders';
             }
         }
 
@@ -6169,9 +6201,11 @@ function getIcon(item) {
             // Render root scene
             navigateToCircularRoot();
 
-            // Click on background to restore folder sidebar
+           // Click on background to restore folder sidebar
             document.getElementById('circular-container').addEventListener('click', (e) => {
-                if (e.target.id === 'circular-container' || e.target.classList.contains('circular-scene')) {
+                // Sadece boşluğa tıklandıysa VE hiçbir pencere açık DEĞİLSE resetle
+                // Eğer pencere açıksa (openWindowItem doluysa) dokunma.
+                if ((e.target.id === 'circular-container' || e.target.classList.contains('circular-scene')) && !circularNav.openWindowItem) {
                     restoreFolderSidebar();
                 }
             });
@@ -6607,13 +6641,24 @@ if (thumbnailsEl) {
         /** Yeni bir pencere açar */
         /** Yeni bir pencere açar */
         function openWindow(item) {
-            // YENİ KONTROL: Eğer tip 'link' ise pencere açma, double click zaten linki açar
-            if (item.type === 'link') {
-                console.warn(`Cannot open window for type 'link'. Use double-click or enter key.`);
-                return;
-            }
+            // YENİ KONTROL: Eğer tip 'link' ise pencere açma
+            if (item.type === 'link') { return; }
 
-            // Update sidebar and mark as window opening
+            // Önceki pencereleri kapat ama sidebar'ı resetleme (çünkü yenisini açıyoruz)
+            const existingWindows = document.querySelectorAll('.floating-window');
+            existingWindows.forEach(win => {
+                const winId = win.id;
+                // Mevcut pencereyi kapatırken sidebar resetlemesini atla (true)
+                // Ama global değişkeni null yapma, aşağıda set edeceğiz.
+                const windowEl = document.getElementById(winId);
+                if (windowEl) windowEl.remove();
+                openWindows = openWindows.filter(w => w.id !== winId);
+            });
+
+            // KİLİT NOKTASI: Artık bir pencere açık, bunu kaydet.
+            circularNav.openWindowItem = item;
+            
+            // Sidebar'ı ZORLA güncelle (ikinci parametre true olmasa da olur ama garanti olsun)
             updateSidebarForWindow(item, true);
 
             zIndexCounter++;
@@ -6760,11 +6805,8 @@ if (thumbnailsEl) {
 
             windowEl.addEventListener('mousedown', () => {
                 bringToFront(windowId);
-                // Update sidebar when window is clicked
-                if (window.innerWidth > 768) {
-                    document.getElementById('circular-sidebar-title').textContent = item.name;
-                    document.getElementById('circular-sidebar-description').textContent = item.description || 'No description available';
-                }
+                // DON'T update sidebar here - it's already set when window opened!
+                // Sidebar should stay locked to the open window's info
             }, true);
             windowEl.querySelector('.close').addEventListener('click', () => closeWindow(windowId));
             windowEl.querySelector('.maximize').addEventListener('click', () => maximizeWindow(windowId));
@@ -6773,16 +6815,17 @@ if (thumbnailsEl) {
             makeResizable(windowEl); // Gelişmiş resize fonksiyonunu çağır
         }
         /** Pencereyi kapatır */
-        function closeWindow(windowId) {
+       function closeWindow(windowId, skipSidebarRestore = false) {
             const windowEl = document.getElementById(windowId);
             if (windowEl) windowEl.remove();
             openWindows = openWindows.filter(w => w.id !== windowId);
 
-            // Clear open window state
+            // KİLİDİ KALDIR: Artık pencere yok.
             circularNav.openWindowItem = null;
 
-            // Restore folder sidebar when window is closed
-            if (window.innerWidth > 768) {
+            // Eğer hemen başka pencere açılmıyorsa (skipSidebarRestore false ise)
+            // Bilgileri eski klasör bilgisine geri döndür.
+            if (!skipSidebarRestore && window.innerWidth > 768) {
                 restoreFolderSidebar();
             }
         }
