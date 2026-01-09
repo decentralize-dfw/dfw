@@ -772,6 +772,12 @@
             }
         }
 
+        /* Desktop icons - higher z-index */
+        #desktop-icons {
+            z-index: 100 !important;
+        }
+
+        /* Circular navigation behind desktop icons */
         #circular-navigation {
             display: none;
             position: fixed;
@@ -882,12 +888,19 @@
             justify-content: center;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.5s ease;
+            transform: scale(1.3);
+            transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .circular-scene.active {
             opacity: 1;
             pointer-events: all;
+            transform: scale(1);
+        }
+
+        .circular-scene.zoom-out {
+            opacity: 0;
+            transform: scale(0.7);
         }
 
         /* Circular Item */
@@ -911,8 +924,7 @@
         }
 
         .circular-item-icon {
-            width: 90px;
-            height: 90px;
+            /* Dynamic size set via JS */
             border-radius: 20px;
             background: rgba(255,255,255,0.15);
             backdrop-filter: blur(20px);
@@ -945,12 +957,11 @@
 
         .circular-item-name {
             margin-top: 12px;
-            font-size: 14px;
+            /* Dynamic font size set via JS */
             font-weight: 600;
             color: white;
             text-shadow: 0 2px 4px rgba(0,0,0,0.5);
             text-align: center;
-            max-width: 140px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -1036,12 +1047,12 @@
     <div id="circular-navigation">
         <!-- Left Sidebar with Title & Description -->
         <div id="circular-sidebar">
-            <div id="circular-sidebar-title">C:/</div>
-            <div id="circular-sidebar-description">Navigate through your files and folders</div>
+            <div id="circular-sidebar-title">DFW website ui</div>
+            <div id="circular-sidebar-description">Decentralized Fashion Week - Navigate through files and folders</div>
         </div>
 
         <!-- Breadcrumb Path -->
-        <div id="circular-breadcrumb">C:/</div>
+        <div id="circular-breadcrumb">DFW/</div>
 
         <!-- Back Button -->
         <div id="circular-back-button">
@@ -6104,9 +6115,23 @@ function getIcon(item) {
 
                 itemEl.appendChild(iconContainer);
                 itemEl.appendChild(nameEl);
-                
+
                 addClickListeners(itemEl, item); // Tıklama olaylarını ekle
-                
+
+                // Desktop icon hover - update sidebar
+                itemEl.addEventListener('mouseenter', () => {
+                    if (window.innerWidth > 768) {
+                        document.getElementById('circular-sidebar-title').textContent = item.name;
+                        document.getElementById('circular-sidebar-description').textContent = item.description || 'Desktop item';
+                    }
+                });
+
+                itemEl.addEventListener('mouseleave', () => {
+                    if (window.innerWidth > 768) {
+                        restoreFolderSidebar();
+                    }
+                });
+
                 // Masaüstü ikonları için sürükleme ekle
                 makeDraggable(itemEl);
 
@@ -6144,9 +6169,25 @@ function getIcon(item) {
             return newArray;
         }
 
-        function getCircularPositions(count) {
+        function calculateDynamicSizes(count) {
+            // Circle is 80% of screen
+            const screenSize = Math.min(window.innerWidth, window.innerHeight);
+            const circleRadius = screenSize * 0.40; // 80% diameter = 40% radius
+
+            // Calculate circumference and divide by items (with spacing)
+            const circumference = 2 * Math.PI * circleRadius;
+            const totalSlots = count * 2; // count items + count spaces
+            const slotSize = circumference / totalSlots;
+
+            // Icon size is 2x of slot size (as per user's formula)
+            const iconSize = Math.min(slotSize * 2, 120); // max 120px
+            const fontSize = Math.max(iconSize * 0.15, 11); // 15% of icon size, min 11px
+
+            return { iconSize, fontSize, radius: circleRadius };
+        }
+
+        function getCircularPositions(count, radius) {
             const positions = [];
-            const radius = Math.min(window.innerWidth, window.innerHeight) * 0.28;
             const centerX = window.innerWidth / 2;
             const centerY = window.innerHeight / 2;
 
@@ -6162,7 +6203,7 @@ function getIcon(item) {
             for (let i = 0; i < count; i++) {
                 const angle = shuffledAngles[i];
                 // Add slight random variation to radius for more organic feel
-                const radiusVar = radius + (Math.random() - 0.5) * 40;
+                const radiusVar = radius + (Math.random() - 0.5) * 30;
                 const x = centerX + Math.cos(angle) * radiusVar;
                 const y = centerY + Math.sin(angle) * radiusVar;
                 positions.push({ x, y });
@@ -6174,10 +6215,17 @@ function getIcon(item) {
         function renderCircularScene(sceneId, items, isRoot = false) {
             const container = document.getElementById('circular-container');
 
-            // Remove old scenes
+            // Calculate dynamic sizes
+            const { iconSize, fontSize, radius } = calculateDynamicSizes(items.length);
+
+            // Mark old scene for zoom-out
             const oldScenes = container.querySelectorAll('.circular-scene');
             oldScenes.forEach(scene => {
-                if (!scene.classList.contains('active')) {
+                if (scene.classList.contains('active')) {
+                    scene.classList.remove('active');
+                    scene.classList.add('zoom-out');
+                    setTimeout(() => scene.remove(), 600);
+                } else if (!scene.classList.contains('zoom-out')) {
                     scene.remove();
                 }
             });
@@ -6187,7 +6235,7 @@ function getIcon(item) {
             scene.className = 'circular-scene';
             scene.dataset.sceneId = sceneId;
 
-            const positions = getCircularPositions(items.length);
+            const positions = getCircularPositions(items.length, radius);
 
             items.forEach((item, index) => {
                 const itemEl = document.createElement('div');
@@ -6198,6 +6246,9 @@ function getIcon(item) {
 
                 const iconContainer = document.createElement('div');
                 iconContainer.className = 'circular-item-icon';
+                // Apply dynamic sizing
+                iconContainer.style.width = `${iconSize}px`;
+                iconContainer.style.height = `${iconSize}px`;
 
                 if (isRoot) {
                     // For root level (folders), show folder icon
@@ -6211,9 +6262,28 @@ function getIcon(item) {
                 const nameEl = document.createElement('div');
                 nameEl.className = 'circular-item-name';
                 nameEl.textContent = item.name;
+                // Apply dynamic font size and max width
+                nameEl.style.fontSize = `${fontSize}px`;
+                nameEl.style.maxWidth = `${iconSize * 1.5}px`;
 
                 itemEl.appendChild(iconContainer);
                 itemEl.appendChild(nameEl);
+
+                // Mouse hover handler - update sidebar
+                itemEl.addEventListener('mouseenter', () => {
+                    if (isRoot) {
+                        document.getElementById('circular-sidebar-title').textContent = item.name;
+                        document.getElementById('circular-sidebar-description').textContent = item.description;
+                    } else {
+                        document.getElementById('circular-sidebar-title').textContent = item.name;
+                        document.getElementById('circular-sidebar-description').textContent = item.description || 'No description available';
+                    }
+                });
+
+                // Mouse leave handler - restore folder info
+                itemEl.addEventListener('mouseleave', () => {
+                    restoreFolderSidebar();
+                });
 
                 // Click handler
                 itemEl.addEventListener('click', () => {
@@ -6251,9 +6321,9 @@ function getIcon(item) {
         function updateCircularBreadcrumb() {
             const breadcrumb = document.getElementById('circular-breadcrumb');
             if (circularNav.history.length === 0) {
-                breadcrumb.textContent = 'C:/';
+                breadcrumb.textContent = 'DFW/';
             } else {
-                const path = circularNav.history.map(h => h.folderName).join('/');
+                const path = 'DFW/' + circularNav.history.map(h => h.folderName).join('/');
                 breadcrumb.textContent = path;
             }
         }
@@ -6311,9 +6381,9 @@ function getIcon(item) {
             circularNav.currentFolder = 'root';
             circularNav.currentFolderData = null;
 
-            document.getElementById('circular-sidebar-title').textContent = 'C:/';
-            document.getElementById('circular-sidebar-description').textContent = 'Navigate through your files and folders';
-            document.getElementById('circular-breadcrumb').textContent = 'C:/';
+            document.getElementById('circular-sidebar-title').textContent = 'DFW website ui';
+            document.getElementById('circular-sidebar-description').textContent = 'Decentralized Fashion Week - Navigate through files and folders';
+            document.getElementById('circular-breadcrumb').textContent = 'DFW/';
             document.getElementById('circular-back-button').classList.remove('visible');
 
             renderCircularScene('root', mainCategories, true);
@@ -6342,9 +6412,12 @@ function getIcon(item) {
             if (circularNav.currentFolderData) {
                 document.getElementById('circular-sidebar-title').textContent = circularNav.currentFolderData.name;
                 document.getElementById('circular-sidebar-description').textContent = circularNav.currentFolderData.description;
+            } else if (circularNav.currentFolder === 'root') {
+                document.getElementById('circular-sidebar-title').textContent = 'DFW website ui';
+                document.getElementById('circular-sidebar-description').textContent = 'Decentralized Fashion Week - Navigate through files and folders';
             } else {
-                document.getElementById('circular-sidebar-title').textContent = 'C:/';
-                document.getElementById('circular-sidebar-description').textContent = 'Navigate through your files and folders';
+                document.getElementById('circular-sidebar-title').textContent = 'DFW website ui';
+                document.getElementById('circular-sidebar-description').textContent = 'Decentralized Fashion Week - Navigate through files and folders';
             }
         }
 
@@ -6896,7 +6969,18 @@ if (thumbnailsEl) {
             } else if (isAsyncContent && (item.type === 'glb' || item.type === 'vrm')) {
                 setTimeout(() => loadGlbInWindow(item.url, `glb-canvas-container-${windowId}`), 0);
             }
-            windowEl.addEventListener('mousedown', () => bringToFront(windowId), true);
+            // Store item data on window element for sidebar updates
+            windowEl.dataset.itemName = item.name;
+            windowEl.dataset.itemDescription = item.description || 'No description available';
+
+            windowEl.addEventListener('mousedown', () => {
+                bringToFront(windowId);
+                // Update sidebar when window is clicked
+                if (window.innerWidth > 768) {
+                    document.getElementById('circular-sidebar-title').textContent = item.name;
+                    document.getElementById('circular-sidebar-description').textContent = item.description || 'No description available';
+                }
+            }, true);
             windowEl.querySelector('.close').addEventListener('click', () => closeWindow(windowId));
             windowEl.querySelector('.maximize').addEventListener('click', () => maximizeWindow(windowId));
             
