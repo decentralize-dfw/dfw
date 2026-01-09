@@ -1065,13 +1065,18 @@
             transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1); /* Smooth transition for layout changes */
         }
 
-        .circular-item:hover {
-            animation: smoothFloat 2.5s ease-in-out infinite;
-        }
-
-        @keyframes smoothFloat {
-            0%, 100% { transform: translate(-50%, -50%) scale(1.08); }
-            50% { transform: translate(-50%, calc(-50% - 6px)) scale(1.08); }
+        /* YENİ BLOK: Hover efekti artık 'circular-item'ın transformunu bozmuyor,
+           sadece içindeki ikonu büyütüyor. */
+        
+        .circular-item {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: left 0.6s cubic-bezier(0.4, 0, 0.2, 1), top 0.6s cubic-bezier(0.4, 0, 0.2, 1); 
+            /* Transform transition'ı JS yönetiyor, buraya eklemiyoruz */
         }
 
         .circular-item-icon {
@@ -1084,12 +1089,16 @@
             justify-content: center;
             overflow: hidden;
             box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-            transition: all 0.3s ease;
+            /* Hover animasyonu için transition ekledik */
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, background-color 0.3s ease;
         }
 
+        /* Hover olunca SADECE İKONU büyütüyoruz, ana kapsayıcı dönmeye devam ediyor */
         .circular-item:hover .circular-item-icon {
-            box-shadow: 0 12px 48px rgba(0,0,0,0.4);
-            background: rgba(255,255,255,0.25);
+            transform: scale(1.15) translateY(-5px); /* Hafif yukarı kalkma ve büyüme */
+            box-shadow: 0 15px 50px rgba(0,0,0,0.5);
+            background: rgba(255,255,255,0.3);
+            border-color: rgba(255,255,255,0.5);
         }
 
         .circular-item-icon img {
@@ -5700,96 +5709,63 @@ function getIcon(item) {
             return positions;
         }
 
-        function switchLayout(mode) {
+       function switchLayout(mode) {
             if (circularNav.layoutMode === mode) return;
 
             circularNav.layoutMode = mode;
 
-            // GRID MODUNA GEÇERKEN ROTATION STATE'İ VE TÜM TRANSFORM'LARI SIFIRLA
-            if (mode === 'grid') {
-                rotationState.outer.currentAngle = 0;
-                rotationState.outer.velocity = 0;
-                rotationState.outer.isDragging = false;
-                rotationState.inner.currentAngle = 0;
-                rotationState.inner.velocity = 0;
-                rotationState.inner.isDragging = false;
-
-                // TÜM İTEMLERİN VE WRAPPER'LARIN ROTATION'INI TEMİZLE
-                const container = document.getElementById('circular-container');
-                const activeScene = container.querySelector('.circular-scene.active');
-                if (activeScene) {
-                    // Item transform'larını temizle
-                    const items = activeScene.querySelectorAll('.circular-item');
-                    items.forEach(item => {
-                        item.style.transform = 'translate(-50%, -50%)';
-                    });
-
-                    // Wrapper transform'larını temizle
-                    const wrappers = activeScene.querySelectorAll('.circle-wrapper');
-                    wrappers.forEach(wrapper => {
-                        wrapper.style.transform = 'rotate(0deg)';
-                    });
-                }
-            }
-
-            // Update toggle buttons
+            // Toggle butonlarının durumunu güncelle
             document.getElementById('layout-circle-btn').classList.toggle('active', mode === 'circle');
             document.getElementById('layout-grid-btn').classList.toggle('active', mode === 'grid');
 
-            // Re-render current scene with new layout
+            // ROTASYON AYARLARINI SIFIRLA
+            rotationState.outer.currentAngle = 0;
+            rotationState.outer.velocity = 0;
+            rotationState.inner.currentAngle = 0;
+            rotationState.inner.velocity = 0;
+
+            // MEVCUT SAHNEYİ BUL VE YENİDEN OLUŞTUR (Re-render)
+            // Bu işlem, Grid modunda elementleri "wrapper" içinden çıkarıp 
+            // temiz bir düzleme koyacağı için tıklama sorununu çözer.
             const container = document.getElementById('circular-container');
             const activeScene = container.querySelector('.circular-scene.active');
+            
             if (activeScene) {
                 const sceneId = activeScene.dataset.sceneId;
                 const isRoot = sceneId === 'root';
+                // Veriyi çek
                 const items = isRoot ? mainCategories : (fileSystemDB[sceneId] || []);
-                rerenderLayoutPositions(activeScene, items, isRoot);
-            }
-        }
+                
+                // Mevcut sahneyi hemen kaldır (animasyon beklemeden, layout değişikliği anlık olsun)
+                activeScene.remove();
 
-        function rerenderLayoutPositions(scene, items, isRoot) {
-            const { iconSize } = calculateDynamicSizes(items.length);
-            const { radius } = calculateDynamicSizes(items.length);
-
-            // Get new positions based on layout mode
-            const positions = circularNav.layoutMode === 'circle'
-                ? getCircularPositions(items.length, radius)
-                : getGridPositions(items.length, iconSize);
-
-            // Update positions of existing items smoothly
-            const itemElements = scene.querySelectorAll('.circular-item');
-            itemElements.forEach((itemEl, index) => {
-                if (positions[index]) {
-                    itemEl.style.left = `${positions[index].x}px`;
-                    itemEl.style.top = `${positions[index].y}px`;
-
-                    // GRID MODUNDA: Tüm rotation transform'larını temizle
-                    if (circularNav.layoutMode === 'grid') {
-                        itemEl.style.transform = 'translate(-50%, -50%)'; // Sadece merkez hizalama
+                // Yeni sahneyi oluştur
+                renderCircularScene(sceneId, items, isRoot);
+                
+                // Eğer Grid moduna geçildiyse transformları temizle (Garanti olsun)
+                if (mode === 'grid') {
+                    const newScene = container.querySelector('.circular-scene.active');
+                    if(newScene) {
+                        const allItems = newScene.querySelectorAll('.circular-item');
+                        allItems.forEach(el => el.style.transform = 'translate(-50%, -50%)');
                     }
-                    // CIRCLE MODUNDA: Counter-rotation zaten updatePositionsDOM'da uygulanıyor
                 }
-            });
-
-            // GRID MODUNA GEÇİŞTE: Wrapper'ların rotation'ını da sıfırla
-            if (circularNav.layoutMode === 'grid') {
-                const wrappers = scene.querySelectorAll('.circle-wrapper');
-                wrappers.forEach(wrapper => {
-                    wrapper.style.transform = 'rotate(0deg)';
-                });
             }
         }
+
+        
 
         function renderCircularScene(sceneId, items, isRoot = false, targetX = null, targetY = null) {
             const container = document.getElementById('circular-container');
 
-            // HER SAYFA BAĞIMSIZ: Yeni sahne açılınca rotation state'i sıfırla
+            // HER SAYFA BAĞIMSIZ: Yeni sahne açılınca rotation state'i ve drag state'i sıfırla
             rotationState.outer.currentAngle = 0;
             rotationState.outer.velocity = 0;
             rotationState.outer.isDragging = false;
             rotationState.inner.currentAngle = 0;
             rotationState.inner.velocity = 0;
             rotationState.inner.isDragging = false;
+            hasMovedEnoughToDrag = false; // Grid tıklama için önemli!
 
             // Calculate dynamic sizes
             const { iconSize, fontSize, radius } = calculateDynamicSizes(items.length);
@@ -5859,11 +5835,20 @@ function getIcon(item) {
                 itemEl.className = 'circular-item';
                 itemEl.style.left = `${positions[index].x}px`;
                 itemEl.style.top = `${positions[index].y}px`;
-                itemEl.style.transform = 'translate(-50%, -50%)';
+
+                // GRID vs CIRCLE: Transform farklı!
+                if (circularNav.layoutMode === 'grid') {
+                    // GRID: Sadece merkez hizalama, ASLA rotation yok!
+                    itemEl.style.transform = 'translate(-50%, -50%)';
+                } else {
+                    // CIRCLE: Başlangıçta merkez hizalama (counter-rotation updatePositionsDOM'da)
+                    itemEl.style.transform = 'translate(-50%, -50%)';
+                }
+
                 itemEl.style.pointerEvents = 'auto'; // İtemlar tıklama alır
 
-                // Store position data for rotation
-                if (positions[index].circle) {
+                // Store position data for rotation (SADECE CIRCLE MODUNDA)
+                if (positions[index].circle && circularNav.layoutMode === 'circle') {
                     itemEl.dataset.circle = positions[index].circle;
                     itemEl.dataset.baseAngle = positions[index].baseAngle;
                     itemEl.dataset.radius = positions[index].radius;
@@ -5910,9 +5895,9 @@ function getIcon(item) {
                 // Click handler
                 // --- YENİ CLICK HANDLER (Sürükleme Korumalı) ---
                 itemEl.addEventListener('click', (e) => {
-                    // Eğer kullanıcı döndürmek için sürüklediyse (belli bir pikselden fazla),
-                    // bu bir tıklama değildir, açılma işlemini DURDUR.
-                    if (hasMovedEnoughToDrag) {
+                    // SADECE CIRCLE MODUNDA sürükleme kontrolü yap
+                    // Grid modunda her zaman tıklanabilir olmalı!
+                    if (circularNav.layoutMode === 'circle' && hasMovedEnoughToDrag) {
                         e.stopPropagation();
                         e.preventDefault();
                         return;
@@ -5958,13 +5943,18 @@ function getIcon(item) {
 
             container.appendChild(scene);
 
-            // Activate scene with delay for animation
-            requestAnimationFrame(() => {
-                // Deactivate old scene
-                oldScenes.forEach(s => s.classList.remove('active'));
-                // Activate new scene
-                scene.classList.add('active');
-            });
+            // Activate scene HEMEN (gecikme yok - counter-rotation için gerekli!)
+            // Deactivate old scene
+            oldScenes.forEach(s => s.classList.remove('active'));
+            // Activate new scene
+            scene.classList.add('active');
+
+            // CIRCLE MODE: İlk counter-rotation'u hemen uygula!
+            if (circularNav.layoutMode === 'circle') {
+                requestAnimationFrame(() => {
+                    updatePositionsDOM(); // İlk frame'de counter-rotation uygula
+                });
+            }
         }
 
         function updateCircularBreadcrumb() {
@@ -6315,12 +6305,18 @@ function getIcon(item) {
         function handleDragEnd() {
             rotationState.outer.isDragging = false;
             rotationState.inner.isDragging = false;
-            
+
             const container = document.getElementById('circular-container');
             container.classList.remove('dragging');
-            
-            // NOT: Burada velocity'i sıfırlamıyoruz. 
-            // handleDragMove içinde hesaplanan son 'velocity' değeri ile 
+
+            // hasMovedEnoughToDrag'i bir süre sonra reset et
+            // (Click event'i çalıştıktan sonra)
+            setTimeout(() => {
+                hasMovedEnoughToDrag = false;
+            }, 100);
+
+            // NOT: Burada velocity'i sıfırlamıyoruz.
+            // handleDragMove içinde hesaplanan son 'velocity' değeri ile
             // animateRotation fonksiyonunda çark dönmeye devam edecek (momentum).
         }
 
