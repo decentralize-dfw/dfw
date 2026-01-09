@@ -9,7 +9,10 @@
     
     <!-- PDF.js Kütüphanesi -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-    
+
+    <!-- D3.js Kütüphanesi (Parametric Plan için) -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+
     <!-- Three.js ve Gerekli Loader'lar (GLB için) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
@@ -852,7 +855,7 @@
             text-shadow: 0 1px 4px rgba(0,0,0,0.5);
             line-height: 1.6;
             max-width: 350px;
-            max-height: 200px;
+            max-height: 400px;
             letter-spacing: -0.2px;
             /* Vertical scrollbar for long descriptions */
             overflow-y: auto;
@@ -865,6 +868,105 @@
             /* Custom scrollbar styling */
             scrollbar-width: thin;
             scrollbar-color: rgba(255,255,255,0.3) transparent;
+        }
+
+        /* Parametric Plan Container */
+        #parametric-plan-container {
+            width: 100%;
+            max-width: 350px;
+            aspect-ratio: 1;
+            margin-top: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            padding: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        #parametric-plan-container svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Plan Shape Styles */
+        .plan-corridor-link {
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            fill: none;
+            opacity: 0.6;
+        }
+
+        .plan-membrane-outline {
+            fill: none;
+            stroke: #ffffff;
+            stroke-width: 2px;
+            stroke-linejoin: round;
+            stroke-linecap: round;
+            opacity: 0.5;
+        }
+
+        .plan-room-shape {
+            stroke: #ffffff;
+            stroke-width: 1px;
+            stroke-opacity: 0.3;
+            transition: opacity 0.5s ease, fill-opacity 0.5s ease;
+        }
+
+        .plan-room-shape.hub {
+            stroke-width: 2px;
+            stroke-dasharray: 4,2;
+            stroke-opacity: 0.6;
+        }
+
+        .plan-room-shape.sub-hub {
+            stroke-width: 1.5px;
+            stroke-opacity: 0.5;
+        }
+
+        /* Active state for current location */
+        .plan-room-shape.active {
+            opacity: 0.8 !important;
+            animation: pulse-plan 2s ease-in-out infinite;
+        }
+
+        .plan-room-shape.inactive {
+            opacity: 0.2 !important;
+        }
+
+        @keyframes pulse-plan {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 0.95; }
+        }
+
+        .plan-label {
+            pointer-events: none;
+            text-anchor: middle;
+            dominant-baseline: central;
+        }
+
+        .plan-label-main {
+            font-size: 16px;
+            font-weight: 900;
+            fill: #ffffff;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+        }
+
+        .plan-label-hub {
+            font-size: 11px;
+            font-weight: 700;
+            fill: #e2e8f0;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+        }
+
+        .plan-label-room {
+            font-size: 8px;
+            font-weight: 500;
+            fill: #cbd5e1;
+            opacity: 0.9;
+            font-family: 'Courier New', Courier, monospace;
         }
 
         /* WebKit scrollbar for description */
@@ -1254,6 +1356,7 @@
         <div id="circular-sidebar">
             <div id="circular-sidebar-title">DFW website ui</div>
             <div id="circular-sidebar-description">Decentralized Fashion Week - Navigate through files and folders</div>
+            <div id="parametric-plan-container"></div>
             <div id="circular-sidebar-links"></div>
         </div>
 
@@ -5298,6 +5401,344 @@ links: [
         let navHistory = [];
         let navIndex = -1;
 
+        // --- PARAMETRIC PLAN STATE ---
+        let parametricPlanNodes = [];
+        let parametricPlanSVG = null;
+
+        // ==========================================
+        // PARAMETRIC PLAN FUNCTIONS
+        // ==========================================
+
+        function generateOrganicPath(radius) {
+            const points = [];
+            const numPoints = 10 + Math.floor(Math.random() * 4);
+            for (let i = 0; i < numPoints; i++) {
+                const angle = (i / numPoints) * Math.PI * 2;
+                const variation = 0.85 + Math.random() * 0.3;
+                const r = radius * variation;
+                points.push([Math.cos(angle) * r, Math.sin(angle) * r]);
+            }
+            return d3.line().curve(d3.curveBasisClosed)(points);
+        }
+
+        function getPlanColor(g) {
+            if (g === 'Design') return '#fdba74';
+            if (g === 'Avatar') return '#d8b4fe';
+            if (g === 'Space') return '#a5f3fc';
+            if (g === 'DFW') return '#86efac';
+            if (g === 'Gallery') return '#93c5fd';
+            if (g === 'Experience') return '#fca5a5';
+            if (g === 'ItemHall') return '#94a3b8';
+            return '#f1f5f9';
+        }
+
+        function initParametricPlan() {
+            const rawData = {
+                "Design": [
+                    { name: 'FURNITURE' }, { name: 'SCULPTURE' }, { name: 'AUTOMOBILE' },
+                    { name: 'CHAIR' }, { name: 'SOFA' }, { name: 'TABLE' },
+                    { name: 'MUSIC' }, { name: 'CARPET' }
+                ],
+                "Avatar": [{ name: 'C2W' }, { name: 'C2W2' }],
+                "Space": [{ name: 'Digital Topographies' }],
+                "Experience": [
+                    { name: 'Why We Exist?' }, { name: 'Balloon' }, { name: 'Hatch' },
+                    { name: 'C2W Runway' }, { name: 'C2W2 Runway' }
+                ],
+                "Gallery": [
+                    { name: 'Scaffold' }, { name: 'Retail' }, { name: 'Neue² Dojo' },
+                    { name: 'Elements Store' }, { name: 'Black City' }, { name: 'Forge' }
+                ],
+                "DFW": [{ name: 'Works' }]
+            };
+
+            const nodes = [];
+            const links = [];
+
+            // 1. LOBBY
+            const lobbyNode = {
+                id: 'LOBBY', group: 'Lobby', type: 'root',
+                r: 90, fx: 0, fy: 0,
+                pathData: generateOrganicPath(90),
+                color: '#e2e8f0',
+                folderMatch: 'root'
+            };
+            nodes.push(lobbyNode);
+
+            // 2. ITEM HALL
+            const itemHallNode = {
+                id: 'ITEM HALL', group: 'ItemHall', type: 'hub',
+                r: 80,
+                targetX: -160, targetY: 0,
+                pathData: generateOrganicPath(80),
+                color: getPlanColor('ItemHall'),
+                folderMatch: 'Item'
+            };
+            nodes.push(itemHallNode);
+
+            links.push({
+                source: lobbyNode, target: itemHallNode,
+                width: 80, color: getPlanColor('ItemHall'), distance: 140
+            });
+
+            // 3. ZONE TARGETS
+            const zoneTargets = {
+                "Design": { x: -350, y: 0 },
+                "Avatar": { x: -220, y: -180 },
+                "Space": { x: -220, y: 180 },
+                "Gallery": { x: 0, y: -280 },
+                "Experience": { x: 0, y: 280 },
+                "DFW": { x: 280, y: 0 }
+            };
+
+            // 4. SUB ROOM TARGETS
+            const subRoomTargets = {
+                "Design": { x: -450, y: 0 },
+                "Avatar": { x: -280, y: -240 },
+                "Space": { x: -280, y: 240 },
+                "Gallery": { x: 0, y: -360 },
+                "Experience": { x: 0, y: 360 },
+                "DFW": { x: 360, y: 0 }
+            };
+
+            Object.keys(rawData).forEach(group => {
+                const isItemWing = ["Design", "Avatar", "Space"].includes(group);
+
+                // HUB NODE
+                const hubNode = {
+                    id: group.toUpperCase() + (isItemWing ? "" : " HALL"),
+                    group: group,
+                    type: isItemWing ? 'sub-hub' : 'hub',
+                    r: isItemWing ? 60 : 70,
+                    pathData: generateOrganicPath(isItemWing ? 60 : 70),
+                    color: getPlanColor(group),
+                    targetX: zoneTargets[group].x,
+                    targetY: zoneTargets[group].y,
+                    folderMatch: group
+                };
+                nodes.push(hubNode);
+
+                // LINKS
+                if (isItemWing) {
+                    links.push({
+                        source: itemHallNode, target: hubNode,
+                        width: 50, color: getPlanColor(group), distance: 110
+                    });
+                } else {
+                    links.push({
+                        source: lobbyNode, target: hubNode,
+                        width: 60, color: getPlanColor(group), distance: 160
+                    });
+                }
+
+                // SUB ROOMS
+                const subTarget = subRoomTargets[group];
+
+                rawData[group].forEach(item => {
+                    const subNode = {
+                        id: item.name,
+                        group: group, type: 'room',
+                        r: 45,
+                        pathData: generateOrganicPath(45),
+                        color: getPlanColor(group),
+                        targetX: subTarget.x,
+                        targetY: subTarget.y,
+                        folderMatch: item.name
+                    };
+                    nodes.push(subNode);
+
+                    links.push({
+                        source: hubNode, target: subNode,
+                        width: 30, color: getPlanColor(group), distance: 55
+                    });
+                });
+            });
+
+            // SIMULATION
+            const simulation = d3.forceSimulation(nodes)
+                .force("link", d3.forceLink(links).id(d => d.id).distance(d => d.distance).strength(1.5))
+                .force("collide", d3.forceCollide().radius(d => d.r + 5).iterations(8))
+                .force("x", d3.forceX(d => d.targetX || 0).strength(d => d.type === 'room' ? 0.5 : 0.2))
+                .force("y", d3.forceY(d => d.targetY || 0).strength(d => d.type === 'room' ? 0.5 : 0.2))
+                .force("charge", d3.forceManyBody().strength(-300))
+                .stop();
+
+            for (let i = 0; i < 400; ++i) simulation.tick();
+
+            // RENDER
+            let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+            const padding = 40;
+
+            nodes.forEach(d => {
+                const r = d.r + 30;
+                if (d.x - r < minX) minX = d.x - r;
+                if (d.x + r > maxX) maxX = d.x + r;
+                if (d.y - r < minY) minY = d.y - r;
+                if (d.y + r > maxY) maxY = d.y + r;
+            });
+
+            const contentWidth = maxX - minX;
+            const contentHeight = maxY - minY;
+            const maxDim = Math.max(contentWidth, contentHeight);
+
+            const centerX = (minX + maxX) / 2;
+            const centerY = (minY + maxY) / 2;
+
+            const viewX = centerX - maxDim / 2;
+            const viewY = centerY - maxDim / 2;
+
+            const totalSize = maxDim + padding * 2;
+            const finalX = viewX - padding;
+            const finalY = viewY - padding;
+
+            const container = document.getElementById('parametric-plan-container');
+            container.innerHTML = '';
+
+            const svg = d3.select("#parametric-plan-container").append("svg")
+                .attr("viewBox", `${finalX} ${finalY} ${totalSize} ${totalSize}`)
+                .attr("preserveAspectRatio", "xMidYMid meet");
+
+            // PLAN IMAGE
+            const planSize = totalSize * 0.9955;
+            const planOffset = (totalSize - planSize) / 2;
+            const planX = finalX + planOffset;
+            const planY = finalY + planOffset;
+
+            svg.append("image")
+                .attr("href", "https://raw.githubusercontent.com/decentralize-dfw/dfw/main/PLAN.png")
+                .attr("x", planX)
+                .attr("y", planY)
+                .attr("width", planSize)
+                .attr("height", planSize)
+                .attr("preserveAspectRatio", "none")
+                .style("opacity", "1");
+
+            const linkLayer = svg.append("g");
+            const membraneLayer = svg.append("g");
+            const roomLayer = svg.append("g");
+            const labelLayer = svg.append("g");
+
+            // LINKS
+            linkLayer.selectAll("line")
+                .data(links).enter().append("line")
+                .attr("class", "plan-corridor-link")
+                .attr("stroke-width", d => d.width)
+                .attr("stroke", d => d.color)
+                .attr("x1", d => d.source.x)
+                .attr("y1", d => d.source.y)
+                .attr("x2", d => d.target.x)
+                .attr("y2", d => d.target.y);
+
+            // MEMBRANE
+            let membranePoints = [];
+            nodes.forEach(d => {
+                const numPoints = 12;
+                for (let i = 0; i < numPoints; i++) {
+                    const angle = (i / numPoints) * Math.PI * 2;
+                    const r = d.r + 20;
+                    membranePoints.push([d.x + Math.cos(angle) * r, d.y + Math.sin(angle) * r]);
+                }
+            });
+            const hull = d3.polygonHull(membranePoints);
+            if (hull) {
+                membraneLayer.append("path")
+                    .attr("class", "plan-membrane-outline")
+                    .attr("d", d3.line().curve(d3.curveBasisClosed)(hull));
+            }
+
+            // ROOMS
+            const roomGroups = roomLayer.selectAll("g")
+                .data(nodes).enter().append("g")
+                .attr("transform", d => `translate(${d.x}, ${d.y})`)
+                .attr("data-folder", d => d.folderMatch);
+
+            roomGroups.append("path")
+                .attr("class", d => {
+                    if (d.type === 'root') return "plan-room-shape hub";
+                    if (d.type === 'hub') return "plan-room-shape hub";
+                    if (d.type === 'sub-hub') return "plan-room-shape sub-hub";
+                    return "plan-room-shape";
+                })
+                .attr("d", d => d.pathData)
+                .attr("fill", d => d.color)
+                .style("opacity", "0.25");
+
+            // LABELS
+            labelLayer.selectAll("text")
+                .data(nodes).enter().append("text")
+                .attr("class", d => {
+                    if (d.type === 'root') return "plan-label-main";
+                    if (d.type === 'hub' || d.type === 'sub-hub') return "plan-label-hub";
+                    return "plan-label-room";
+                })
+                .attr("x", d => d.x)
+                .attr("y", d => d.y)
+                .text(d => d.id === 'LOBBY' ? "LOBBY" : d.id);
+
+            parametricPlanNodes = nodes;
+            parametricPlanSVG = svg;
+        }
+
+        function updateParametricPlan(currentFolderKey) {
+            if (!parametricPlanSVG) return;
+
+            // Normalize folder key
+            let normalizedFolder = currentFolderKey;
+
+            // Map UI folder names to plan folder names
+            const folderMapping = {
+                'Cdrive': 'root',
+                'root': 'root',
+                'Item': 'Item',
+                'Design': 'Design',
+                'Avatar': 'Avatar',
+                'Space': 'Space',
+                'Gallery': 'Gallery',
+                'Experience': 'Experience',
+                'DFW': 'DFW',
+                // Specific folders
+                'des_furniture': 'FURNITURE',
+                'des_sculpture': 'SCULPTURE',
+                'des_automobile': 'AUTOMOBILE',
+                'des_chair': 'CHAIR',
+                'des_sofa': 'SOFA',
+                'des_table': 'TABLE',
+                'des_music': 'MUSIC',
+                'des_carpet': 'CARPET',
+                'dt_models': 'Digital Topographies',
+                'Why We Exist?': 'Why We Exist?',
+                'Balloon': 'Balloon',
+                'Hatch': 'Hatch',
+                'C2W Runway': 'C2W Runway',
+                'C2W2 Runway': 'C2W2 Runway',
+                'Scaffold': 'Scaffold',
+                'Retail': 'Retail',
+                'Neue² Dojo': 'Neue² Dojo',
+                'Elements Store': 'Elements Store',
+                'Black City': 'Black City',
+                'Forge': 'Forge'
+            };
+
+            normalizedFolder = folderMapping[currentFolderKey] || currentFolderKey;
+
+            // Update all shapes
+            const allShapes = parametricPlanSVG.selectAll('.plan-room-shape');
+
+            allShapes.classed('active', false)
+                     .classed('inactive', false);
+
+            allShapes.each(function() {
+                const group = d3.select(this.parentNode);
+                const folderMatch = group.attr('data-folder');
+
+                if (folderMatch === normalizedFolder) {
+                    d3.select(this).classed('active', true);
+                } else {
+                    d3.select(this).classed('inactive', true);
+                }
+            });
+        }
+
 function getIcon(item) {
             // Not: Bu fonksiyon küçük ikonlar ve thumbnail'ler için kullanılır.
             // Büyük önizlemeler (Galeri modu) render fonksiyonları içinde ayrıca ele alınır.
@@ -6001,6 +6442,9 @@ function getIcon(item) {
             circularNav.currentFolder = folderKey;
             circularNav.currentFolderData = { key: folderKey, name: folderName, description: folderDescription };
 
+            // Update parametric plan
+            updateParametricPlan(folderKey);
+
             // Update breadcrumb
             updateCircularBreadcrumb();
 
@@ -6033,6 +6477,9 @@ function getIcon(item) {
                     circularNav.currentFolder = prev.folderKey;
                     circularNav.currentFolderData = prev;
 
+                    // Update parametric plan
+                    updateParametricPlan(prev.folderKey);
+
                     updateCircularBreadcrumb();
                     // Render with ZOOM OUT effect ('out')
                     renderCircularScene(prev.folderKey, items, false, null, null, 'out');
@@ -6059,6 +6506,9 @@ function getIcon(item) {
             circularNav.history = [];
             circularNav.currentFolder = 'root';
             circularNav.currentFolderData = null;
+
+            // Update parametric plan
+            updateParametricPlan('root');
 
             document.getElementById('circular-sidebar-title').textContent = 'DFW website ui';
             document.getElementById('circular-sidebar-description').textContent = 'Decentralized Fashion Week - Navigate through files and folders';
@@ -6347,6 +6797,9 @@ function getIcon(item) {
             // Setup layout toggle buttons
             document.getElementById('layout-circle-btn').addEventListener('click', () => switchLayout('circle'));
             document.getElementById('layout-grid-btn').addEventListener('click', () => switchLayout('grid'));
+
+            // Initialize parametric plan
+            initParametricPlan();
 
             // Render root scene
             navigateToCircularRoot();
