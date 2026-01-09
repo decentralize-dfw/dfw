@@ -1074,8 +1074,7 @@
         }
 
         .circular-item-icon {
-            /* Dynamic size set via JS */
-            border-radius: 20px;
+            /* Dynamic size and border-radius set via JS */
             background: rgba(255,255,255,0.15);
             backdrop-filter: blur(20px);
             border: 1px solid rgba(255,255,255,0.2);
@@ -5423,21 +5422,30 @@ function getIcon(item) {
         function getCircularIconHTML(item) {
             // Priority 1: Check for thumbnailUrl
             if (item.thumbnailUrl) {
-                return `<img src="${item.thumbnailUrl}" alt="${item.name}" onerror="this.parentElement.innerHTML = \`${getDefaultIcon(item).replace(/`/g, '\\`')}\`;">`;
+                return `<img src="${item.thumbnailUrl}" alt="${item.name}" onerror="this.style.display='none'; this.parentElement.insertAdjacentHTML('afterbegin', getDefaultIconForError('${item.type}'));">`;
             }
 
             // Priority 2: Check for iconUrl
             if (item.iconUrl) {
-                return `<img src="${item.iconUrl}" alt="${item.name}" onerror="this.parentElement.innerHTML = \`${getDefaultIcon(item).replace(/`/g, '\\`')}\`;">`;
+                return `<img src="${item.iconUrl}" alt="${item.name}" onerror="this.style.display='none'; this.parentElement.insertAdjacentHTML('afterbegin', getDefaultIconForError('${item.type}'));">`;
             }
 
             // Priority 3: For images, use the image URL itself as thumbnail
             if (item.type === 'image' && item.url) {
-                return `<img src="${item.url}" alt="${item.name}" onerror="this.parentElement.innerHTML = \`${getDefaultIcon(item).replace(/`/g, '\\`')}\`;">`;
+                return `<img src="${item.url}" alt="${item.name}" onerror="this.style.display='none'; this.parentElement.insertAdjacentHTML('afterbegin', getDefaultIconForError('image'));">`;
             }
 
             // Priority 4: Default icon based on type
             return getDefaultIcon(item);
+        }
+
+        // Fallback icon for onerror (simplified, without complex escaping)
+        function getDefaultIconForError(type) {
+            if (type === 'folder') {
+                return '<svg fill="currentColor" viewBox="0 0 20 20" class="text-blue-400" style="width:60%;height:60%;color:white;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.3))"><path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"></path></svg>';
+            }
+            // Default file icon for all other types
+            return '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="text-gray-400" style="width:60%;height:60%;color:white;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.3))"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>';
         }
 
         function getDefaultIcon(item) {
@@ -5533,8 +5541,8 @@ function getIcon(item) {
 
             // Use 60% of screen width (20% margins on each side)
             const availableWidth = window.innerWidth * 0.6;
-            // Use 70% of screen height (15% margins top and bottom)
-            const availableHeight = window.innerHeight * 0.7;
+            // Use 80% of screen height (10% margins top and bottom)
+            const availableHeight = window.innerHeight * 0.8;
 
             // Estimate optimal column count based on aspect ratio
             const aspectRatio = availableWidth / availableHeight;
@@ -5567,7 +5575,7 @@ function getIcon(item) {
 
             // Margins for centering
             const marginLeft = window.innerWidth * 0.2; // 20% left margin
-            const marginTop = window.innerHeight * 0.15; // 15% top margin
+            const marginTop = window.innerHeight * 0.1; // 10% top margin
 
             // Center the grid within available area
             const startX = marginLeft + (availableWidth - actualGridWidth) / 2;
@@ -5675,9 +5683,10 @@ function getIcon(item) {
 
                 const iconContainer = document.createElement('div');
                 iconContainer.className = 'circular-item-icon';
-                // Apply dynamic sizing
+                // Apply dynamic sizing and parametric border-radius
                 iconContainer.style.width = `${iconSize}px`;
                 iconContainer.style.height = `${iconSize}px`;
+                iconContainer.style.borderRadius = `${Math.max(iconSize * 0.15, 8)}px`; // 15% of icon size, min 8px
 
                 // Use mobile-style icons (same as mobile interface)
                 if (isRoot) {
@@ -5756,6 +5765,9 @@ function getIcon(item) {
         }
 
         function navigateToCircularFolder(folderKey, folderName, folderDescription, targetX = null, targetY = null) {
+            // Clear open window state when navigating to a folder
+            circularNav.openWindowItem = null;
+
             // Update sidebar
             document.getElementById('circular-sidebar-title').textContent = folderName;
             document.getElementById('circular-sidebar-description').textContent = folderDescription;
@@ -5781,6 +5793,9 @@ function getIcon(item) {
         }
 
         function navigateBackCircular() {
+            // Clear open window state when navigating back
+            circularNav.openWindowItem = null;
+
             if (circularNav.currentIndex > 0) {
                 circularNav.currentIndex--;
                 const prev = circularNav.history[circularNav.currentIndex];
@@ -5803,6 +5818,9 @@ function getIcon(item) {
         }
 
         function navigateToCircularRoot() {
+            // Clear open window state when returning to root
+            circularNav.openWindowItem = null;
+
             circularNav.currentIndex = -1;
             circularNav.history = [];
             circularNav.currentFolder = 'root';
@@ -5823,9 +5841,7 @@ function getIcon(item) {
                     window.open(item.url, '_blank');
                 }
             } else {
-                // Update sidebar to show window info
-                updateSidebarForWindow(item);
-                // Open in window using existing openWindow function
+                // Open in window (openWindow will handle sidebar update)
                 openWindow(item);
             }
         }
