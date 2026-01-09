@@ -5489,10 +5489,12 @@ function getIcon(item) {
                 lastMouseAngle: 0,
                 lastDragTime: 0
             },
-            // Fizik Ayarları
-            friction: 0.96,         // Sürtünme (1'e yaklaştıkça daha uzun döner)
-            velocityCap: 0.3,       // Maksimum dönüş hızı (çok aşırı dönmemesi için)
+            // Fizik Ayarları (ÇARK SİSTEMİ - Gerçekçi fizik)
+            friction: 0.97,         // Sürtünme (0.97 = yumuşak yavaşlama)
+            velocityCap: 0.15,      // Maksimum dönüş hızı (daha kontrollü dönme)
+            velocitySmoothing: 0.3, // Velocity smoothing faktörü (0-1, anlık hız yumuşatma)
             dragThreshold: 5,       // Tıklama mı sürükleme mi ayrımı için piksel sınırı
+            minVelocity: 0.0001,    // Bu değerin altında velocity sıfırlanır
             isInteractionActive: false // Genel etkileşim kilidi
         };
         
@@ -5772,12 +5774,38 @@ function getIcon(item) {
                 ? getCircularPositions(items.length, radius)
                 : getGridPositions(items.length, iconSize);
 
+            // ÇARK SİSTEMİ: Her çember için wrapper oluştur
+            const innerWrapper = document.createElement('div');
+            innerWrapper.className = 'circle-wrapper';
+            innerWrapper.dataset.circle = 'inner';
+            innerWrapper.style.position = 'absolute';
+            innerWrapper.style.width = '100%';
+            innerWrapper.style.height = '100%';
+            innerWrapper.style.top = '0';
+            innerWrapper.style.left = '0';
+            innerWrapper.style.transformOrigin = 'center center';
+            innerWrapper.style.pointerEvents = 'none'; // Wrapper tıklama almaz, itemlar alır
+            innerWrapper.style.willChange = 'transform'; // Performance optimization
+
+            const outerWrapper = document.createElement('div');
+            outerWrapper.className = 'circle-wrapper';
+            outerWrapper.dataset.circle = 'outer';
+            outerWrapper.style.position = 'absolute';
+            outerWrapper.style.width = '100%';
+            outerWrapper.style.height = '100%';
+            outerWrapper.style.top = '0';
+            outerWrapper.style.left = '0';
+            outerWrapper.style.transformOrigin = 'center center';
+            outerWrapper.style.pointerEvents = 'none';
+            outerWrapper.style.willChange = 'transform';
+
             items.forEach((item, index) => {
                 const itemEl = document.createElement('div');
                 itemEl.className = 'circular-item';
                 itemEl.style.left = `${positions[index].x}px`;
                 itemEl.style.top = `${positions[index].y}px`;
                 itemEl.style.transform = 'translate(-50%, -50%)';
+                itemEl.style.pointerEvents = 'auto'; // İtemlar tıklama alır
 
                 // Store position data for rotation
                 if (positions[index].circle) {
@@ -5852,12 +5880,18 @@ function getIcon(item) {
                         }
                     }
                 });
-                
+
                 // Resimlerin ve linklerin sürüklenirken "hayalet" görüntü çıkarmasını engelle
                 itemEl.addEventListener('dragstart', (e) => e.preventDefault());
 
-                scene.appendChild(itemEl);
+                // İTEMLERİ İLGİLİ WRAPPER'A EKLE (ÇARK SİSTEMİ)
+                const targetWrapper = positions[index].circle === 'inner' ? innerWrapper : outerWrapper;
+                targetWrapper.appendChild(itemEl);
             });
+
+            // Wrapper'ları scene'e ekle
+            scene.appendChild(innerWrapper);
+            scene.appendChild(outerWrapper);
 
             container.appendChild(scene);
 
@@ -6062,26 +6096,26 @@ function getIcon(item) {
             return distance < threshold ? 'inner' : 'outer';
         }
 
-       // Ana animasyon ve fizik döngüsü
+       // Ana animasyon ve fizik döngüsü (ÇARK SİSTEMİ)
         function animateRotation() {
             let needsUpdate = false;
 
             // --- DIŞ ÇEMBER ---
-            if (!rotationState.outer.isDragging && Math.abs(rotationState.outer.velocity) > 0.0001) {
+            if (!rotationState.outer.isDragging && Math.abs(rotationState.outer.velocity) > rotationState.minVelocity) {
                 // Mouse basılı değilse, var olan hızla dön ve yavaşla (sürtünme)
                 rotationState.outer.currentAngle += rotationState.outer.velocity;
                 rotationState.outer.velocity *= rotationState.friction;
                 needsUpdate = true;
-            } else if (Math.abs(rotationState.outer.velocity) <= 0.0001) {
+            } else if (Math.abs(rotationState.outer.velocity) <= rotationState.minVelocity) {
                 rotationState.outer.velocity = 0;
             }
 
             // --- İÇ ÇEMBER ---
-            if (!rotationState.inner.isDragging && Math.abs(rotationState.inner.velocity) > 0.0001) {
+            if (!rotationState.inner.isDragging && Math.abs(rotationState.inner.velocity) > rotationState.minVelocity) {
                 rotationState.inner.currentAngle += rotationState.inner.velocity;
                 rotationState.inner.velocity *= rotationState.friction;
                 needsUpdate = true;
-            } else if (Math.abs(rotationState.inner.velocity) <= 0.0001) {
+            } else if (Math.abs(rotationState.inner.velocity) <= rotationState.minVelocity) {
                 rotationState.inner.velocity = 0;
             }
 
@@ -6093,33 +6127,26 @@ function getIcon(item) {
             requestAnimationFrame(animateRotation);
         }
 
-        // Ögelerin ekrandaki yerini güncelleyen fonksiyon
+        // ÇARK SİSTEMİ: Wrapper'ları döndüren fonksiyon (Itemlar SABİT pozisyonda kalır)
         function updatePositionsDOM() {
             const container = document.getElementById('circular-container');
             const scene = container?.querySelector('.circular-scene.active');
             if (!scene || circularNav.layoutMode !== 'circle') return;
 
-            const centerX = window.innerWidth / 2;
-            const centerY = window.innerHeight / 2;
+            // Her wrapper'ı kendi rotation state'i ile döndür
+            const innerWrapper = scene.querySelector('.circle-wrapper[data-circle="inner"]');
+            const outerWrapper = scene.querySelector('.circle-wrapper[data-circle="outer"]');
 
-            const items = scene.querySelectorAll('.circular-item[data-circle]');
-            items.forEach(item => {
-                const circleType = item.dataset.circle; // 'inner' veya 'outer'
-                const baseAngle = parseFloat(item.dataset.baseAngle);
-                const radius = parseFloat(item.dataset.radius);
+            if (innerWrapper) {
+                // Radyan'dan dereceye çevir (CSS rotate için)
+                const innerAngleDeg = rotationState.inner.currentAngle * (180 / Math.PI);
+                innerWrapper.style.transform = `rotate(${innerAngleDeg}deg)`;
+            }
 
-                // İlgili çemberin anlık dönüş açısını ekle
-                const rotationOffset = (circleType === 'inner') ? rotationState.inner.currentAngle : rotationState.outer.currentAngle;
-                
-                const finalAngle = baseAngle + rotationOffset;
-
-                // Yeni koordinatlar (Merkez sabit, etrafında dönüyor)
-                const x = centerX + Math.cos(finalAngle) * radius;
-                const y = centerY + Math.sin(finalAngle) * radius;
-
-                item.style.left = `${x}px`;
-                item.style.top = `${y}px`;
-            });
+            if (outerWrapper) {
+                const outerAngleDeg = rotationState.outer.currentAngle * (180 / Math.PI);
+                outerWrapper.style.transform = `rotate(${outerAngleDeg}deg)`;
+            }
         }
 
         // Sayfa yüklenince animasyon döngüsünü başlat
@@ -6149,13 +6176,13 @@ function getIcon(item) {
             container.classList.add('dragging');
         }
 
-        // Sürükleme Esnası
+        // Sürükleme Esnası (ÇARK SİSTEMİ - Gelişmiş hız algılama)
         function handleDragMove(clientX, clientY) {
             // Hangi çember sürükleniyor?
             let state = null;
             if (rotationState.outer.isDragging) state = rotationState.outer;
             if (rotationState.inner.isDragging) state = rotationState.inner;
-            
+
             if (!state) return;
 
             // Tıklama eşiği kontrolü (5px hareket ettiyse artık sürüklüyordur)
@@ -6168,7 +6195,7 @@ function getIcon(item) {
 
             const currentMouseAngle = getMouseAngle(clientX, clientY);
             const now = performance.now();
-            
+
             // Açılar arası farkı bul (Radyan cinsinden)
             let deltaAngle = currentMouseAngle - state.lastMouseAngle;
 
@@ -6177,21 +6204,27 @@ function getIcon(item) {
             while (deltaAngle <= -Math.PI) deltaAngle += 2 * Math.PI;
             while (deltaAngle > Math.PI) deltaAngle -= 2 * Math.PI;
 
-            // Açıyı güncelle (Mouse'u birebir takip et)
+            // Açıyı güncelle (Mouse'u birebir takip et - GERÇEK ZAMANLI)
             state.currentAngle += deltaAngle;
 
-            // Anlık hız hesapla (Fırlatma efekti için)
+            // Anlık hız hesapla (Fırlatma efekti için - GELİŞMİŞ)
             const deltaTime = now - state.lastDragTime;
             if (deltaTime > 0) {
-                // Hızı hesapla ve çok uçuk değerleri yumuşat
-                const rawVelocity = deltaAngle; // Basit ivme
+                // Zaman bazlı velocity hesaplama (daha gerçekçi)
+                const rawVelocity = deltaAngle / (deltaTime / 16.67); // 60fps bazlı normalize
+
+                // Eski velocity ile blend (smoothing - titreme önleme)
+                const smoothedVelocity = state.velocity * (1 - rotationState.velocitySmoothing) +
+                                        rawVelocity * rotationState.velocitySmoothing;
+
                 // Hız sınırla (Velocity Cap)
-                state.velocity = Math.max(-rotationState.velocityCap, Math.min(rotationState.velocityCap, rawVelocity));
+                state.velocity = Math.max(-rotationState.velocityCap,
+                                         Math.min(rotationState.velocityCap, smoothedVelocity));
             }
 
             state.lastMouseAngle = currentMouseAngle;
             state.lastDragTime = now;
-            
+
             // DOM güncellemesi animasyon döngüsünde (animateRotation) otomatik yapılacak
         }
 
