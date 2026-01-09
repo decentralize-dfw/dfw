@@ -756,6 +756,193 @@
             height: 100% !important;
             border-radius: 12px;
         }
+
+        /* ============================================= */
+        /* ========== CIRCULAR NAVIGATION STYLES ======= */
+        /* ============================================= */
+
+        /* Desktop breakpoint - hide finder window, show circular nav */
+        @media (min-width: 769px) {
+            .finder-window {
+                display: none !important;
+            }
+
+            #circular-navigation {
+                display: flex !important;
+            }
+        }
+
+        #circular-navigation {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        /* Left Sidebar for Title & Description */
+        #circular-sidebar {
+            position: fixed;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 300px;
+            padding: 40px;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        #circular-sidebar-title {
+            font-size: 42px;
+            font-weight: 700;
+            color: white;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+            margin-bottom: 16px;
+            line-height: 1.2;
+        }
+
+        #circular-sidebar-description {
+            font-size: 16px;
+            color: rgba(255,255,255,0.9);
+            text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+            line-height: 1.6;
+        }
+
+        /* Back Button */
+        #circular-back-button {
+            position: fixed;
+            top: 40px;
+            left: 40px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 100;
+            transition: all 0.3s ease;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #circular-back-button.visible {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        #circular-back-button:hover {
+            background: rgba(255,255,255,0.25);
+            transform: scale(1.05);
+        }
+
+        #circular-back-button svg {
+            width: 24px;
+            height: 24px;
+            color: white;
+        }
+
+        /* Circular Container */
+        #circular-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Circular Scene */
+        .circular-scene {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+
+        .circular-scene.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        /* Circular Item */
+        .circular-item {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .circular-item:hover {
+            transform: scale(1.1);
+            animation: float 2s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) scale(1.1); }
+            50% { transform: translateY(-10px) scale(1.1); }
+        }
+
+        .circular-item-icon {
+            width: 120px;
+            height: 120px;
+            border-radius: 24px;
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+        }
+
+        .circular-item:hover .circular-item-icon {
+            box-shadow: 0 12px 48px rgba(0,0,0,0.4);
+            background: rgba(255,255,255,0.25);
+        }
+
+        .circular-item-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .circular-item-icon svg {
+            width: 60%;
+            height: 60%;
+            color: white;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+        }
+
+        .circular-item-name {
+            margin-top: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            text-align: center;
+            max-width: 140px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
     </style>
 </head>
 <body class="p-8 flex items-center justify-center min-h-screen">
@@ -830,6 +1017,29 @@
         </div>
     </div>
     <!-- ============================================= -->
+
+    <!-- ============================================= -->
+    <!-- ========== CIRCULAR NAVIGATION ============= -->
+    <!-- ============================================= -->
+    <div id="circular-navigation">
+        <!-- Left Sidebar with Title & Description -->
+        <div id="circular-sidebar">
+            <div id="circular-sidebar-title">C:/</div>
+            <div id="circular-sidebar-description">Navigate through your files and folders</div>
+        </div>
+
+        <!-- Back Button -->
+        <div id="circular-back-button">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            </svg>
+        </div>
+
+        <!-- Circular Container -->
+        <div id="circular-container">
+            <!-- Scenes will be dynamically generated -->
+        </div>
+    </div>
 
     <!-- YENİ: Masaüstü İkonları Alanı -->
     <div id="desktop-icons" class="absolute top-0 left-0 p-4 z-0 space-y-4">
@@ -5888,7 +6098,243 @@ function getIcon(item) {
                 desktopIconsContainer.appendChild(itemEl);
             });
         }
-        
+
+        // ============================================= //
+        // ======== CIRCULAR NAVIGATION SYSTEM ======== //
+        // ============================================= //
+
+        // Circular navigation state
+        const circularNav = {
+            history: [],
+            currentIndex: -1,
+            currentFolder: 'root',
+            currentFolderData: null
+        };
+
+        // Main categories for root level
+        const mainCategories = [
+            { key: 'AirDrop', name: 'DFW', description: 'Decentralized Fashion Week projects' },
+            { key: 'Recents', name: 'Season 1 (C2W, 2023)', description: 'Recent works from 2023' },
+            { key: 'Applications', name: 'Applications', description: 'Interactive applications' },
+            { key: 'Cdrive', name: 'C:/', description: 'System files and documents' },
+            { key: 'Documents', name: 'Documents', description: 'Your document collection' }
+        ];
+
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+
+        function getCircularPositions(count) {
+            const positions = [];
+            const radius = Math.min(window.innerWidth, window.innerHeight) * 0.28;
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+
+            // Create randomized angles
+            const angles = [];
+            for (let i = 0; i < count; i++) {
+                angles.push((Math.PI * 2 * i) / count);
+            }
+
+            // Shuffle angles for random positioning
+            const shuffledAngles = shuffleArray(angles);
+
+            for (let i = 0; i < count; i++) {
+                const angle = shuffledAngles[i];
+                // Add slight random variation to radius for more organic feel
+                const radiusVar = radius + (Math.random() - 0.5) * 40;
+                const x = centerX + Math.cos(angle) * radiusVar;
+                const y = centerY + Math.sin(angle) * radiusVar;
+                positions.push({ x, y });
+            }
+
+            return positions;
+        }
+
+        function renderCircularScene(sceneId, items, isRoot = false) {
+            const container = document.getElementById('circular-container');
+
+            // Remove old scenes
+            const oldScenes = container.querySelectorAll('.circular-scene');
+            oldScenes.forEach(scene => {
+                if (!scene.classList.contains('active')) {
+                    scene.remove();
+                }
+            });
+
+            // Create new scene
+            const scene = document.createElement('div');
+            scene.className = 'circular-scene';
+            scene.dataset.sceneId = sceneId;
+
+            const positions = getCircularPositions(items.length);
+
+            items.forEach((item, index) => {
+                const itemEl = document.createElement('div');
+                itemEl.className = 'circular-item';
+                itemEl.style.left = `${positions[index].x}px`;
+                itemEl.style.top = `${positions[index].y}px`;
+                itemEl.style.transform = 'translate(-50%, -50%)';
+
+                const iconContainer = document.createElement('div');
+                iconContainer.className = 'circular-item-icon';
+
+                if (isRoot) {
+                    // For root level (folders), show folder icon
+                    iconContainer.innerHTML = `<svg fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"></path></svg>`;
+                } else {
+                    // For items, use appropriate icon
+                    if (item.type === 'image') {
+                        iconContainer.innerHTML = `<img src="${item.url}" alt="${item.name}" onerror="this.src='https://placehold.co/100x100/e0e0e0/909090?text=Image';">`;
+                    } else if (item.type === 'video') {
+                        iconContainer.innerHTML = `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M4 18h10a2 2 0 002-2V8a2 2 0 00-2-2H4a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>`;
+                    } else if (item.type === 'glb' || item.type === 'vrm') {
+                        iconContainer.innerHTML = `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m0 10l8 4m6 0v-4m0 0L4 11m6 4l8-4m-8 4v4m0 0L4 17m6 4l8-4"></path></svg>`;
+                    } else if (item.type === 'html') {
+                        if (item.iconUrl) {
+                            iconContainer.innerHTML = `<img src="${item.iconUrl}" alt="${item.name}" onerror="this.src='https://placehold.co/100x100/e0e0e0/909090?text=App';">`;
+                        } else {
+                            iconContainer.innerHTML = `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>`;
+                        }
+                    } else if (item.type === 'link') {
+                        iconContainer.innerHTML = `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>`;
+                    } else {
+                        iconContainer.innerHTML = `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>`;
+                    }
+                }
+
+                const nameEl = document.createElement('div');
+                nameEl.className = 'circular-item-name';
+                nameEl.textContent = item.name;
+
+                itemEl.appendChild(iconContainer);
+                itemEl.appendChild(nameEl);
+
+                // Click handler
+                itemEl.addEventListener('click', () => {
+                    if (isRoot) {
+                        // Navigate to folder
+                        navigateToCircularFolder(item.key, item.name, item.description);
+                    } else {
+                        // Open item in window (reuse existing window system)
+                        handleCircularItemClick(item);
+                    }
+                });
+
+                scene.appendChild(itemEl);
+            });
+
+            container.appendChild(scene);
+
+            // Activate scene with delay for animation
+            requestAnimationFrame(() => {
+                // Deactivate old scene
+                oldScenes.forEach(s => s.classList.remove('active'));
+                // Activate new scene
+                scene.classList.add('active');
+            });
+        }
+
+        function navigateToCircularFolder(folderKey, folderName, folderDescription) {
+            // Update sidebar
+            document.getElementById('circular-sidebar-title').textContent = folderName;
+            document.getElementById('circular-sidebar-description').textContent = folderDescription;
+
+            // Get folder items
+            const items = fileSystemDB[folderKey] || [];
+
+            // Update history
+            circularNav.history = circularNav.history.slice(0, circularNav.currentIndex + 1);
+            circularNav.history.push({ folderKey, folderName, folderDescription });
+            circularNav.currentIndex++;
+            circularNav.currentFolder = folderKey;
+            circularNav.currentFolderData = { key: folderKey, name: folderName, description: folderDescription };
+
+            // Show back button
+            document.getElementById('circular-back-button').classList.add('visible');
+
+            // Render scene
+            renderCircularScene(folderKey, items, false);
+        }
+
+        function navigateBackCircular() {
+            if (circularNav.currentIndex > 0) {
+                circularNav.currentIndex--;
+                const prev = circularNav.history[circularNav.currentIndex];
+
+                if (prev) {
+                    document.getElementById('circular-sidebar-title').textContent = prev.folderName;
+                    document.getElementById('circular-sidebar-description').textContent = prev.folderDescription;
+
+                    const items = fileSystemDB[prev.folderKey] || [];
+                    circularNav.currentFolder = prev.folderKey;
+                    circularNav.currentFolderData = prev;
+
+                    renderCircularScene(prev.folderKey, items, false);
+                }
+            } else {
+                // Back to root
+                navigateToCircularRoot();
+            }
+        }
+
+        function navigateToCircularRoot() {
+            circularNav.currentIndex = -1;
+            circularNav.history = [];
+            circularNav.currentFolder = 'root';
+            circularNav.currentFolderData = null;
+
+            document.getElementById('circular-sidebar-title').textContent = 'C:/';
+            document.getElementById('circular-sidebar-description').textContent = 'Navigate through your files and folders';
+            document.getElementById('circular-back-button').classList.remove('visible');
+
+            renderCircularScene('root', mainCategories, true);
+        }
+
+        function handleCircularItemClick(item) {
+            // Reuse existing window/viewer system
+            if (item.type === 'link') {
+                if (item.url) {
+                    window.open(item.url, '_blank');
+                }
+            } else {
+                // Open in window using existing createWindow function
+                createWindow(item);
+            }
+        }
+
+        // Initialize circular navigation
+        function initCircularNavigation() {
+            // Setup back button
+            document.getElementById('circular-back-button').addEventListener('click', navigateBackCircular);
+
+            // Render root scene
+            navigateToCircularRoot();
+
+            // Handle window resize
+            let resizeTimeout;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(() => {
+                    if (circularNav.currentFolder === 'root') {
+                        navigateToCircularRoot();
+                    } else if (circularNav.currentFolderData) {
+                        const items = fileSystemDB[circularNav.currentFolder] || [];
+                        renderCircularScene(circularNav.currentFolder, items, false);
+                    }
+                }, 300);
+            });
+        }
+
+        // ============================================= //
+        // ======== END CIRCULAR NAVIGATION =========== //
+        // ============================================= //
+
         /** Grid (Izgara) Görünümünü Render Eder */
         function renderGridView(items) {
             fileBrowserContainer.style.overflowX = 'hidden';
@@ -6963,7 +7409,12 @@ if (thumbnailsEl) {
             navIndex = 0;
             renderFileSystem('Cdrive');
             renderDesktopIcons(); // Masaüstü ikonlarını çiz (RealDesktop'tan)
-            
+
+            // Initialize circular navigation for desktop
+            if (window.innerWidth > 768) {
+                initCircularNavigation();
+            }
+
             // Sol sidebar navigasyonu
             document.getElementById('nav-airdrop').addEventListener('click', (e) => { e.preventDefault(); navigateTo('AirDrop'); });
             document.getElementById('nav-recents').addEventListener('click', (e) => { e.preventDefault(); navigateTo('Recents'); });
