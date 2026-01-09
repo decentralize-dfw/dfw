@@ -5705,7 +5705,7 @@ function getIcon(item) {
 
             circularNav.layoutMode = mode;
 
-            // GRID MODUNA GEÇERKEN ROTATION STATE'İ SIFIRLA
+            // GRID MODUNA GEÇERKEN ROTATION STATE'İ VE TÜM TRANSFORM'LARI SIFIRLA
             if (mode === 'grid') {
                 rotationState.outer.currentAngle = 0;
                 rotationState.outer.velocity = 0;
@@ -5713,6 +5713,23 @@ function getIcon(item) {
                 rotationState.inner.currentAngle = 0;
                 rotationState.inner.velocity = 0;
                 rotationState.inner.isDragging = false;
+
+                // TÜM İTEMLERİN VE WRAPPER'LARIN ROTATION'INI TEMİZLE
+                const container = document.getElementById('circular-container');
+                const activeScene = container.querySelector('.circular-scene.active');
+                if (activeScene) {
+                    // Item transform'larını temizle
+                    const items = activeScene.querySelectorAll('.circular-item');
+                    items.forEach(item => {
+                        item.style.transform = 'translate(-50%, -50%)';
+                    });
+
+                    // Wrapper transform'larını temizle
+                    const wrappers = activeScene.querySelectorAll('.circle-wrapper');
+                    wrappers.forEach(wrapper => {
+                        wrapper.style.transform = 'rotate(0deg)';
+                    });
+                }
             }
 
             // Update toggle buttons
@@ -5745,8 +5762,22 @@ function getIcon(item) {
                 if (positions[index]) {
                     itemEl.style.left = `${positions[index].x}px`;
                     itemEl.style.top = `${positions[index].y}px`;
+
+                    // GRID MODUNDA: Tüm rotation transform'larını temizle
+                    if (circularNav.layoutMode === 'grid') {
+                        itemEl.style.transform = 'translate(-50%, -50%)'; // Sadece merkez hizalama
+                    }
+                    // CIRCLE MODUNDA: Counter-rotation zaten updatePositionsDOM'da uygulanıyor
                 }
             });
+
+            // GRID MODUNA GEÇİŞTE: Wrapper'ların rotation'ını da sıfırla
+            if (circularNav.layoutMode === 'grid') {
+                const wrappers = scene.querySelectorAll('.circle-wrapper');
+                wrappers.forEach(wrapper => {
+                    wrapper.style.transform = 'rotate(0deg)';
+                });
+            }
         }
 
         function renderCircularScene(sceneId, items, isRoot = false, targetX = null, targetY = null) {
@@ -6143,8 +6174,13 @@ function getIcon(item) {
                 rotationState.inner.velocity = 0;
             }
 
-            // Eğer bir hareket varsa DOM'u güncelle
-            if (needsUpdate || rotationState.outer.isDragging || rotationState.inner.isDragging) {
+            // DOM'u SÜREKLI güncelle (Counter-rotation için önemli!)
+            // Çünkü currentAngle != 0 olsa bile velocity = 0 olabilir
+            // Bu durumda counter-rotation uygulanmazsa itemlar yamuk kalır
+            const hasRotation = Math.abs(rotationState.outer.currentAngle) > 0.001 ||
+                               Math.abs(rotationState.inner.currentAngle) > 0.001;
+
+            if (needsUpdate || rotationState.outer.isDragging || rotationState.inner.isDragging || hasRotation) {
                 updatePositionsDOM();
             }
 
