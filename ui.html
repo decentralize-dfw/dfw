@@ -5705,6 +5705,16 @@ function getIcon(item) {
 
             circularNav.layoutMode = mode;
 
+            // GRID MODUNA GEÇERKEN ROTATION STATE'İ SIFIRLA
+            if (mode === 'grid') {
+                rotationState.outer.currentAngle = 0;
+                rotationState.outer.velocity = 0;
+                rotationState.outer.isDragging = false;
+                rotationState.inner.currentAngle = 0;
+                rotationState.inner.velocity = 0;
+                rotationState.inner.isDragging = false;
+            }
+
             // Update toggle buttons
             document.getElementById('layout-circle-btn').classList.toggle('active', mode === 'circle');
             document.getElementById('layout-grid-btn').classList.toggle('active', mode === 'grid');
@@ -5741,6 +5751,14 @@ function getIcon(item) {
 
         function renderCircularScene(sceneId, items, isRoot = false, targetX = null, targetY = null) {
             const container = document.getElementById('circular-container');
+
+            // HER SAYFA BAĞIMSIZ: Yeni sahne açılınca rotation state'i sıfırla
+            rotationState.outer.currentAngle = 0;
+            rotationState.outer.velocity = 0;
+            rotationState.outer.isDragging = false;
+            rotationState.inner.currentAngle = 0;
+            rotationState.inner.velocity = 0;
+            rotationState.inner.isDragging = false;
 
             // Calculate dynamic sizes
             const { iconSize, fontSize, radius } = calculateDynamicSizes(items.length);
@@ -6096,8 +6114,14 @@ function getIcon(item) {
             return distance < threshold ? 'inner' : 'outer';
         }
 
-       // Ana animasyon ve fizik döngüsü (ÇARK SİSTEMİ)
+       // Ana animasyon ve fizik döngüsü (ÇARK SİSTEMİ - SADECE CIRCLE MODE)
         function animateRotation() {
+            // SADECE CIRCLE MODE'DA ÇALIŞ (Grid modunu hiç etkileme)
+            if (circularNav.layoutMode !== 'circle') {
+                requestAnimationFrame(animateRotation);
+                return;
+            }
+
             let needsUpdate = false;
 
             // --- DIŞ ÇEMBER ---
@@ -6190,6 +6214,9 @@ function getIcon(item) {
 
         // Sürükleme Esnası (ÇARK SİSTEMİ - Gelişmiş hız algılama)
         function handleDragMove(clientX, clientY) {
+            // SADECE CIRCLE MODE'DA ÇALIŞ
+            if (circularNav.layoutMode !== 'circle') return;
+
             // Hangi çember sürükleniyor?
             let state = null;
             if (rotationState.outer.isDragging) state = rotationState.outer;
@@ -6297,6 +6324,9 @@ function getIcon(item) {
             // MOUSE EVENTLERİ
             // SADECE ÇEMBERE BASILINCA DÖNME SİSTEMİ
             container.addEventListener('mousedown', (e) => {
+                // SADECE CIRCLE MODE'DA ÇALIŞ
+                if (circularNav.layoutMode !== 'circle') return;
+
                 // Sadece sol tık (0) çalışsın
                 if (e.button !== 0) return;
 
@@ -6320,6 +6350,9 @@ function getIcon(item) {
 
             // TOUCH (DOKUNMATİK) EVENTLERİ
             container.addEventListener('touchstart', (e) => {
+                // SADECE CIRCLE MODE'DA ÇALIŞ
+                if (circularNav.layoutMode !== 'circle') return;
+
                 if (circularNav.openWindowItem) return;
 
                 // SADECE çembere basınca dönmeli
