@@ -6062,13 +6062,99 @@ function getIcon(item) {
 
         // Circular navigation state
         const circularNav = {
-            history: [],
-            currentIndex: -1,
             currentFolder: 'root',
             currentFolderData: null,
             layoutMode: 'circle', // 'circle' or 'grid'
             openWindowItem: null // Track currently open window to prevent sidebar changes
         };
+
+        // Folder hierarchy - maps each folder to its parent
+        const folderHierarchy = {
+            // Root level categories have no parent (null)
+            'DFW': { parent: null, name: 'DFW' },
+            'Experience': { parent: null, name: 'EXPERIENCE' },
+            'Gallery': { parent: null, name: 'GALLERY' },
+            'Item': { parent: null, name: 'ITEM' },
+
+            // DFW sub-folders
+            'Works': { parent: 'DFW', name: 'Works' },
+
+            // Item sub-folders
+            'Space': { parent: 'Item', name: 'Space' },
+            'Avatar': { parent: 'Item', name: 'Avatar' },
+            'Design': { parent: 'Item', name: 'Design' },
+
+            // Experience sub-folders
+            'Why We Exist?': { parent: 'Experience', name: 'Why We Exist?' },
+            'Balloon': { parent: 'Experience', name: 'Balloon' },
+            'Hatch': { parent: 'Experience', name: 'Hatch' },
+            'C2W Runway': { parent: 'Experience', name: 'C2W Runway' },
+            'C2W2 Runway': { parent: 'Experience', name: 'C2W2 Runway' },
+
+            // Gallery sub-folders
+            'Scaffold': { parent: 'Gallery', name: 'Scaffold' },
+            'Retail': { parent: 'Gallery', name: 'Retail' },
+            'Neue² Dojo': { parent: 'Gallery', name: 'Neue² Dojo' },
+            'Elements Store': { parent: 'Gallery', name: 'Elements Store' },
+            'Black City': { parent: 'Gallery', name: 'Black City' },
+            'Forge': { parent: 'Gallery', name: 'Forge' },
+
+            // Design sub-folders
+            'des_furniture': { parent: 'Design', name: 'FURNITURE' },
+            'des_sculpture': { parent: 'Design', name: 'SCULPTURE' },
+            'des_automobile': { parent: 'Design', name: 'AUTOMOBILE' },
+            'des_chair': { parent: 'Design', name: 'CHAIR' },
+            'des_sofa': { parent: 'Design', name: 'SOFA' },
+            'des_table': { parent: 'Design', name: 'TABLE' },
+            'des_music': { parent: 'Design', name: 'MUSIC' },
+            'des_carpet': { parent: 'Design', name: 'CARPET' },
+
+            // Space sub-folders
+            'dt_models': { parent: 'Space', name: 'Digital Topographies' },
+
+            // Avatar sub-folders (if any)
+            'c2w.vrm': { parent: 'Avatar', name: 'C2W' },
+            'c2w.media': { parent: 'Avatar', name: 'C2W.media' },
+            'polaroid': { parent: 'Avatar', name: 'Polaroid' },
+
+            // Other sub-folders
+            'c_text': { parent: 'Avatar', name: 'C2W2' },
+            'Sample_3d': { parent: 'Avatar', name: 'Sample_3d' },
+            'hyperfy_mp4': { parent: 'Avatar', name: 'Hyperfy_mp4' }
+        };
+
+        // Helper function to get full hierarchical path
+        function getHierarchicalPath(folderKey) {
+            if (!folderKey || folderKey === 'root') {
+                return [];
+            }
+
+            const path = [];
+            let current = folderKey;
+
+            while (current && folderHierarchy[current]) {
+                path.unshift({
+                    key: current,
+                    name: folderHierarchy[current].name
+                });
+                current = folderHierarchy[current].parent;
+            }
+
+            return path;
+        }
+
+        // Helper function to get parent folder
+        function getParentFolder(folderKey) {
+            if (!folderKey || folderKey === 'root') {
+                return null;
+            }
+
+            if (folderHierarchy[folderKey]) {
+                return folderHierarchy[folderKey].parent;
+            }
+
+            return null;
+        }
 
         // Circle rotation state
         // GELİŞMİŞ FİZİK MOTORU STATE'İ
@@ -6527,13 +6613,22 @@ function getIcon(item) {
 
         function updateCircularBreadcrumb() {
             const breadcrumb = document.getElementById('circular-breadcrumb');
-            if (circularNav.currentIndex < 0 || circularNav.history.length === 0) {
+
+            // If at root, just show DFW/
+            if (!circularNav.currentFolder || circularNav.currentFolder === 'root') {
                 breadcrumb.textContent = 'DFW/';
-            } else {
-                // Only show breadcrumb up to current index
-                const currentPath = circularNav.history.slice(0, circularNav.currentIndex + 1);
-                const path = 'DFW/' + currentPath.map(h => h.folderName).join('/');
+                return;
+            }
+
+            // Get hierarchical path for current folder
+            const hierarchicalPath = getHierarchicalPath(circularNav.currentFolder);
+
+            // Build breadcrumb from hierarchical path
+            if (hierarchicalPath.length > 0) {
+                const path = 'DFW/' + hierarchicalPath.map(p => p.name).join('/');
                 breadcrumb.textContent = path;
+            } else {
+                breadcrumb.textContent = 'DFW/';
             }
         }
 
@@ -6548,17 +6643,14 @@ function getIcon(item) {
             // Get folder items
             const items = fileSystemDB[folderKey] || [];
 
-            // Update history
-            circularNav.history = circularNav.history.slice(0, circularNav.currentIndex + 1);
-            circularNav.history.push({ folderKey, folderName, folderDescription });
-            circularNav.currentIndex++;
+            // Update current folder (no history needed - we use hierarchy)
             circularNav.currentFolder = folderKey;
             circularNav.currentFolderData = { key: folderKey, name: folderName, description: folderDescription };
 
             // Update parametric plan
             updateParametricPlan(folderKey);
 
-            // Update breadcrumb
+            // Update breadcrumb (will show hierarchical path)
             updateCircularBreadcrumb();
 
             // Show back button
@@ -6578,27 +6670,29 @@ function getIcon(item) {
 
             circularNav.openWindowItem = null;
 
-            if (circularNav.currentIndex > 0) {
-                circularNav.currentIndex--;
-                const prev = circularNav.history[circularNav.currentIndex];
+            // Get hierarchical parent instead of using history
+            const parentKey = getParentFolder(circularNav.currentFolder);
 
-                if (prev) {
-                    document.getElementById('circular-sidebar-title').textContent = prev.folderName;
-                    document.getElementById('circular-sidebar-description').textContent = prev.folderDescription;
+            if (parentKey) {
+                // Navigate to hierarchical parent
+                const parentInfo = folderHierarchy[parentKey];
+                const items = fileSystemDB[parentKey] || [];
 
-                    const items = fileSystemDB[prev.folderKey] || [];
-                    circularNav.currentFolder = prev.folderKey;
-                    circularNav.currentFolderData = prev;
+                document.getElementById('circular-sidebar-title').textContent = parentInfo.name;
+                document.getElementById('circular-sidebar-description').textContent = '';
 
-                    // Update parametric plan
-                    updateParametricPlan(prev.folderKey);
+                circularNav.currentFolder = parentKey;
+                circularNav.currentFolderData = { key: parentKey, name: parentInfo.name, description: '' };
 
-                    updateCircularBreadcrumb();
-                    // Render with ZOOM OUT effect ('out')
-                    renderCircularScene(prev.folderKey, items, false, null, null, 'out');
-                }
+                // Update parametric plan
+                updateParametricPlan(parentKey);
+
+                updateCircularBreadcrumb();
+
+                // Render with ZOOM OUT effect ('out')
+                renderCircularScene(parentKey, items, false, null, null, 'out');
             } else {
-                // Back to root
+                // No parent means we're at top level, go to root
                 navigateToCircularRoot();
             }
         }
@@ -6612,11 +6706,9 @@ function getIcon(item) {
 
             circularNav.openWindowItem = null;
 
-            // Eğer geçmişte bir yerdeysek ve root'a dönüyorsak animasyonlu dönelim
-            const isNavigatingBack = circularNav.currentIndex > -1;
+            // Check if we're navigating back from somewhere
+            const isNavigatingBack = circularNav.currentFolder && circularNav.currentFolder !== 'root';
 
-            circularNav.currentIndex = -1;
-            circularNav.history = [];
             circularNav.currentFolder = 'root';
             circularNav.currentFolderData = null;
 
