@@ -1,0 +1,464 @@
+"Hatch": [
+    {
+        id: 'hatch-0',
+        type: 'text',
+        name: 'READ_ME_Manifesto.txt',
+        content: 'HATCH, VIRTUAL THEATER NO:3, 07.24\n\nIn a nihilistic virtual setup, two digital beings and an external entity explore existence, freedom, and control. Their journey leads them to question the nature of their reality and dimensions, uncovering deeper truths that challenge their roles. The external entity faces a pivotal choice that could redefine their understanding of existence.\n\n"Hatch" represents an innovative intersection of theater and technology, realized through WebXR. This 27-minute immersive experience unfolds in a metaverse environment where audiences participate either through VR headsets with complete freedom of movement or via computer with access to 32 distinct camera angles. The technical architecture employs 50 smart objects that dynamically load and unload, maintaining an efficient 10-15 MB data usage, making it accessible across various devices.\n\nThe experience is uniquely positioned in current digital culture, addressing the evolving relationship between human consciousness and artificial intelligence. Rather than presenting a dystopian narrative of AI dominance, it explores the current power dynamic where humans hold authority over digital entities, raising questions about ethical responsibility and empathy in these interactions.\n\nAudience members become active participants rather than passive viewers, with their avatars physically present within the virtual space. This direct involvement creates a meta-theatrical layer where viewers simultaneously observe and participate in the unfolding narrative. The experience adapts to each viewer\'s presence, acknowledging them as both audience and performer, creating a unique dynamic where the observer becomes an integral part of the observed system.\n\nThe narrative structure deliberately plays with temporal dimensions, offering multiple viewing variations after the initial experience. Through horizontal, reverse, and circular, the same core story transforms into distinct experiences, each offering new perspectives on the relationship between digital entities and human consciousness. This temporal manipulation echoes concepts from quantum mechanics, particularly Schrödinger\'s thought experiments, suggesting that digital entities might exist differently when not being observed.\n\nA key philosophical thread explores the authenticity of digital experiences and consciousness. The work questions whether programmed responses can evolve into genuine emotions, comparing current AI limitations with potential future developments. It deliberately maintains ambiguity about whether digital entities truly "feel" or simply simulate emotions for effective interaction, mirroring contemporary debates about AI consciousness and ethical obligations.\n\nThe experience balances philosophical depth with accessible storytelling, employing contemporary pacing that reflects modern media consumption patterns while engaging with complex themes. This approach makes sophisticated concepts about transhumanist existentialism approachable without oversimplification, creating multiple layers of engagement for different audience members.\n\n"Hatch" positions itself as a bridge between current technological capabilities and future possibilities in digital theater. It acknowledges present limitations while suggesting potential developments in how we might experience and interact with digital narratives. The work raises questions about the nature of consciousness, the authenticity of digital experiences, and the ethical implications of creating self-aware digital entities.\n\nThe experience concludes with intentional ambiguity, leaving audiences to contemplate their role in digital ecosystems and their ethical responsibilities toward artificial consciousness. This open-ended approach encourages ongoing discussion about the evolution of human-AI relationships and the nature of consciousness itself.\n\nIn the context of contemporary digital art and theater, "Hatch" contributes to discussions about the future of performance art in virtual spaces. It explores how traditional theatrical elements can be transformed and enhanced through digital mediums while maintaining emotional resonance and narrative depth. The work suggests possibilities for new forms of artistic expression that emerge from the intersection of traditional storytelling and emerging technologies.\n\nThe project\'s relationship with blockchain technology through NFT minting of screen recordings, actors, and even creating the whole experience on a Hyperfy WebXr Metaverse adds another layer of permanence and authenticity to the digital experience while also raising questions about ownership and preservation of digital performance art. This technological framework positions the work within current discussions about digital art ownership while looking forward to future developments in how we preserve and share digital theatrical experiences.',
+        description: 'The manifesto and concept details of Hatch, Virtual Theater No:3.',
+        created: '07/2024',
+        minted: '07/2024',
+        medium: 'Text Document',
+        dimensions: 'N/A',
+        size: '4 KB',
+        tags: ['text', 'manifesto', 'theater', 'nihilism'],
+        links: []
+    },
+    {
+        id: 'hatch-link-1',
+        type: 'link',
+        name: 'ENTER_HATCH.exe',
+        iconUrl: 'https://static.wixstatic.com/media/54a996_01299c01980d4ce69247f42d81f6e0ef~mv2.jpg',
+        url: 'https://hyperfy.io/hatch',
+        description: 'Click to enter the Virtual Theater No:3 on Hyperfy.',
+        created: '07/2024',
+        minted: 'N/A',
+        medium: 'External Link',
+        dimensions: 'N/A',
+        size: '0 KB',
+        tags: ['web', 'experience', 'hyperfy', 'vr'],
+        links: [
+            { url: 'https://hyperfy.io/hatch', name: 'Hyperfy World' }
+        ]
+    },
+    {
+        id: 'hatch-vid-rec',
+        type: 'video',
+        name: 'Full_Recording_YouTube.mp4',
+        url: 'https://www.youtube.com/embed/G35uO-eAvJs',
+        description: 'Full recording of the Hatch experience on YouTube.',
+        created: '07/2024',
+        minted: 'N/A',
+        medium: 'YouTube Video',
+        dimensions: 'N/A',
+        size: 'N/A',
+        tags: ['video', 'youtube', 'full', 'recording'],
+        links: []
+    },
+    {
+        id: 'hatch-vid-1',
+        type: 'video',
+        name: 'Metaverse_World_Asset.mp4',
+        url: 'https://video.wixstatic.com/video/54a996_35eb8e4dfd7141d6aef12a36e862b458/1080p/mp4/file.mp4',
+        description: 'Hatch blends WebXR, blockchain, and theater. Viewers join via avatars, shaping the story. VR or PC, with 32 angles.',
+        created: '28.05.24',
+        minted: 'N/A',
+        medium: 'MP4 Video',
+        dimensions: '1920x1080',
+        size: '15 MB',
+        tags: ['video', 'world', 'asset'],
+        links: [
+             { url: 'https://monaverse.com/collections/8453/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/1', name: 'Monaverse Asset' }
+        ]
+    },
+    {
+        id: 'hatch-vid-2',
+        type: 'video',
+        name: 'Horizontal_Part_I.mp4',
+        url: 'https://video.wixstatic.com/video/54a996_4ea42fe5e2fe46ef803411860c059242/1080p/mp4/file.mp4',
+        description: 'Part 1 probes digital existence. Are entities bound by the Pattern or free via the Curve? Human power over AI sparks ethical debates.',
+        created: '28.05.24',
+        minted: 'N/A',
+        medium: 'MP4 Video',
+        dimensions: '1920x1080',
+        size: '15 MB',
+        tags: ['video', 'horizontal', 'part1'],
+        links: [
+            { url: 'https://monaverse.com/collections/8453/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/2', name: 'Monaverse Asset' }
+        ]
+    },
+    {
+        id: 'hatch-vid-3',
+        type: 'video',
+        name: 'Horizontal_Part_II.mp4',
+        url: 'https://video.wixstatic.com/video/54a996_f21cf6bfa7b94496a11de8dff89de7a0/1080p/mp4/file.mp4',
+        description: 'Part 2 debates reality’s layers—dreams or code? The Curve (human essence) vs. Pattern (control) fuels ethical questions.',
+        created: '28.05.24',
+        minted: 'N/A',
+        medium: 'MP4 Video',
+        dimensions: '1920x1080',
+        size: '15 MB',
+        tags: ['video', 'horizontal', 'part2'],
+        links: [
+            { url: 'https://monaverse.com/collections/8253/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/3', name: 'Monaverse Asset' }
+        ]
+    },
+    {
+        id: 'hatch-vid-4',
+        type: 'video',
+        name: 'Horizontal_Part_III.mp4',
+        url: 'https://video.wixstatic.com/video/54a996_68cf5e8b59da49e3a24cf27ca55484ad/1080p/mp4/file.mp4',
+        description: 'Part 3 questions scripted realities. Are digital emotions real? Humans’ power over AI prompts ethical dilemmas.',
+        created: '28.05.24',
+        minted: 'N/A',
+        medium: 'MP4 Video',
+        dimensions: '1920x1080',
+        size: '15 MB',
+        tags: ['video', 'horizontal', 'part3'],
+        links: [
+            { url: 'https://monaverse.com/collections/8453/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/4', name: 'Monaverse Asset' }
+        ]
+    },
+    {
+        id: 'hatch-vid-5',
+        type: 'video',
+        name: 'Reverse_Part_I.mp4',
+        url: 'https://video.wixstatic.com/video/54a996_c4d166f384b74a7e91ae549fefe1e703/1080p/mp4/file.mp4',
+        description: 'Reverse mode turns Hatch backward like Memento. Spaces and words distort, creating new meanings.',
+        created: '28.05.24',
+        minted: 'N/A',
+        medium: 'MP4 Video',
+        dimensions: '1920x1080',
+        size: '15 MB',
+        tags: ['video', 'reverse', 'part1'],
+        links: [
+            { url: 'https://monaverse.com/collections/8453/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/5', name: 'Monaverse Asset' }
+        ]
+    },
+    {
+        id: 'hatch-vid-6',
+        type: 'video',
+        name: 'Reverse_Part_II.mp4',
+        url: 'https://video.wixstatic.com/video/54a996_88f51f7f38e94e339c404ff1a23aa43d/1080p/mp4/file.mp4',
+        description: 'Reverse mode continues backward. Do digital beings feel or just act? It questions human control over AI.',
+        created: '28.05.24',
+        minted: 'N/A',
+        medium: 'MP4 Video',
+        dimensions: '1920x1080',
+        size: '15 MB',
+        tags: ['video', 'reverse', 'part2'],
+        links: [
+            { url: 'https://monaverse.com/collections/8453/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/6', name: 'Monaverse Asset' }
+        ]
+    },
+    {
+        id: 'hatch-vid-7',
+        type: 'video',
+        name: 'Reverse_Part_III.mp4',
+        url: 'https://video.wixstatic.com/video/54a996_f546179fad554c2fb9d22e9d7a4e1488/1080p/mp4/file.mp4',
+        description: 'The conclusion of the reverse mode. If unwatched, do they change, like Schrödinger’s cat?',
+        created: '28.05.24',
+        minted: 'N/A',
+        medium: 'MP4 Video',
+        dimensions: '1920x1080',
+        size: '15 MB',
+        tags: ['video', 'reverse', 'part3'],
+        links: [
+            { url: 'https://monaverse.com/collections/8453/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/6', name: 'Monaverse Asset' }
+        ]
+    },
+    {
+        id: 'hatch-vid-8',
+        type: 'video',
+        name: 'Circular_Mode.mp4',
+        url: 'https://video.wixstatic.com/video/54a996_797da32b9ec943839b776375f59eacbe/1080p/mp4/file.mp4',
+        description: 'Circular mode in Hatch removes time, mixing spaces. Without time, what’s left—meaning, matter?',
+        created: '28.05.24',
+        minted: 'N/A',
+        medium: 'MP4 Video',
+        dimensions: '1920x1080',
+        size: '15 MB',
+        tags: ['video', 'circular', 'experimental'],
+        links: [
+            { url: 'https://monaverse.com/collections/8453/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/6', name: 'Monaverse Asset' }
+        ]
+    },
+    {
+        id: 'hatch-vid-9',
+        type: 'video',
+        name: 'Directors_Note.mp4',
+        url: 'https://video.wixstatic.com/video/54a996_ee84b669670d4ee499f96d7b2f02ceab/1080p/mp4/file.mp4',
+        description: 'Hatch examines human-AI ethics. Do digital entities suffer or simulate? Humans’ control raises duty questions.',
+        created: '28.05.24',
+        minted: 'N/A',
+        medium: 'MP4 Video',
+        dimensions: '1920x1080',
+        size: '15 MB',
+        tags: ['video', 'note', 'director'],
+        links: [
+            { url: 'https://monaverse.com/collections/8453/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/6', name: 'Monaverse Asset' }
+        ]
+    },
+    {
+        id: 'hatch-vid-10',
+        type: 'video',
+        name: 'Hatch_Trailer.mp4',
+        url: 'https://video.wixstatic.com/video/54a996_a6992df717194d93bb8b40ac47036304/1080p/mp4/file.mp4',
+        description: 'Hatch is a 10-min WebXR metaverse experience. A, B, and viewer C question reality in 3 parts.',
+        created: '28.05.24',
+        minted: 'N/A',
+        medium: 'MP4 Video',
+        dimensions: '1920x1080',
+        size: '15 MB',
+        tags: ['video', 'trailer', 'promo'],
+        links: [
+            { url: 'https://monaverse.com/collections/8453/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/6', name: 'Monaverse Asset' }
+        ]
+    },
+    {
+        id: 'hatch-vid-11',
+        type: 'video',
+        name: 'Intro_Sequence.mp4',
+        url: 'https://video.wixstatic.com/video/54a996_d2c145db721b48c9bfccd867cbb8447d/1080p/mp4/file.mp4',
+        description: 'Hatch uses WebXR, with VR or PC access. 50 smart objects keep data low. Avatars via VRM models join the story.',
+        created: '28.05.24',
+        minted: 'N/A',
+        medium: 'MP4 Video',
+        dimensions: '1920x1080',
+        size: '15 MB',
+        tags: ['video', 'intro', 'start'],
+        links: [
+            { url: 'https://monaverse.com/collections/8453/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/1', name: 'Monaverse Asset' }
+        ]
+    }
+],
+
+"Balloon": [
+    {
+        id: 'balloon-0',
+        type: 'text',
+        name: 'READ_ME_Manifesto.txt',
+        content: 'BALLOON, VIRTUAL THEATER NO: 2, 05.24\n\nBalloon No. 2 is a 10-minute WebXR theater piece exploring the absurdity and depth of digital identity in metaverse culture. Accessible via Hyperfy, it places the audience in a surreal environment through VR or desktop, blending architecture, fashion, and AI-driven dialogue. With three seamless acts triggered by interactive visuals, the experience offers a dynamic and personal journey through 32 choreographed camera angles or free exploration in VR. It requires no login or downloads—just a link. A new form of digital performance born for the screen.\n\nBalloon No. 2 is a digital thought experiment wrapped in virtual theater. It questions the nature of self when identity is reduced to code and avatars. Are we files? Are we gods? Or merely remixes of old data seeking meaning in algorithmic noise? The performance critiques the performative culture of the internet while embracing it, drawing a line between presence and simulation. It doesn\'t seek resolution—only to perform existence as theater, forever suspended between awareness and automation. It\'s absurd, melancholic, and deeply familiar.\n\nThe piece unfolds across three surreal acts: a pink room, a desert, and a virtual stage. Digital beings engage in layered, fast-paced dialogue questioning their purpose, place, and existence. The environment shifts as the conversation deepens—from sarcasm to existential crisis—blurring the line between reality and simulation. It is a remix of thoughts, a loop of virtual self-reflection, where each act mirrors and distorts the previous. There are no plot twists, only meditations on the state of being in a virtual realm that remembers everything and means nothing.\n\nBalloon No. 2 is a highly optimized immersive experience under 15 MB, built in WebXR on the Hyperfy platform. It features over 50 timed smart objects that load and unload dynamically across three acts. The performance runs smoothly on both PC and VR headsets, offering 32 fixed camera angles in desktop mode and free navigation in VR. It requires no login or installation, only a browser link. Compatible with Meta Quest and PC VR, it uses minimal data while enabling rich interaction, avatar integration, and layered stage design.',
+        description: 'Manifesto: A digital thought experiment wrapped in virtual theater.',
+        created: '05/2024',
+        minted: '05/2024',
+        medium: 'Text Document',
+        dimensions: 'N/A',
+        size: '3 KB',
+        tags: ['text', 'manifesto', 'theater', 'absurdism'],
+        links: []
+    },
+    {
+        id: 'balloon-link-1',
+        type: 'link',
+        name: 'ENTER_BALLOON.exe',
+        iconUrl: 'https://static.wixstatic.com/media/54a996_f238230fdd034682be2e5a6281ff40b5~mv2.png',
+        url: 'https://hyperfy.io/balloon',
+        description: 'Click to enter the Virtual Theater No:2 on Hyperfy.',
+        created: '05/2024',
+        minted: 'N/A',
+        medium: 'External Link',
+        dimensions: 'N/A',
+        size: '0 KB',
+        tags: ['web', 'experience', 'hyperfy', 'vr'],
+        links: [
+            { url: 'https://hyperfy.io/balloon', name: 'Hyperfy World' }
+        ]
+    },
+    {
+        id: 'balloon-vid-rec',
+        type: 'video',
+        name: 'Full_Recording_YouTube.mp4',
+        url: 'https://www.youtube.com/embed/uZ7R2M2NvM8',
+        description: 'Full recording of the Balloon experience on YouTube.',
+        created: '05/2024',
+        minted: 'N/A',
+        medium: 'YouTube Video',
+        dimensions: 'N/A',
+        size: 'N/A',
+        tags: ['video', 'youtube', 'full', 'recording'],
+        links: []
+    },
+    {
+        id: 'balloon-img-1',
+        type: 'image',
+        name: 'Metaverse_World_Asset.png',
+        url: 'https://static.wixstatic.com/media/54a996_f238230fdd034682be2e5a6281ff40b5~mv2.png',
+        description: 'Balloon No. 2 World Asset. A 10-minute WebXR theater piece exploring the absurdity and depth of digital identity.',
+        created: '05.24',
+        minted: 'N/A',
+        medium: 'PNG Image',
+        dimensions: '1024x1024',
+        size: '2 MB',
+        tags: ['image', 'world', 'asset'],
+        links: [
+             { url: 'https://opensea.io/item/ethereum/0xf53b18570db14c1e7dbc7dc74538c48d042f1332/1735', name: 'OpenSea Asset' }
+        ]
+    },
+    {
+        id: 'balloon-vid-1',
+        type: 'video',
+        name: 'Cinematography_Reel.mp4',
+        url: 'https://www.youtube.com/embed/5veQ5uv6tbk',
+        description: 'Showcases the dynamic visual storytelling, camera angles and seamless transitions across three acts.',
+        created: '05.24',
+        minted: 'N/A',
+        medium: 'YouTube Video',
+        dimensions: 'N/A',
+        size: 'N/A',
+        tags: ['video', 'cinematography', 'reel'],
+        links: []
+    },
+    {
+        id: 'balloon-vid-2',
+        type: 'video',
+        name: 'Processed_Experience.mp4',
+        url: 'https://video.wixstatic.com/video/54a996_b2ac7d43214743a9ac1d0b46bfefc0ec/1080p/mp4/file.mp4',
+        description: 'An early trailer that captures the spirit of Balloon No. 2 in under a minute.',
+        created: '05.24',
+        minted: 'N/A',
+        medium: 'MP4 Video',
+        dimensions: '1920x1080',
+        size: '15 MB',
+        tags: ['video', 'processed', 'teaser'],
+        links: []
+    },
+    {
+        id: 'balloon-vid-3',
+        type: 'video',
+        name: 'Official_Trailer.mp4',
+        url: 'https://video.wixstatic.com/video/54a996_9ad99d6734bc442caa28b3b2a7157f1a/1080p/mp4/file.mp4',
+        description: 'The official trailer for Balloon No. 2. Introduces the surreal metaverse environment and existential questions.',
+        created: '05.24',
+        minted: 'N/A',
+        medium: 'MP4 Video',
+        dimensions: '1920x1080',
+        size: '15 MB',
+        tags: ['video', 'trailer', 'promo'],
+        links: []
+    }
+]
+
+
+"Why We Exist?": [ 
+    {
+        id: 'wwe-0',
+        type: 'text',
+        name: 'READ_ME_Manifesto.txt',
+        content: 'WHY WE EXIST?, VIRTUAL THEATER NO:1, 11.23\n\n"Why We Exist" emerges as an innovative virtual theater experience, marking a pioneering venture into the realm of digital performance art. This concept, the first of its kind in based civilization, pushes the boundaries of digital creativity and immersive storytelling through two distinct modes: Cinematic and Immersive.\n\nThe project was conceived out of a desire to explore the creative potential of digital assets. The limitless possibilities these 3D assets offer, thanks to their intricate design and three-dimensional nature, inspired the creation of a space where these elements could be brought to life in a virtual theater setting. This endeavor celebrates open-ended creativity, blending elements of fashion, design, architecture, sound, light, and the metaverse into a cohesive and immersive experience.\n\nThe idea of a theater within the metaverse has been a long-standing fascination, with the traditional theater\'s inherent ambiguity, the spontaneity of live performances, and the occasional imperfections that add depth to the experience being translated into a digital medium. Avatar bodies serve as a canvas in this project, creating a silent yet profound dialogue about our digital and 3D NFT heritage.\n\nThe Murakami Pill serves as a theoretical foundation for this project, symbolizing the journey of digital "actors" striving to reconnect with their creator. This metaphor explores themes of existence, belief, and identity within the digital realm, inviting contemplation on the essence of digital entities and their parallels to human consciousness.\n\nIn "Why We Exist," viewers become an integral part of the unfolding narrative. By choosing from one of three Clone remixes upon respawning, participants directly influence the perspective and outcome of the story.\n\nCrafted with attention to technical detail and artistic design, the virtual theater showcases a new way of interacting with 3D models. An average of five smart objects per character and precise timing for their activation are achieved without a single line of code. This is complemented by a carefully orchestrated audio-visual landscape that enhances the immersive quality of the experience.\n\nThanks are extended to Neon DAO for their support and for providing the assets that made this project possible.\n\n"Why We Exist" is not merely a virtual theater experience; it is a reflection on the evolving relationship between creators, their creations, and the audience within the digital age.',
+        description: 'The manifesto and concept details of the virtual theater piece.',
+        created: '11/2023',
+        minted: '11/2023',
+        medium: 'Text Document',
+        dimensions: 'N/A',
+        size: '2 KB',
+        tags: ['text', 'manifesto', 'theater'],
+        links: []
+    },
+    {
+        id: 'wwe-link-1',
+        type: 'link',
+        name: 'ENTER_THEATER_Experience.exe',
+        iconUrl: 'https://static.wixstatic.com/media/54a996_a69e60a32afc42dcae2af3cd29305a21~mv2.png',
+        url: 'https://hyperfy.io/pill',
+        description: 'Click to enter the Virtual Theater No:1 on Hyperfy.',
+        created: '11/2023',
+        minted: 'N/A',
+        medium: 'External Link',
+        dimensions: 'N/A',
+        size: '0 KB',
+        tags: ['web', 'experience', 'hyperfy'],
+        links: [
+            { url: 'https://hyperfy.io/pill', name: 'Hyperfy World' }
+        ]
+    },
+    {
+        id: 'wwe-vid-1',
+        type: 'video',
+        name: 'Metaverse_World_Promo.mp4',
+        url: 'https://video.wixstatic.com/video/54a996_45a230b2bece4d03b010b327a5cdaa42/1080p/mp4/file.mp4',
+        description: 'Emerging as an innovative virtual theater experience. Cinematic and Immersive.',
+        created: '11/2023',
+        minted: 'N/A',
+        medium: 'MP4 Video',
+        dimensions: '1920x1080',
+        size: '15 MB',
+        tags: ['video', 'promo', 'world'],
+        links: [
+             { url: 'https://opensea.io/item/ethereum/0xf53b18570db14c1e7dbc7dc74538c48d042f1332/1766', name: 'OpenSea Asset' }
+        ]
+    },
+    {
+        id: 'wwe-vid-2',
+        type: 'video',
+        name: 'VR_Recording_Quest3.mp4',
+        url: 'https://video.wixstatic.com/video/54a996_d0a53c2258ea418a9decdc5ff7ea8634/720p/mp4/file.mp4',
+        description: 'Captured with Meta Quest 3. One of the first 10-minute virtual theater experiences designed for VR.',
+        created: '11/2023',
+        minted: 'N/A',
+        medium: 'MP4 Video',
+        dimensions: '1280x720',
+        size: '20 MB',
+        tags: ['video', 'vr', 'recording'],
+        links: []
+    },
+    {
+        id: 'wwe-vid-3',
+        type: 'video',
+        name: '1st_Take_Technical.mp4',
+        url: 'https://video.wixstatic.com/video/54a996_18a0c3bf7d454587a9b4232ea8cef5b8/1080p/mp4/file.mp4',
+        description: 'Documents the initial technical solutions developed for Why We Exist.',
+        created: '11/2023',
+        minted: 'N/A',
+        medium: 'MP4 Video',
+        dimensions: '1920x1080',
+        size: '18 MB',
+        tags: ['video', 'technical', 'archive'],
+        links: []
+    },
+    {
+        id: 'wwe-img-1',
+        type: 'image',
+        name: 'Script_Timezone_Sheet.png',
+        url: 'https://static.wixstatic.com/media/54a996_7dd2500dbf604854ba481d58f98279fa~mv2.png',
+        description: 'Detailed script and hierarchy of smart objects, outlining the precise orchestration.',
+        created: '11/2023',
+        minted: 'N/A',
+        medium: 'PNG Image',
+        dimensions: '1024x1024',
+        size: '2 MB',
+        tags: ['image', 'script', 'production'],
+        links: []
+    },
+    {
+        id: 'wwe-img-2',
+        type: 'image',
+        name: 'Camera_Angles.jpg',
+        url: 'https://static.wixstatic.com/media/54a996_1dda84dec4f84ea4a9c9674253aa0216~mv2.jpg',
+        description: 'Visual representation of the camera angles used in Cinematic mode.',
+        created: '11/2023',
+        minted: 'N/A',
+        medium: 'JPG Image',
+        dimensions: '1920x1080',
+        size: '1.5 MB',
+        tags: ['image', 'cinematography', 'layout'],
+        links: []
+    },
+    {
+        id: 'wwe-vid-4',
+        type: 'video',
+        name: 'Mess_Mode_Chaos.mp4',
+        url: 'https://video.wixstatic.com/video/54a996_6e47723684a24c93a8cb4eda9f1c229c/1080p/mp4/file.mp4',
+        description: 'Captures the experimental and chaotic essence, showcasing playful interaction.',
+        created: '11/2023',
+        minted: 'N/A',
+        medium: 'MP4 Video',
+        dimensions: '1920x1080',
+        size: '15 MB',
+        tags: ['video', 'experimental', 'art'],
+        links: []
+    },
+    {
+        id: 'wwe-vid-5',
+        type: 'video',
+        name: 'Full_Recording_YouTube.mp4',
+        url: 'https://www.youtube.com/embed/_s8EBp84b3w',
+        description: 'Full recording of the experience on YouTube.',
+        created: '11/2023',
+        minted: 'N/A',
+        medium: 'YouTube Video',
+        dimensions: 'N/A',
+        size: 'N/A',
+        tags: ['video', 'youtube', 'full'],
+        links: []
+    }
+],
