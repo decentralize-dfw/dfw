@@ -823,205 +823,247 @@
         }
 
         /* Left Sidebar for Title & Description */
-        #circular-sidebar {
-            position: fixed;
-            left: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 350px;
-            padding: 40px;
-            z-index: 10;
-            pointer-events: none;
+        //buraya kopyala 
+
+       
+
+        
+
+       
+
+        
+
+       
+
+        
+/* --- YENİ SIDEBAR YAPISI --- */
+        
+       
+
+        /* Ortadaki boşluk (Title'ı ortaya itmek için) */
+        .sidebar-spacer {
+            flex-grow: 1;
+            max-height: 15vh; /* Çok aşağı inmesini engelle */
+            min-height: 20px;
         }
 
-        #circular-sidebar-title {
-            font-size: 34px;
-            font-weight: 700;
-            color: white;
-            text-shadow: 0 2px 8px rgba(0,0,0,0.5);
-            margin-bottom: 16px;
-            line-height: 1.2;
-            max-width: 350px;
-            letter-spacing: -0.2px;
-            /* Allow title to wrap to next line - no truncation */
-            overflow-wrap: break-word;
-            word-wrap: break-word;
-            white-space: normal;
-        }
+        /* 2. TITLE (Ortada) */
+       
 
-        #circular-sidebar-description {
-            font-size: 13px;
-            color: rgba(255,255,255,0.9);
-            text-shadow: 0 1px 4px rgba(0,0,0,0.5);
-            line-height: 1.6;
-            max-width: 350px;
-            max-height: 400px;
-            letter-spacing: -0.2px;
-            /* Vertical scrollbar for long descriptions */
-            overflow-y: auto;
-            overflow-x: hidden;
-            /* Paragraph formatting with justify */
-            text-align: justify;
-            text-align-last: left; /* Last line left-aligned */
-            white-space: normal;
-            word-wrap: break-word;
-            /* Custom scrollbar styling */
+        /* 3. SCROLL ALANI (Description + Links) */
+        #sidebar-scroll-wrapper {
+            flex: 1; /* Kalan tüm alanı kapla */
+            overflow-y: auto; /* Sadece burası scroll olsun */
+            pointer-events: auto;
+            padding-right: 10px;
+            min-height: 0; /* Flex hatasını önlemek için */
+            
+            /* Scrollbar tasarımı */
             scrollbar-width: thin;
             scrollbar-color: rgba(255,255,255,0.3) transparent;
         }
 
-        /* Parametric Plan Container */
+       
+/* --- DÜZELTİLMİŞ YENİ SIDEBAR YAPISI --- */
+        
+        #circular-sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 420px;
+            height: 100vh;
+            padding: 40px;
+            /* Sol üstteki back button ile çakışmaması için padding ayarı */
+            padding-top: 0; 
+            z-index: 10;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 1. ÜST ALAN (Planı kapsar ve esneyerek Başlığı aşağıya, ortaya iter) */
+        #sidebar-top-section {
+    width: 100%;
+    height: 400px; /* <--- PLANIN SABİT YÜKSEKLİĞİ: Burayı planın boyutuna göre ayarla */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0; /* İçerik değişse de bu alan küçülmez veya büyümez */
+    margin-top: 30px; /* Geri butonu ile çakışmaması için en üstten boşluk */
+}
+
+        /* PLAN AYARLARI (Transparan, Büyük) */
         #parametric-plan-container {
-            width: 100%;
-            max-width: 350px;
+            width: 110%; /* %30 Büyütüldü */
+            margin-left: -5%; /* Ortalamak için sola çekildi */
             aspect-ratio: 1;
-            margin-top: 20px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 12px;
-            padding: 10px;
-            backdrop-filter: blur(10px);
+            background: transparent; /* ARKA PLAN TRANSPARAN */
+            border-radius: 0;
+            padding: 0;
+            backdrop-filter: none;
+            pointer-events: auto;
+            flex-shrink: 0;
         }
 
         #parametric-plan-container svg {
             width: 100%;
             height: 100%;
+            overflow: visible;
+            /* Daha iyi görünürlük için gölge */
+            filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5));
         }
 
-        /* Plan Shape Styles */
+        /* --- PLAN ŞEKİLLERİ VE OPAK AYARLARI --- */
+        
+        /* Koridorlar: Neredeyse görünmez (%15 opaklık) */
         .plan-corridor-link {
             stroke-linecap: round;
             stroke-linejoin: round;
             fill: none;
-            opacity: 0.6;
+            stroke-width: 5px;
+            opacity: 0.65 !important;
+            transition: opacity 0.5s ease;
         }
 
-        .plan-membrane-outline {
-            fill: none;
-            stroke: #ffffff;
-            stroke-width: 2px;
-            stroke-linejoin: round;
-            stroke-linecap: round;
-            opacity: 0.5;
-        }
-
+        /* Odalar: Varsayılan olarak sönük */
         .plan-room-shape {
             stroke: #ffffff;
             stroke-width: 1px;
-            stroke-opacity: 0.3;
-            transition: opacity 0.5s ease, fill-opacity 0.5s ease;
+            stroke-opacity: 0.2;
+            fill-opacity: 1;
+            transition: all 0.5s ease;
         }
 
-        .plan-room-shape.hub {
-            stroke-width: 2px;
-            stroke-dasharray: 4,2;
-            stroke-opacity: 0.6;
-        }
-
-        .plan-room-shape.sub-hub {
-            stroke-width: 1.5px;
-            stroke-opacity: 0.5;
-        }
-
-        /* Active state for current location */
+        /* SADECE AKTİF OLAN ODA: %80 Parlak */
         .plan-room-shape.active {
-            opacity: 0.8 !important;
-            animation: pulse-plan 2s ease-in-out infinite;
+            opacity: 0.9 !important;
+            fill-opacity: 0.8 !important;
+            stroke-opacity: 1 !important;
+            stroke-width: 2px;
+            filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.6));
         }
 
         .plan-room-shape.inactive {
             opacity: 0.2 !important;
         }
 
-        @keyframes pulse-plan {
-            0%, 100% { opacity: 0.8; }
-            50% { opacity: 0.95; }
+        .plan-membrane-outline {
+            display: none; /* Dış çerçeve gizlendi */
         }
 
-        .plan-label {
-            pointer-events: none;
-            text-anchor: middle;
-            dominant-baseline: central;
-        }
-
-        .plan-label-main {
-            font-size: 16px;
-            font-weight: 900;
-            fill: #ffffff;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
-        }
-
-        .plan-label-hub {
-            font-size: 11px;
+        /* 2. BAŞLIK (Sayfanın Tam Ortasında) */
+        #circular-sidebar-title {
+            flex-shrink: 0;
+            font-size: 34px;
             font-weight: 700;
-            fill: #e2e8f0;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+            color: white;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+            margin-bottom: 20px;
+            line-height: 1.1;
+            letter-spacing: -0.5px;
+            /* Flex yapısı sayesinde dikeyde tam ortada durur */
         }
 
-        .plan-label-room {
-            font-size: 8px;
-            font-weight: 500;
-            fill: #cbd5e1;
-            opacity: 0.9;
-            font-family: 'Courier New', Courier, monospace;
+        /* 3. ALT ALAN (Açıklama + Linkler -> En alta kadar, %3 boşlukla) */
+        #sidebar-scroll-wrapper {
+            flex: 1; /* Alt alanı doldurur */
+            overflow-y: auto;
+            pointer-events: auto;
+            padding-right: 10px;
+            padding-bottom: 3%; /* En alttan %3 pay */
+            
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255,255,255,0.3) transparent;
         }
 
-        /* WebKit scrollbar for description */
-        #circular-sidebar-description::-webkit-scrollbar {
-            width: 4px;
-        }
-
-        #circular-sidebar-description::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        #circular-sidebar-description::-webkit-scrollbar-thumb {
-            background: rgba(255,255,255,0.3);
-            border-radius: 10px;
-        }
-
-        #circular-sidebar-description::-webkit-scrollbar-thumb:hover {
-            background: rgba(255,255,255,0.5);
+        #circular-sidebar-description {
+            font-size: 13px;
+            color: rgba(255,255,255,0.9);
+            text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+            line-height: 1.6;
+            text-align: justify;
+            text-align-last: left;
+            margin-bottom: 24px;
         }
 
         #circular-sidebar-links {
-            margin-top: 16px;
             font-size: 14px;
-            color: rgba(255,255,255,0.85);
-            max-width: 350px;
-            pointer-events: auto; /* LİNKLERE TIKLANABİLMESİ İÇİN ŞART */
+            color: rgba(255,255,255,0.9);
         }
 
         .sidebar-link-item {
             margin-bottom: 8px;
-            padding: 8px 12px;
-            background: rgba(255,255,255,0.1);
+            padding: 10px 14px;
+            background: rgba(0, 0, 0, 0.4);
             border-radius: 8px;
             border-left: 3px solid rgba(59, 130, 246, 0.6);
             transition: all 0.2s ease;
             cursor: pointer;
+            backdrop-filter: blur(4px);
         }
 
         .sidebar-link-item:hover {
-            background: rgba(255,255,255,0.2);
-            border-left-color: rgb(59, 130, 246);
-            transform: translateX(4px);
+            background: rgba(59, 130, 246, 0.2);
+            border-left-color: #3b82f6;
+            transform: translateX(5px);
         }
 
-        .sidebar-link-name {
-            font-weight: 600;
-            color: white;
-            margin-bottom: 4px;
-        }
+        .sidebar-link-name { font-weight: 600; color: white; margin-bottom: 4px; }
+        .sidebar-link-desc { font-size: 12px; color: rgba(255,255,255,0.7); line-height: 1.4; }
 
-        .sidebar-link-desc {
-            font-size: 12px;
-            color: rgba(255,255,255,0.7);
-            line-height: 1.4;
-        }
+        /* Plan üzerindeki yazılar */
+       .plan-label { 
+    pointer-events: none; 
+    text-anchor: middle; /* Yatayda tam merkezleme */
+    dominant-baseline: central; /* Dikeyde tam merkezleme */
+    alignment-baseline: central; /* Bazı tarayıcılar için ek dikey merkezleme */
+    fill: #ffffff !important; 
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif; 
+    paint-order: stroke;
+    /* Yazıların bulunduğu koordinattan kaymasını engellemek için: */
+    transform-box: fill-box;
+    transform-origin: center;
+}
+       .plan-label-main { 
+    font-size: 16px; 
+    font-weight: 900; 
+    fill: #ffffff !important; 
+    text-shadow: 0 0 8px rgba(0,0,0,1), 0 0 4px rgba(0,0,0,1); /* Siyah gölge ile öne çıkarır */
+}
+
+/* DESIGN HALL gibi alt merkezler */
+.plan-label-hub { 
+    font-size: 11px; 
+    font-weight: 700; 
+    fill: #ffffff !important;
+    text-shadow: 0 0 5px rgba(0,0,0,0.8);
+}
+
+/* Küçük oda isimleri (Görünmesini istiyorsan) */
+.plan-label-room { 
+    display: block; /* Kapalıydı, görünmesi için block yaptık */
+    font-size: 12px; 
+    font-weight: 300; 
+    fill: rgba(255, 255, 255, 0.9) !important; 
+    text-shadow: 0 0 3px rgba(0,0,0,0.8);
+}
+        /* Scrollbar */
+        #sidebar-scroll-wrapper::-webkit-scrollbar { width: 4px; }
+        #sidebar-scroll-wrapper::-webkit-scrollbar-track { background: transparent; }
+        #sidebar-scroll-wrapper::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 10px; }
+        #sidebar-scroll-wrapper::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.5); }
+       
+
+        /* Scrollbar stilleri */
+        #sidebar-scroll-wrapper::-webkit-scrollbar { width: 4px; }
+        #sidebar-scroll-wrapper::-webkit-scrollbar-track { background: transparent; }
+        #sidebar-scroll-wrapper::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 10px; }
+        #sidebar-scroll-wrapper::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.5); }
+       
+
+        
+
+        
 
         /* Breadcrumb Path */
         #circular-breadcrumb {
@@ -1354,11 +1396,17 @@
     <div id="circular-navigation">
         <!-- Left Sidebar with Title & Description -->
         <div id="circular-sidebar">
-            <div id="circular-sidebar-title">DFW website ui</div>
-            <div id="circular-sidebar-description">Decentralized Fashion Week - Navigate through files and folders</div>
-            <div id="parametric-plan-container"></div>
-            <div id="circular-sidebar-links"></div>
-        </div>
+    <div id="sidebar-top-section">
+        <div id="parametric-plan-container"></div>
+    </div>
+
+    <div id="circular-sidebar-title">DFW website ui</div>
+
+    <div id="sidebar-scroll-wrapper">
+        <div id="circular-sidebar-description">Decentralized Fashion Week - Navigate through files and folders</div>
+        <div id="circular-sidebar-links"></div>
+    </div>
+</div>
 
         <!-- Layout Toggle Buttons -->
         <div id="layout-toggle-container">
@@ -5665,15 +5713,20 @@ links: [
 
             // LABELS
             labelLayer.selectAll("text")
-                .data(nodes).enter().append("text")
-                .attr("class", d => {
-                    if (d.type === 'root') return "plan-label-main";
-                    if (d.type === 'hub' || d.type === 'sub-hub') return "plan-label-hub";
-                    return "plan-label-room";
-                })
-                .attr("x", d => d.x)
-                .attr("y", d => d.y)
-                .text(d => d.id === 'LOBBY' ? "LOBBY" : d.id);
+    .data(nodes)
+    .enter()
+    .append("text")
+    .attr("class", d => {
+        if (d.type === 'root') return "plan-label-main";
+        if (d.type === 'hub' || d.type === 'sub-hub') return "plan-label-hub";
+        return "plan-label-room";
+    })
+    // X ve Y koordinatları doğrudan node'un merkez (intersection) noktasıdır
+    .attr("x", d => d.x)
+    .attr("y", d => d.y)
+    .attr("text-anchor", "middle") // Yatay merkezleme garantisi
+    .attr("dominant-baseline", "central") // Dikey merkezleme garantisi
+    .text(d => d.id === 'LOBBY' ? "LOBBY" : d.id);
 
             parametricPlanNodes = nodes;
             parametricPlanSVG = svg;
