@@ -5807,7 +5807,14 @@ function getIcon(item) {
         }
 
         function navigateBackCircular() {
-            // Clear open window state when navigating back
+            // Close all open windows when navigating back
+            const existingWindows = document.querySelectorAll('.floating-window');
+            existingWindows.forEach(win => {
+                const winId = win.id;
+                closeWindow(winId, true); // true = skip sidebar restore (we're navigating)
+            });
+
+            // Clear open window state
             circularNav.openWindowItem = null;
 
             if (circularNav.currentIndex > 0) {
@@ -5832,7 +5839,14 @@ function getIcon(item) {
         }
 
         function navigateToCircularRoot() {
-            // Clear open window state when returning to root
+            // Close all open windows when returning to root
+            const existingWindows = document.querySelectorAll('.floating-window');
+            existingWindows.forEach(win => {
+                const winId = win.id;
+                closeWindow(winId, true); // true = skip sidebar restore
+            });
+
+            // Clear open window state
             circularNav.openWindowItem = null;
 
             circularNav.currentIndex = -1;
@@ -6700,10 +6714,8 @@ if (thumbnailsEl) {
 
             windowEl.addEventListener('mousedown', () => {
                 bringToFront(windowId);
-                // Update sidebar when window is clicked - show links too!
-                if (window.innerWidth > 768) {
-                    updateSidebarForWindow(item, true);
-                }
+                // DON'T update sidebar here - it's already set when window opened!
+                // Sidebar should stay locked to the open window's info
             }, true);
             windowEl.querySelector('.close').addEventListener('click', () => closeWindow(windowId));
             windowEl.querySelector('.maximize').addEventListener('click', () => maximizeWindow(windowId));
