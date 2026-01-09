@@ -808,6 +808,10 @@
             text-shadow: 0 2px 8px rgba(0,0,0,0.5);
             margin-bottom: 16px;
             line-height: 1.2;
+            max-width: 350px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         #circular-sidebar-description {
@@ -815,13 +819,16 @@
             color: rgba(255,255,255,0.9);
             text-shadow: 0 1px 4px rgba(0,0,0,0.5);
             line-height: 1.6;
+            max-width: 350px;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         /* Breadcrumb Path */
         #circular-breadcrumb {
             position: fixed;
             bottom: 30px;
-            left: 90px; /* Space for toggle buttons */
+            left: 120px; /* Space for toggle buttons */
             font-size: 12px;
             color: rgba(255,255,255,0.7);
             text-shadow: 0 1px 2px rgba(0,0,0,0.5);
@@ -6281,22 +6288,63 @@ function getIcon(item) {
             const centerX = window.innerWidth / 2;
             const centerY = window.innerHeight / 2;
 
-            // Create randomized angles
-            const angles = [];
-            for (let i = 0; i < count; i++) {
-                angles.push((Math.PI * 2 * i) / count);
-            }
+            // Use double circle for 20+ items
+            if (count > 20) {
+                // 35% inner, 65% outer for balanced distribution
+                const innerCount = Math.round(count * 0.35);
+                const outerCount = count - innerCount;
+                const innerRadius = radius * 0.65;
+                const outerRadius = radius;
 
-            // Shuffle angles for random positioning
-            const shuffledAngles = shuffleArray(angles);
+                // Create inner circle angles
+                const innerAngles = [];
+                for (let i = 0; i < innerCount; i++) {
+                    innerAngles.push((Math.PI * 2 * i) / innerCount);
+                }
+                const shuffledInner = shuffleArray(innerAngles);
 
-            for (let i = 0; i < count; i++) {
-                const angle = shuffledAngles[i];
-                // Add slight random variation to radius for more organic feel
-                const radiusVar = radius + (Math.random() - 0.5) * 30;
-                const x = centerX + Math.cos(angle) * radiusVar;
-                const y = centerY + Math.sin(angle) * radiusVar;
-                positions.push({ x, y });
+                // Create outer circle angles
+                const outerAngles = [];
+                for (let i = 0; i < outerCount; i++) {
+                    outerAngles.push((Math.PI * 2 * i) / outerCount);
+                }
+                const shuffledOuter = shuffleArray(outerAngles);
+
+                // Position inner circle items
+                for (let i = 0; i < innerCount; i++) {
+                    const angle = shuffledInner[i];
+                    const radiusVar = innerRadius + (Math.random() - 0.5) * 20;
+                    const x = centerX + Math.cos(angle) * radiusVar;
+                    const y = centerY + Math.sin(angle) * radiusVar;
+                    positions.push({ x, y });
+                }
+
+                // Position outer circle items
+                for (let i = 0; i < outerCount; i++) {
+                    const angle = shuffledOuter[i];
+                    const radiusVar = outerRadius + (Math.random() - 0.5) * 30;
+                    const x = centerX + Math.cos(angle) * radiusVar;
+                    const y = centerY + Math.sin(angle) * radiusVar;
+                    positions.push({ x, y });
+                }
+            } else {
+                // Single circle for 20 or fewer items
+                const angles = [];
+                for (let i = 0; i < count; i++) {
+                    angles.push((Math.PI * 2 * i) / count);
+                }
+
+                // Shuffle angles for random positioning
+                const shuffledAngles = shuffleArray(angles);
+
+                for (let i = 0; i < count; i++) {
+                    const angle = shuffledAngles[i];
+                    // Add slight random variation to radius for more organic feel
+                    const radiusVar = radius + (Math.random() - 0.5) * 30;
+                    const x = centerX + Math.cos(angle) * radiusVar;
+                    const y = centerY + Math.sin(angle) * radiusVar;
+                    positions.push({ x, y });
+                }
             }
 
             return positions;
@@ -6304,20 +6352,25 @@ function getIcon(item) {
 
         function getGridPositions(count, iconSize) {
             const positions = [];
-            const padding = 40;
+            const cols = 7; // Always 7 columns
             const gap = iconSize * 0.5; // Gap between icons
-
-            // Calculate how many columns fit
-            const availableWidth = window.innerWidth - padding * 2;
             const itemWidth = iconSize + gap;
-            const cols = Math.max(3, Math.floor(availableWidth / itemWidth));
+
+            // Use 60% of screen width (20% margins on each side)
+            const availableWidth = window.innerWidth * 0.6;
+            // Use 80% of screen height (10% margins top and bottom)
+            const availableHeight = window.innerHeight * 0.8;
 
             // Calculate starting position to center the grid
             const rows = Math.ceil(count / cols);
             const totalWidth = (cols * itemWidth) - gap;
             const totalHeight = (rows * itemWidth) - gap;
-            const startX = (window.innerWidth - totalWidth) / 2;
-            const startY = (window.innerHeight - totalHeight) / 2;
+
+            // Center in the available area (which is already centered)
+            const marginLeft = window.innerWidth * 0.2; // 20% left margin
+            const marginTop = window.innerHeight * 0.1; // 10% top margin
+            const startX = marginLeft + (availableWidth - totalWidth) / 2;
+            const startY = marginTop + (availableHeight - totalHeight) / 2;
 
             for (let i = 0; i < count; i++) {
                 const row = Math.floor(i / cols);
