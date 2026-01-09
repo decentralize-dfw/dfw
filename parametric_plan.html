@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C2W2 Compact Organic Blueprint V10 (Transparent)</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        :root {
+            /* ARKA PLAN ŞEFFAF */
+            --bg-color: transparent;
+            --membrane-stroke: #ffffff;
+            --link-stroke: #475569; 
+            
+            /* Renkler */
+            --color-lobby: #1e293b;
+            --color-item-hall: #334155; 
+            --color-design: #431407; 
+            --color-avatar: #2e1065;
+            --color-space: #083344;
+            --color-dfw: #052e16;
+            --color-gallery: #1e3a8a; 
+            --color-exp: #450a0a;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: #fff;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            overflow: hidden; 
+        }
+
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        svg {
+            width: 100%; 
+            height: 100%;
+            max-width: 100vh; 
+            max-height: 100vw;
+        }
+
+        .corridor-link {
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            fill: none;
+            opacity: 0.6;
+        }
+
+        .membrane-outline {
+            fill: none;
+            stroke: var(--membrane-stroke);
+            stroke-width: 2px;
+            stroke-linejoin: round;
+            stroke-linecap: round;
+            opacity: 0.5;
+        }
+
+        .room-shape {
+            stroke: #ffffff;
+            stroke-width: 1px;
+            stroke-opacity: 0.3;
+        }
+        
+        .room-shape.hub {
+            stroke-width: 2px;
+            stroke-dasharray: 4,2;
+            stroke-opacity: 0.6;
+        }
+        
+        .room-shape.sub-hub {
+            stroke-width: 1.5px;
+            stroke-opacity: 0.5;
+        }
+
+        .label-group {
+            pointer-events: none;
+            text-anchor: middle;
+            dominant-baseline: central;
+        }
+
+        .label-main {
+            font-size: 16px;
+            font-weight: 900;
+            fill: #ffffff;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+        }
+
+        .label-hub {
+            font-size: 11px;
+            font-weight: 700;
+            fill: #e2e8f0;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+        }
+
+        .label-room {
+            font-size: 8px;
+            font-weight: 500;
+            fill: #cbd5e1;
+            opacity: 0.9;
+            font-family: 'Courier New', Courier, monospace;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="canvas-container"></div>
+
+    <script>
+        // ==========================================
+        // 1. VERİ & YAPILANDIRMA
+        // ==========================================
+        
+        const rawData = {
+            "Design": [ 
+                { name: 'FURNITURE' }, { name: 'SCULPTURE' }, { name: 'AUTOMOBILE' }, 
+                { name: 'CHAIR' }, { name: 'SOFA' }, { name: 'TABLE' }, 
+                { name: 'MUSIC' }, { name: 'CARPET' }
+            ],
+            "Avatar": [ { name: 'C2W' }, { name: 'C2W2' } ],
+            "Space": [ { name: 'Digital Topographies' } ],
+            
+            "Experience": [
+                { name: 'Why We Exist?' }, { name: 'Balloon' }, { name: 'Hatch' }, 
+                { name: 'C2W Runway' }, { name: 'C2W2 Runway' }
+            ],
+            "Gallery": [
+                { name: 'Scaffold' }, { name: 'Retail' }, { name: 'Neue² Dojo' }, 
+                { name: 'Elements Store' }, { name: 'Black City' }, { name: 'Forge' }
+            ],
+            "DFW": [ { name: 'Works' } ]
+        };
+
+        const nodes = [];
+        const links = [];
+
+        function generateOrganicPath(radius) {
+            const points = [];
+            const numPoints = 10 + Math.floor(Math.random() * 4); 
+            for (let i = 0; i < numPoints; i++) {
+                const angle = (i / numPoints) * Math.PI * 2;
+                const variation = 0.85 + Math.random() * 0.3; 
+                const r = radius * variation;
+                points.push([ Math.cos(angle) * r, Math.sin(angle) * r ]);
+            }
+            return d3.line().curve(d3.curveBasisClosed)(points);
+        }
+
+        function getColor(g) {
+            if(g==='Design') return '#fdba74';
+            if(g==='Avatar') return '#d8b4fe';
+            if(g==='Space') return '#a5f3fc';
+            if(g==='DFW') return '#86efac';
+            if(g==='Gallery') return '#93c5fd';
+            if(g==='Experience') return '#fca5a5';
+            if(g==='ItemHall') return '#94a3b8';
+            return '#f1f5f9';
+        }
+
+        // --- NODE OLUŞTURMA ---
+        
+        // 1. LOBBY
+        const lobbyNode = {
+            id: 'LOBBY', group: 'Lobby', type: 'root',
+            r: 90, fx: 0, fy: 0,
+            pathData: generateOrganicPath(90),
+            color: '#e2e8f0'
+        };
+        nodes.push(lobbyNode);
+
+        // 2. ITEM HALL
+        const itemHallNode = {
+            id: 'ITEM HALL', group: 'ItemHall', type: 'hub',
+            r: 80,
+            targetX: -160, targetY: 0, 
+            pathData: generateOrganicPath(80),
+            color: getColor('ItemHall')
+        };
+        nodes.push(itemHallNode);
+        
+        links.push({
+            source: lobbyNode, target: itemHallNode,
+            width: 80, color: getColor('ItemHall'), distance: 140
+        });
+
+        // 3. ANA SALONLARIN HEDEFLERİ
+        const zoneTargets = {
+            "Design": { x: -350, y: 0 },
+            "Avatar": { x: -220, y: -180 },
+            "Space": { x: -220, y: 180 },
+            "Gallery": { x: 0, y: -280 },
+            "Experience": { x: 0, y: 280 },
+            "DFW": { x: 280, y: 0 }
+        };
+
+        // 4. ALT ODALARIN HEDEFLERİ
+        const subRoomTargets = {
+            "Design": { x: -450, y: 0 },
+            "Avatar": { x: -280, y: -240 },
+            "Space": { x: -280, y: 240 },
+            "Gallery": { x: 0, y: -360 },
+            "Experience": { x: 0, y: 360 },
+            "DFW": { x: 360, y: 0 }
+        };
+
+        Object.keys(rawData).forEach(group => {
+            const isItemWing = ["Design", "Avatar", "Space"].includes(group);
+            
+            // HUB OLUŞTUR
+            const hubNode = {
+                id: group.toUpperCase() + (isItemWing ? "" : " HALL"), 
+                group: group, 
+                type: isItemWing ? 'sub-hub' : 'hub', 
+                r: isItemWing ? 60 : 70,
+                pathData: generateOrganicPath(isItemWing ? 60 : 70),
+                color: getColor(group),
+                targetX: zoneTargets[group].x,
+                targetY: zoneTargets[group].y
+            };
+            nodes.push(hubNode);
+
+            // BAĞLANTILAR
+            if (isItemWing) {
+                links.push({ 
+                    source: itemHallNode, target: hubNode, 
+                    width: 50, color: getColor(group), distance: 110 
+                });
+            } else {
+                links.push({ 
+                    source: lobbyNode, target: hubNode, 
+                    width: 60, color: getColor(group), distance: 160 
+                });
+            }
+
+            // ODALARI OLUŞTUR
+            const subTarget = subRoomTargets[group];
+            
+            rawData[group].forEach(item => {
+                const subNode = {
+                    id: item.name,
+                    group: group, type: 'room',
+                    r: 45,
+                    pathData: generateOrganicPath(45),
+                    color: getColor(group),
+                    targetX: subTarget.x,
+                    targetY: subTarget.y
+                };
+                nodes.push(subNode);
+
+                links.push({ 
+                    source: hubNode, target: subNode, 
+                    width: 30, color: getColor(group), distance: 55
+                });
+            });
+        });
+
+        // ==========================================
+        // 2. POZİSYON HESAPLAMA
+        // ==========================================
+        
+        const simulation = d3.forceSimulation(nodes)
+            .force("link", d3.forceLink(links).id(d => d.id).distance(d => d.distance).strength(1.5)) 
+            .force("collide", d3.forceCollide().radius(d => d.r + 5).iterations(8)) 
+            .force("x", d3.forceX(d => d.targetX || 0).strength(d => d.type === 'room' ? 0.5 : 0.2)) 
+            .force("y", d3.forceY(d => d.targetY || 0).strength(d => d.type === 'room' ? 0.5 : 0.2))
+            .force("charge", d3.forceManyBody().strength(-300))
+            .stop();
+
+        // 400 adım çalıştır
+        for (let i = 0; i < 400; ++i) simulation.tick();
+
+        // ==========================================
+        // 3. ÇİZİM (RENDER) - KARE FORMAT
+        // ==========================================
+
+        let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+        // Padding sabitlendi
+        const padding = 40; 
+
+        nodes.forEach(d => {
+            const r = d.r + 30; 
+            if (d.x - r < minX) minX = d.x - r;
+            if (d.x + r > maxX) maxX = d.x + r;
+            if (d.y - r < minY) minY = d.y - r;
+            if (d.y + r > maxY) maxY = d.y + r;
+        });
+
+        const contentWidth = maxX - minX;
+        const contentHeight = maxY - minY;
+        const maxDim = Math.max(contentWidth, contentHeight);
+        
+        const centerX = (minX + maxX) / 2;
+        const centerY = (minY + maxY) / 2;
+        
+        const viewX = centerX - maxDim/2;
+        const viewY = centerY - maxDim/2;
+        
+        const totalSize = maxDim + padding * 2;
+        const finalX = viewX - padding;
+        const finalY = viewY - padding;
+
+        const svg = d3.select("#canvas-container").append("svg")
+            .attr("viewBox", `${finalX} ${finalY} ${totalSize} ${totalSize}`)
+            .attr("preserveAspectRatio", "xMidYMid meet");
+
+        // --- PLAN GÖRSELİ (SABİT AYARLAR) ---
+        
+        // Scale sabitlendi: 0.9955
+        const planSize = totalSize * 0.9955;
+        const planOffset = (totalSize - planSize) / 2;
+        
+        const planX = finalX + planOffset;
+        const planY = finalY + planOffset;
+
+        svg.append("image")
+            .attr("href", "https://raw.githubusercontent.com/decentralize-dfw/dfw/main/PLAN.png")
+            .attr("x", planX)
+            .attr("y", planY)
+            .attr("width", planSize)
+            .attr("height", planSize)
+            .attr("preserveAspectRatio", "none")
+            // Opacity sabitlendi: 1
+            .style("opacity", "1"); 
+
+        const linkLayer = svg.append("g");
+        const membraneLayer = svg.append("g");
+        const roomLayer = svg.append("g");
+        const labelLayer = svg.append("g");
+
+        // Linkler
+        linkLayer.selectAll("line")
+            .data(links).enter().append("line")
+            .attr("class", "corridor-link")
+            .attr("stroke-width", d => d.width)
+            .attr("stroke", d => d.color)
+            .attr("x1", d => d.source.x)
+            .attr("y1", d => d.source.y)
+            .attr("x2", d => d.target.x)
+            .attr("y2", d => d.target.y);
+
+        // Dış Zar
+        let membranePoints = [];
+        nodes.forEach(d => {
+            const numPoints = 12; 
+            for(let i=0; i<numPoints; i++) {
+                const angle = (i/numPoints)*Math.PI*2;
+                const r = d.r + 20; 
+                membranePoints.push([d.x + Math.cos(angle)*r, d.y + Math.sin(angle)*r]);
+            }
+        });
+        const hull = d3.polygonHull(membranePoints);
+        if(hull) {
+            membraneLayer.append("path")
+                .attr("class", "membrane-outline")
+                .attr("d", d3.line().curve(d3.curveBasisClosed)(hull));
+        }
+
+        // Odalar
+        const roomGroups = roomLayer.selectAll("g")
+            .data(nodes).enter().append("g")
+            .attr("transform", d => `translate(${d.x}, ${d.y})`);
+
+        roomGroups.append("path")
+            .attr("class", d => {
+                if(d.type === 'root') return "room-shape hub";
+                if(d.type === 'hub') return "room-shape hub";
+                if(d.type === 'sub-hub') return "room-shape sub-hub";
+                return "room-shape";
+            })
+            .attr("d", d => d.pathData)
+            .attr("fill", d => d.color)
+            .style("opacity", "0.25");
+
+        // Etiketler
+        const labels = labelLayer.selectAll("text")
+            .data(nodes).enter().append("text")
+            .attr("class", d => {
+                if(d.type === 'root') return "label-main";
+                if(d.type === 'hub' || d.type === 'sub-hub') return "label-hub";
+                return "label-room";
+            })
+            .attr("x", d => d.x)
+            .attr("y", d => d.y)
+            .text(d => d.id === 'LOBBY' ? "LOBBY" : d.id);
+
+    </script>
+</body>
+</html>
