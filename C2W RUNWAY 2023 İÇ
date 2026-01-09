@@ -1,0 +1,735 @@
+"C2W Runway": [
+   {
+        id: 'rec-1',
+        type: 'video',
+        name: 'c2w Runway Ticket Art work.mp4',
+        url: 'https://video.wixstatic.com/video/54a996_008a92463e2c490bae5c5176ccd0fa13/1080p/mp4/file.mp4',
+        description: 'The C2W Metaverse Runway event ticket artwork.',
+        created: '11/23',
+        minted: '11/23',
+        medium: 'video',
+        dimensions: '1920x1080',
+        size: '15 MB',
+        tags: ['event', 'experience', 'metaverse'],
+        links: []
+    },
+    {
+        id: 'rec-2',
+        type: 'folder',
+        name: 'VRM Avatars',
+        folderKey: 'c2w.vrm', // -> Aşağıdaki "c2w.vrm" dizisine bağlanır
+        created: 'Monday, September 3, 2024 at 4:38 PM',
+        size: '1.2 GB',
+        links: []
+    },
+    {
+        id: 'rec-3',
+        type: 'folder',
+        name: 'C2W Collection Media',
+        folderKey: 'c2w.media', // -> Aşağıdaki "c2w.media" dizisine bağlanır
+        created: 'Monday, September 3, 2024 at 4:38 PM',
+        size: '1.2 GB',
+        links: []
+    },
+    {
+        id: 'rec-4',
+        type: 'folder',
+        name: 'polaroid shots',
+        folderKey: 'polaroid', // -> Aşağıdaki "polaroid" dizisine bağlanır
+        created: 'Monday, September 3, 2024 at 4:38 PM',
+        size: '1.2 GB',
+        links: []
+    },
+    {
+        id: 'rec-5',
+        type: 'html',
+        name: 'model viewer, vertical catwalk.html',
+        url: 'https://raw.githubusercontent.com/decentralize-dfw/finder/main/c2w-viewer2.html',
+        description: 'C2W2 Runway 2025.',
+        created: 'from 06/2024',
+        minted: '24/10/2025',
+        medium: 'HTML Document',
+        dimensions: 'N/A',
+        size: '12 KB',
+        tags: ['web', 'metaverse', 'fashion'],
+        links: []
+    },
+    {
+        id: 'rec-6',
+        type: 'text',
+        name: 'c2w manifesto.txt',
+        content: 'The C2W Metaverse Runway took place on November 9, 2023...', // (İçerik kısaltıldı)
+        description: 'Proje ile ilgili temel notlar.',
+        created: 'Today, 10:05 AM',
+        minted: 'Today, 10:05 AM',
+        medium: 'Text Document',
+        dimensions: 'N/A',
+        size: '1 KB',
+        tags: ['text', 'notes'],
+        links: []
+    },
+    {
+        id: 'rec-7',
+        type: 'html',
+        name: 'sync walking.html',
+        url: 'https://raw.githubusercontent.com/decentralize-dfw/finder/main/3dopen-c2w-v2.html',
+        description: 'C2W2 Runway 2025.',
+        created: 'from 06/2024',
+        minted: '24/10/2025',
+        medium: 'HTML Document',
+        dimensions: 'N/A',
+        size: '12 KB',
+        tags: ['web', 'metaverse', 'fashion'],
+        links: []
+    },
+    {
+        id: 'rec-8',
+        type: 'html',
+        name: 'webpage.html',
+        url: 'https://raw.githubusercontent.com/decentralize-dfw/finder/main/c2wrunway.html',
+        description: 'C2W2 Runway 2025.',
+        created: 'from 06/2024',
+        minted: '24/10/2025',
+        medium: 'HTML Document',
+        dimensions: 'N/A',
+        size: '12 KB',
+        tags: ['web', 'metaverse', 'fashion'],
+        links: []
+    },
+    {
+        id: 'rec-9',
+        type: 'link',
+        name: 'C2W RUNWAY[NEWTAB]',
+        iconUrl: 'https://static.wixstatic.com/media/54a996_47b0c01fb7404427ade7405c73862623~mv2.jpg',
+        url: 'https://hyperfy.io/c2w',
+        description: 'First Runway, Hyperfy, 2023',
+        created: '2023',
+        minted: 'N/A',
+        medium: 'External Link',
+        dimensions: 'N/A',
+        size: '0 KB',
+        tags: ['web', 'site', 'dfw'],
+        links: [{ url: 'https://hyperfy.io/c2w', name: 'Hyperfy' }]
+    }
+],
+
+"c2w.vrm": [ //recents - c2w avatar files VRM
+                 
+{
+id: 'pf3-c2w-1',
+type: 'vrm',
+name: 'x1b4lb4',
+url: 'https://ipfs.filebase.io/ipfs/QmW6LuNKusV6NmMMvqhVQeRSo32YiuXJJeybubPqaWbcmt.vrm',
+description: '#C2W (Click-To-Wear) is a VRM avatars collection, and 16 of them will be available to mint as a first drop, after a virtual catwalk on 9th November 2023. The collection is designed for during VCA x Draup Virtual Fashion Residency, exhibited at the Royal Institution for New Codes event by Mad Global, and acclaimed with RedDAO\'s Digital Fashion 1st prize with the member votes.',
+created: '11/23',
+minted: '11/23',
+medium: 'PNG Image',
+dimensions: '1440x1920',
+size: '-',
+tags: ['avatar', 'vrm', 'fashion'],
+links: [{ url: 'https://opensea.io/item/ethereum/0xdd0df57dbbf9dc804e778fd907e5a7f5d3051d60/1', name: 'Opensea' }]
+},
+{
+id: 'pf3-c2w-2',
+type: 'vrm',
+name: 'red xermes',
+url: 'https://ipfs.filebase.io/ipfs/QmQh1naRtQVYcobMoeeS9fzftKraRsqXjqgMB5ccKYNBE8.vrm',
+description: '#C2W (Click-To-Wear) is a VRM avatars collection, and 16 of them will be available to mint as a first drop, after a virtual catwalk on 9th November 2023. The collection is designed for during VCA x Draup Virtual Fashion Residency, exhibited at the Royal Institution for New Codes event by Mad Global, and acclaimed with RedDAO\'s Digital Fashion 1st prize with the member votes.',
+created: '11/23',
+minted: '11/23',
+medium: 'PNG Image',
+dimensions: '1440x1920',
+size: '-',
+tags: ['avatar', 'vrm', 'fashion'],
+links: [{ url: 'https://opensea.io/item/ethereum/0xdd0df57dbbf9dc804e778fd907e5a7f5d3051d60/2', name: 'Opensea' }]
+},
+{
+id: 'pf3-c2w-3',
+type: 'vrm',
+name: 'sinister',
+url: 'https://ipfs.filebase.io/ipfs/QmYi43GMi9ZD8yPYVGy45zq9QCibLNpsmaN2apwSTCKq1g.vrm',
+description: '#C2W (Click-To-Wear) is a VRM avatars collection, and 16 of them will be available to mint as a first drop, after a virtual catwalk on 9th November 2023. The collection is designed for during VCA x Draup Virtual Fashion Residency, exhibited at the Royal Institution for New Codes event by Mad Global, and acclaimed with RedDAO\'s Digital Fashion 1st prize with the member votes.',
+created: '11/23',
+minted: '11/23',
+medium: 'PNG Image',
+dimensions: '1440x1920',
+size: '-',
+tags: ['avatar', 'vrm', 'fashion'],
+links: [{ url: 'https://opensea.io/item/ethereum/0xdd0df57dbbf9dc804e778fd907e5a7f5d3051d60/3', name: 'Opensea' }]
+},
+{
+id: 'pf3-c2w-4',
+type: 'vrm',
+name: '0xthello albino',
+url: 'https://ipfs.filebase.io/ipfs/QmahNTydLma9dGhVdKRNRXvFFjPVT6ms8PFa44eg8XeP9e.vrm',
+description: '#C2W (Click-To-Wear) is a VRM avatars collection, and 16 of them will be available to mint as a first drop, after a virtual catwalk on 9th November 2023. The collection is designed for during VCA x Draup Virtual Fashion Residency, exhibited at the Royal Institution for New Codes event by Mad Global, and acclaimed with RedDAO\'s Digital Fashion 1st prize with the member votes.',
+created: '11/23',
+minted: '11/23',
+medium: 'PNG Image',
+dimensions: '1440x1920',
+size: '-',
+tags: ['avatar', 'vrm', 'fashion'],
+links: [{ url: 'https://opensea.io/item/ethereum/0xdd0df57dbbf9dc804e778fd907e5a7f5d3051d60/4', name: 'Opensea' }]
+},
+{
+id: 'pf3-c2w-5',
+type: 'vrm',
+name: 'glixeir',
+url: 'https://ipfs.filebase.io/ipfs/QmbtThd7ZiH9W8evDsq5MCzRYsY4cdR4e7ThyKi9RzTubr.vrm',
+description: '#C2W (Click-To-Wear) is a VRM avatars collection, and 16 of them will be available to mint as a first drop, after a virtual catwalk on 9th November 2023. The collection is designed for during VCA x Draup Virtual Fashion Residency, exhibited at the Royal Institution for New Codes event by Mad Global, and acclaimed with RedDAO\'s Digital Fashion 1st prize with the member votes.',
+created: '11/23',
+minted: '11/23',
+medium: 'PNG Image',
+dimensions: '1440x1920',
+size: '-',
+tags: ['avatar', 'vrm', 'fashion'],
+links: [{ url: 'https://opensea.io/item/ethereum/0xdd0df57dbbf9dc804e778fd907e5a7f5d3051d60/5', name: 'Opensea' }]
+},
+{
+id: 'pf3-c2w-6',
+type: 'vrm',
+name: 'dogtooth venom',
+url: 'https://ipfs.filebase.io/ipfs/Qmaa6zN1SNDuQUs4wja9bVRsFTMBHqzZcfZJwqNPwYSXCp.vrm',
+description: '#C2W (Click-To-Wear) is a VRM avatars collection, and 16 of them will be available to mint as a first drop, after a virtual catwalk on 9th November 2023. The collection is designed for during VCA x Draup Virtual Fashion Residency, exhibited at the Royal Institution for New Codes event by Mad Global, and acclaimed with RedDAO\'s Digital Fashion 1st prize with the member votes.',
+created: '11/23',
+minted: '11/23',
+medium: 'PNG Image',
+dimensions: '1440x1920',
+size: '-',
+tags: ['avatar', 'vrm', 'fashion'],
+links: [{ url: 'https://opensea.io/item/ethereum/0xdd0df57dbbf9dc804e778fd907e5a7f5d3051d60/6', name: 'Opensea' }]
+},
+{
+id: 'pf3-c2w-7',
+type: 'vrm',
+name: 'yes playable character',
+url: 'https://ipfs.filebase.io/ipfs/QmXAdu3aQWG3wLG5iPz5w1WPZKWNG7iTCSnrDDFK97sJck.vrm',
+description: '#C2W (Click-To-Wear) is a VRM avatars collection, and 16 of them will be available to mint as a first drop, after a virtual catwalk on 9th November 2023. The collection is designed for during VCA x Draup Virtual Fashion Residency, exhibited at the Royal Institution for New Codes event by Mad Global, and acclaimed with RedDAO\'s Digital Fashion 1st prize with the member votes.',
+created: '11/23',
+minted: '11/23',
+medium: 'PNG Image',
+dimensions: '1440x1920',
+size: '-',
+tags: ['avatar', 'vrm', 'fashion'],
+links: [{ url: 'https://opensea.io/item/ethereum/0xdd0df57dbbf9dc804e778fd907e5a7f5d3051d60/7', name: 'Opensea' }]
+},
+{
+id: 'pf3-c2w-8',
+type: 'vrm',
+name: 'GX.FUP3',
+url: 'https://ipfs.filebase.io/ipfs/QmZZaHek7bmnZBM5ngS6LAiUjbRpsG3wUSbiiueFCUH5Va.vrm',
+description: '#C2W (Click-To-Wear) is a VRM avatars collection, and 16 of them will be available to mint as a first drop, after a virtual catwalk on 9th November 2023. The collection is designed for during VCA x Draup Virtual Fashion Residency, exhibited at the Royal Institution for New Codes event by Mad Global, and acclaimed with RedDAO\'s Digital Fashion 1st prize with the member votes.',
+created: '11/23',
+minted: '11/23',
+medium: 'PNG Image',
+dimensions: '1440x1920',
+size: '-',
+tags: ['avatar', 'vrm', 'fashion'],
+links: [{ url: 'https://opensea.io/item/ethereum/0xdd0df57dbbf9dc804e778fd907e5a7f5d3051d60/8', name: 'Opensea' }]
+},
+{
+id: 'pf3-c2w-9',
+type: 'vrm',
+name: 'xeus',
+url: 'https://ipfs.filebase.io/ipfs/QmNjN5bQYnm8G233bbaUdUaJVDZoLajYtoi6NKeZTybxKm.vrm',
+description: '#C2W (Click-To-Wear) is a VRM avatars collection, and 16 of them will be available to mint as a first drop, after a virtual catwalk on 9th November 2023. The collection is designed for during VCA x Draup Virtual Fashion Residency, exhibited at the Royal Institution for New Codes event by Mad Global, and acclaimed with RedDAO\'s Digital Fashion 1st prize with the member votes.',
+created: '11/23',
+minted: '11/23',
+medium: 'PNG Image',
+dimensions: '1440x1920',
+size: '-',
+tags: ['avatar', 'vrm', 'fashion'],
+links: [{ url: 'https://opensea.io/item/ethereum/0xdd0df57dbbf9dc804e778fd907e5a7f5d3051d60/9', name: 'Opensea' }]
+},
+{
+id: 'pf3-c2w-10',
+type: 'vrm',
+name: 'gray daisy butterfly',
+url: 'https://ipfs.filebase.io/ipfs/QmQCTcLRgiwapdPWwfLf6KYMEfqCbCbEURGp26HBnm1LUq.vrm',
+description: '#C2W (Click-To-Wear) is a VRM avatars collection, and 16 of them will be available to mint as a first drop, after a virtual catwalk on 9th November 2023. The collection is designed for during VCA x Draup Virtual Fashion Residency, exhibited at the Royal Institution for New Codes event by Mad Global, and acclaimed with RedDAO\'s Digital Fashion 1st prize with the member votes.',
+created: '11/23',
+minted: '11/23',
+medium: 'PNG Image',
+dimensions: '1440x1920',
+size: '-',
+tags: ['avatar', 'vrm', 'fashion'],
+links: [{ url: 'https://opensea.io/item/ethereum/0xdd0df57dbbf9dc804e778fd907e5a7f5d3051d60/10', name: 'Opensea' }]
+},
+{
+id: 'pf3-c2w-11',
+type: 'vrm',
+name: 'xvptos',
+url: 'https://ipfs.filebase.io/ipfs/QmcxJf2GHfHjyReNFsKq4FEHjB4goiJ6nLnyN2MJVWUDjr.vrm',
+description: '#C2W (Click-To-Wear) is a VRM avatars collection, and 16 of them will be available to mint as a first drop, after a virtual catwalk on 9th November 2023. The collection is designed for during VCA x Draup Virtual Fashion Residency, exhibited at the Royal Institution for New Codes event by Mad Global, and acclaimed with RedDAO\'s Digital Fashion 1st prize with the member votes.',
+created: '11/23',
+minted: '11/23',
+medium: 'PNG Image',
+dimensions: '1440x1920',
+size: '-',
+tags: ['avatar', 'vrm', 'fashion'],
+links: [{ url: 'https://opensea.io/item/ethereum/0xdd0df57dbbf9dc804e778fd907e5a7f5d3051d60/11', name: 'Opensea' }]
+},
+{
+id: 'pf3-c2w-12',
+type: 'vrm',
+name: 'muzzy redev',
+url: 'https://ipfs.filebase.io/ipfs/QmQV41KVe8FSLREUB6n7g2NnU1wyCWPbbVMb3kPBGXUGUa.vrm',
+description: '#C2W (Click-To-Wear) is a VRM avatars collection, and 16 of them will be available to mint as a first drop, after a virtual catwalk on 9th November 2023. The collection is designed for during VCA x Draup Virtual Fashion Residency, exhibited at the Royal Institution for New Codes event by Mad Global, and acclaimed with RedDAO\'s Digital Fashion 1st prize with the member votes.',
+created: '11/23',
+minted: '11/23',
+medium: 'PNG Image',
+dimensions: '1440x1920',
+size: '-',
+tags: ['avatar', 'vrm', 'fashion'],
+links: [{ url: 'https://opensea.io/item/ethereum/0xdd0df57dbbf9dc804e778fd907e5a7f5d3051d60/12', name: 'Opensea' }]
+},
+{
+id: 'pf3-c2w-13',
+type: 'vrm',
+name: 'muzzy the 2nd, grid',
+url: 'https://ipfs.filebase.io/ipfs/QmctAp396TfTyD8WBRGNAa3DeEy8oqJDKgMUtn18zahh62.vrm',
+description: '#C2W (Click-To-Wear) is a VRM avatars collection, and 16 of them will be available to mint as a first drop, after a virtual catwalk on 9th November 2023. The collection is designed for during VCA x Draup Virtual Fashion Residency, exhibited at the Royal Institution for New Codes event by Mad Global, and acclaimed with RedDAO\'s Digital Fashion 1st prize with the member votes.',
+created: '11/23',
+minted: '11/23',
+medium: 'PNG Image',
+dimensions: '1440x1920',
+size: '-',
+tags: ['avatar', 'vrm', 'fashion'],
+links: [{ url: 'https://opensea.io/item/ethereum/0xdd0df57dbbf9dc804e778fd907e5a7f5d3051d60/13', name: 'Opensea' }]
+},
+{
+id: 'pf3-c2w-14',
+type: 'vrm',
+name: 'when the darkness surrounds',
+url: 'https://ipfs.filebase.io/ipfs/QmSG9ap2EkFnJKtfrzKsdcN4L4eKBKxcDKXn3VXDB6u9S6.vrm',
+description: '#C2W (Click-To-Wear) is a VRM avatars collection, and 16 of them will be available to mint as a first drop, after a virtual catwalk on 9th November 2023. The collection is designed for during VCA x Draup Virtual Fashion Residency, exhibited at the Royal Institution for New Codes event by Mad Global, and acclaimed with RedDAO\'s Digital Fashion 1st prize with the member votes.',
+created: '11/23',
+minted: '11/23',
+medium: 'PNG Image',
+dimensions: '1440x1920',
+size: '-',
+tags: ['avatar', 'vrm', 'fashion'],
+links: [{ url: 'https://opensea.io/item/ethereum/0xdd0df57dbbf9dc804e778fd907e5a7f5d3051d60/14', name: 'Opensea' }]
+},
+{
+id: 'pf3-c2w-15',
+type: 'vrm',
+name: 'void black',
+url: 'https://ipfs.filebase.io/ipfs/QmWTzJErwpdhbnkWWtYwJjic4rg5qrtzLV3hVQym4gMMP2.vrm',
+description: '#C2W (Click-To-Wear) is a VRM avatars collection, and 16 of them will be available to mint as a first drop, after a virtual catwalk on 9th November 2023. The collection is designed for during VCA x Draup Virtual Fashion Residency, exhibited at the Royal Institution for New Codes event by Mad Global, and acclaimed with RedDAO\'s Digital Fashion 1st prize with the member votes.',
+created: '11/23',
+minted: '11/23',
+medium: 'PNG Image',
+dimensions: '1440x1920',
+size: '-',
+tags: ['avatar', 'vrm', 'fashion'],
+links: [{ url: 'https://opensea.io/item/ethereum/0xdd0df57dbbf9dc804e778fd907e5a7f5d3051d60/15', name: 'Opensea' }]
+},
+{
+id: 'pf3-c2w-16',
+type: 'vrm',
+name: 'hunna mein',
+url: 'https://ipfs.filebase.io/ipfs/QmQgn8x4kRRxEGdgcKNzcfZwCcGobRwX9wp1G6Z3kT7yrY.vrm',
+description: '#C2W (Click-To-Wear) is a VRM avatars collection, and 16 of them will be available to mint as a first drop, after a virtual catwalk on 9th November 2023. The collection is designed for during VCA x Draup Virtual Fashion Residency, exhibited at the Royal Institution for New Codes event by Mad Global, and acclaimed with RedDAO\'s Digital Fashion 1st prize with the member votes.',
+created: '11/23',
+minted: '11/23',
+medium: 'PNG Image',
+dimensions: '1440x1920',
+size: '-',
+tags: ['avatar', 'vrm', 'fashion'],
+links: [{ url: 'https://opensea.io/item/ethereum/0xdd0df57dbbf9dc804e778fd907e5a7f5d3051d60/16', name: 'Opensea' }]
+}
+
+
+            ],
+
+             "c2w.media": [ //recents - c2w - colelciton media
+                 
+  {
+    id: 2,
+    type: 'video',
+    name: 'Click-to-B Hyperfy Video Clip @ Retail_v4, C2W',
+    url: 'https://video.wixstatic.com/video/54a996_21a2c46e200b4c8d872f84bc1ae72f48/1080p/mp4/file.mp4',
+    description: 'The C2W Metaverse Runway event, held on 9.11.23 and was accessible through a $20 ticket purchased between 1-2.11.23 following the Digital Fashion Showcase at New Codes in London by VCA x Draup, showcased a distinctive digital fashion collection. This event provided attendees with an immersive virtual fashion show experience directly from their browsers without the need for downloads, marking a significant step in exploring and redefining personal expression in digital realms. Alongside their ticket, attendees received a complimentary avatar, The Viewer, which they showcased during this token-gated event. The show is available for free to anyone now.',
+    created: '11/23',
+    minted: '11/23',
+    medium: 'video',
+    dimensions: '-',
+size: '-',
+tags: ['event', 'experience', 'metaverse'],
+links: []
+  },
+  {
+    id: 48,
+    type: 'video',
+    name: 'C2W New Codes Exhibition',
+    url: 'https://video.wixstatic.com/video/54a996_0232a6790a7647ef862d91e3f8e7a223/1080p/mp4/file.mp4',
+    description: 'The C2W Metaverse Runway event, held on 9.11.23 and was accessible through a $20 ticket purchased between 1-2.11.23 following the Digital Fashion Showcase at New Codes in London by VCA x Draup, showcased a distinctive digital fashion collection. This event provided attendees with an immersive virtual fashion show experience directly from their browsers without the need for downloads, marking a significant step in exploring and redefining personal expression in digital realms. Alongside their ticket, attendees received a complimentary avatar, The Viewer, which they showcased during this token-gated event. The show is available for free to anyone now.',
+    created: '11/23',
+    minted: '11/23',
+    medium: 'video',
+    dimensions: '-',
+size: '-',
+tags: ['event', 'experience', 'metaverse'],
+links: []
+  },
+  {
+    id: 34,
+    type: 'video',
+    name: 'Afterparty',
+    url: 'https://video.wixstatic.com/video/54a996_b120f236c9854ed1a890426666252145/1080p/mp4/file.mp4',
+    description: 'Designed as an afterparty venue to enjoy after the runway show, where models party with the attendees, and there are click-to-wearable options instantly.',
+    created: '11/23',
+    minted: '11/23',
+    medium: 'video',
+    dimensions: '-',
+size: '-',
+tags: ['event', 'experience', 'metaverse'],
+links: []
+  },
+  {
+    id: 47,
+    type: 'video',
+    name: 'C2W Collection Promo 1',
+    url: 'https://video.wixstatic.com/video/54a996_ec462c493fd541a6801a7b1e1ccd59fb/1080p/mp4/file.mp4',
+    description: 'The C2W Metaverse Runway event, held on 9.11.23 and was accessible through a $20 ticket purchased between 1-2.11.23 following the Digital Fashion Showcase at New Codes in London by VCA x Draup, showcased a distinctive digital fashion collection. This event provided attendees with an immersive virtual fashion show experience directly from their browsers without the need for downloads, marking a significant step in exploring and redefining personal expression in digital realms. Alongside their ticket, attendees received a complimentary avatar, The Viewer, which they showcased during this token-gated event. The show is available for free to anyone now.',
+    created: '11/23',
+    minted: '11/23',
+    medium: 'video',
+    dimensions: '-',
+size: '-',
+tags: ['event', 'experience', 'metaverse'],
+links: []
+  },
+  {
+    id: 50,
+    type: 'video',
+    name: 'C2W Polaroid Shots',
+    url: 'https://video.wixstatic.com/video/54a996_06faa3498bf146b5aa739b4c1012aadd/1080p/mp4/file.mp4',
+    description: 'The C2W Metaverse Runway event, held on 9.11.23 and was accessible through a $20 ticket purchased between 1-2.11.23 following the Digital Fashion Showcase at New Codes in London by VCA x Draup, showcased a distinctive digital fashion collection. This event provided attendees with an immersive virtual fashion show experience directly from their browsers without the need for downloads, marking a significant step in exploring and redefining personal expression in digital realms. Alongside their ticket, attendees received a complimentary avatar, The Viewer, which they showcased during this token-gated event. The show is available for free to anyone now.',
+    created: '11/23',
+    minted: '11/23',
+    medium: 'video',
+    dimensions: '-',
+size: '-',
+tags: ['event', 'experience', 'metaverse'],
+links: []
+  },
+  {
+    id: 51,
+    type: 'video',
+    name: 'CYNNX Live Recording of C2W Event',
+    url: 'https://www.youtube.com/embed/Ougtz4jod9c?t=1112s',
+    description: 'The C2W Metaverse Runway event, held on 9.11.23 and was accessible through a $20 ticket purchased between 1-2.11.23 following the Digital Fashion Showcase at New Codes in London by VCA x Draup, showcased a distinctive digital fashion collection. This event provided attendees with an immersive virtual fashion show experience directly from their browsers without the need for downloads, marking a significant step in exploring and redefining personal expression in digital realms. Alongside their ticket, attendees received a complimentary avatar, The Viewer, which they showcased during this token-gated event. The show is available for free to anyone now.',
+    created: '11/23',
+    minted: '11/23',
+    medium: 'video',
+    dimensions: '-',
+size: '-',
+tags: ['event', 'experience', 'metaverse'],
+links: []
+  },
+  {
+    id: 52,
+    type: 'video',
+    name: 'C2W, Afterparty Recording Voxvienne',
+    url: 'https://video.wixstatic.com/video/54a996_99bf250049af451596a557301c399b48/1080p/mp4/file.mp4',
+    description: 'Designed as an afterparty venue to enjoy after the runway show, where models party with the attendees, and there are click-to-wearable options instantly.',
+    created: '11/23',
+    minted: '11/23',
+    medium: 'video',
+    dimensions: '-',
+size: '-',
+tags: ['event', 'experience', 'metaverse'],
+links: []
+  },
+  {
+    id: 74,
+    type: 'video',
+    name: 'c2w event -promo 5',
+    url: 'https://video.wixstatic.com/video/54a996_da9bac51d12f425182b687f06b6452a5/1080p/mp4/file.mp4',
+    description: 'The C2W Metaverse Runway event, held on 9.11.23 and was accessible through a $20 ticket purchased between 1-2.11.23 following the Digital Fashion Showcase at New Codes in London by VCA x Draup, showcased a distinctive digital fashion collection. This event provided attendees with an immersive virtual fashion show experience directly from their browsers without the need for downloads, marking a significant step in exploring and redefining personal expression in digital realms. Alongside their ticket, attendees received a complimentary avatar, The Viewer, which they showcased during this token-gated event. The show is available for free to anyone now.',
+    created: '11/23',
+    minted: '11/23',
+    medium: 'video',
+  dimensions: '-',
+size: '-',
+tags: ['event', 'experience', 'metaverse'],
+links: []
+},
+  {
+    id: 77,
+    type: 'video',
+    name: 'retail biggie song',
+    url: 'https://video.wixstatic.com/video/54a996_2b529cb35fda488f8486f0a11871ee5c/1080p/mp4/file.mp4',
+    description: 'AI-generated Notorious BIG song about C2W collection, its retail space, and other cloudy thoughts.',
+    created: '11/23',
+    minted: '11/23',
+    medium: 'video',
+    dimensions: '-',
+size: '-',
+tags: ['event', 'experience', 'metaverse'],
+links: []
+  }
+
+
+            ],
+
+ "polaroid": [ //c2w polaroid shots
+                {
+id: 'pf5-polaroid-1',
+type: 'image',
+name: 'x1b4lb4',
+url: 'https://arweave.net/SSBx3mIlnoEEJlB4QAC6qGpLjUAsDwxboyRA1a2yWhk',
+description: '#C2W (Click-To-Wear) is a VRM avatars collection, and 16 of them will be available to mint as a first drop, after a virtual catwalk on 9th November 2023. The collection is designed for during VCA x Draup Virtual Fashion Residency, exhibited at the Royal Institution for New Codes event by Mad Global, and acclaimed with RedDAO\'s Digital Fashion 1st prize with the member votes.',
+created: '11/23',
+minted: '11/23',
+medium: 'PNG Image',
+dimensions: '1440x1920',
+size: '-',
+tags: ['avatar', 'vrm', 'fashion'],
+links: [
+  { url: 'https://opensea.io/item/ethereum/0xdd0df57dbbf9dc804e778fd907e5a7f5d3051d60/1', name: 'Opensea' }
+]
+},
+{
+id: 'pf5-polaroid-2',
+type: 'image',
+name: 'red xermes',
+url: 'https://arweave.net/eAt9tEDG-U1HUNDAHFUIs26bdLsUyf4-Mx_aq1ifPDY',
+description: '#C2W (Click-To-Wear) is a VRM avatars collection, and 16 of them will be available to mint as a first drop, after a virtual catwalk on 9th November 2023. The collection is designed for during VCA x Draup Virtual Fashion Residency, exhibited at the Royal Institution for New Codes event by Mad Global, and acclaimed with RedDAO\'s Digital Fashion 1st prize with the member votes.',
+created: '11/23',
+minted: '11/23',
+medium: 'PNG Image',
+dimensions: '1440x1920',
+size: '-',
+tags: ['avatar', 'vrm', 'fashion'],
+links: [
+  { url: 'https://opensea.io/item/ethereum/0xdd0df57dbbf9dc804e778fd907e5a7f5d3051d60/2', name: 'Opensea' }
+]
+},
+{
+id: 'pf5-polaroid-3',
+type: 'image',
+name: 'sinister',
+url: 'https://arweave.net/94yXwO9YU3Fms3124c9BdoB6GDAt9U_ehTEh5atFg64',
+description: '#C2W (Click-To-Wear) is a VRM avatars collection, and 16 of them will be available to mint as a first drop, after a virtual catwalk on 9th November 2023. The collection is designed for during VCA x Draup Virtual Fashion Residency, exhibited at the Royal Institution for New Codes event by Mad Global, and acclaimed with RedDAO\'s Digital Fashion 1st prize with the member votes.',
+created: '11/23',
+minted: '11/23',
+medium: 'PNG Image',
+dimensions: '1440x1920',
+size: '-',
+tags: ['avatar', 'vrm', 'fashion'],
+links: [
+  { url: 'https://opensea.io/item/ethereum/0xdd0df57dbbf9dc804e778fd907e5a7f5d3051d60/3', name: 'Opensea' }
+]
+},
+{
+id: 'pf5-polaroid-4',
+type: 'image',
+name: '0xthello albino',
+url: 'https://arweave.net/omFfyAbp-xXbJsvPwjdVLVgLVTeKjfreOdomVgW1aYo',
+description: '#C2W (Click-To-Wear) is a VRM avatars collection, and 16 of them will be available to mint as a first drop, after a virtual catwalk on 9th November 2023. The collection is designed for during VCA x Draup Virtual Fashion Residency, exhibited at the Royal Institution for New Codes event by Mad Global, and acclaimed with RedDAO\'s Digital Fashion 1st prize with the member votes.',
+created: '11/23',
+minted: '11/23',
+medium: 'PNG Image',
+dimensions: '1440x1920',
+size: '-',
+tags: ['avatar', 'vrm', 'fashion'],
+links: [
+  { url: 'https://opensea.io/item/ethereum/0xdd0df57dbbf9dc804e778fd907e5a7f5d3051d60/4', name: 'Opensea' }
+]
+},
+{
+id: 'pf5-polaroid-5',
+type: 'image',
+name: 'glixeir',
+url: 'https://arweave.net/7MgrGHVz2TATrHkxf80cmAP1KDtuqFF78Umc-1OQ9JU',
+description: '#C2W (Click-To-Wear) is a VRM avatars collection, and 16 of them will be available to mint as a first drop, after a virtual catwalk on 9th November 2023. The collection is designed for during VCA x Draup Virtual Fashion Residency, exhibited at the Royal Institution for New Codes event by Mad Global, and acclaimed with RedDAO\'s Digital Fashion 1st prize with the member votes.',
+created: '11/23',
+minted: '11/23',
+medium: 'PNG Image',
+dimensions: '1440x1920',
+size: '-',
+tags: ['avatar', 'vrm', 'fashion'],
+links: [
+  { url: 'https://opensea.io/item/ethereum/0xdd0df57dbbf9dc804e778fd907e5a7f5d3051d60/5', name: 'Opensea' }
+]
+},
+{
+id: 'pf5-polaroid-6',
+type: 'image',
+name: 'dogtooth venom',
+url: 'https://arweave.net/Y2fSExSlZzHv2HNhFZ7VOSEfRqAgLFtGXu4sT75ey2U',
+description: '#C2W (Click-To-Wear) is a VRM avatars collection, and 16 of them will be available to mint as a first drop, after a virtual catwalk on 9th November 2023. The collection is designed for during VCA x Draup Virtual Fashion Residency, exhibited at the Royal Institution for New Codes event by Mad Global, and acclaimed with RedDAO\'s Digital Fashion 1st prize with the member votes.',
+created: '11/23',
+minted: '11/23',
+medium: 'PNG Image',
+dimensions: '1440x1920',
+size: '-',
+tags: ['avatar', 'vrm', 'fashion'],
+links: [
+  { url: 'https://opensea.io/item/ethereum/0xdd0df57dbbf9dc804e778fd907e5a7f5d3051d60/6', name: 'Opensea' }
+]
+},
+{
+id: 'pf5-polaroid-7',
+type: 'image',
+name: 'yes playable character',
+url: 'https://arweave.net/Rzjp209HuMMA5dRlQ1DA6MSJg1i59-lHtGavB1v3pHM',
+description: '#C2W (Click-To-Wear) is a VRM avatars collection, and 16 of them will be available to mint as a first drop, after a virtual catwalk on 9th November 2023. The collection is designed for during VCA x Draup Virtual Fashion Residency, exhibited at the Royal Institution for New Codes event by Mad Global, and acclaimed with RedDAO\'s Digital Fashion 1st prize with the member votes.',
+created: '11/23',
+minted: '11/23',
+medium: 'PNG Image',
+dimensions: '1440x1920',
+size: '-',
+tags: ['avatar', 'vrm', 'fashion'],
+links: [
+  { url: 'https://opensea.io/item/ethereum/0xdd0df57dbbf9dc804e778fd907e5a7f5d3051d60/7', name: 'Opensea' }
+]
+},
+{
+id: 'pf5-polaroid-8',
+type: 'image',
+name: 'GX.FUP3',
+url: 'https://arweave.net/_HUkGdC9JHJv-qz12m-1YzfqoBvqWN90NYzOXDHuOP0',
+description: '#C2W (Click-To-Wear) is a VRM avatars collection, and 16 of them will be available to mint as a first drop, after a virtual catwalk on 9th November 2023. The collection is designed for during VCA x Draup Virtual Fashion Residency, exhibited at the Royal Institution for New Codes event by Mad Global, and acclaimed with RedDAO\'s Digital Fashion 1st prize with the member votes.',
+created: '11/23',
+minted: '11/23',
+medium: 'PNG Image',
+dimensions: '1440x1920',
+size: '-',
+tags: ['avatar', 'vrm', 'fashion'],
+links: [
+  { url: 'https://opensea.io/item/ethereum/0xdd0df57dbbf9dc804e778fd907e5a7f5d3051d60/8', name: 'Opensea' }
+]
+},
+{
+id: 'pf5-polaroid-9',
+type: 'image',
+name: 'xeus',
+url: 'https://arweave.net/Ns528wP0ZqRVSYbHmOfIhLu3Ar-PeveILvBlxOy1SbI',
+description: '#C2W (Click-To-Wear) is a VRM avatars collection, and 16 of them will be available to mint as a first drop, after a virtual catwalk on 9th November 2023. The collection is designed for during VCA x Draup Virtual Fashion Residency, exhibited at the Royal Institution for New Codes event by Mad Global, and acclaimed with RedDAO\'s Digital Fashion 1st prize with the member votes.',
+created: '11/23',
+minted: '11/23',
+medium: 'PNG Image',
+dimensions: '1440x1920',
+size: '-',
+tags: ['avatar', 'vrm', 'fashion'],
+links: [
+  { url: 'https://opensea.io/item/ethereum/0xdd0df57dbbf9dc804e778fd907e5a7f5d3051d60/9', name: 'Opensea' }
+]
+},
+{
+id: 'pf5-polaroid-10',
+type: 'image',
+name: 'gray daisy butterfly',
+url: 'https://arweave.net/1o1GTUtipP4Z5imnNAwYiP7pz4txhwgz3ONhOV-8EDs',
+description: '#C2W (Click-To-Wear) is a VRM avatars collection, and 16 of them will be available to mint as a first drop, after a virtual catwalk on 9th November 2023. The collection is designed for during VCA x Draup Virtual Fashion Residency, exhibited at the Royal Institution for New Codes event by Mad Global, and acclaimed with RedDAO\'s Digital Fashion 1st prize with the member votes.',
+created: '11/23',
+minted: '11/23',
+medium: 'PNG Image',
+dimensions: '1440x1920',
+size: '-',
+tags: ['avatar', 'vrm', 'fashion'],
+links: [
+  { url: 'https://opensea.io/item/ethereum/0xdd0df57dbbf9dc804e778fd907e5a7f5d3051d60/10', name: 'Opensea' }
+]
+},
+{
+id: 'pf5-polaroid-11',
+type: 'image',
+name: 'xvptos',
+url: 'https://arweave.net/Rf3qtKQuPf77zD4uMM97vALX0cCRz9eUR6Fb8RrWYQM',
+description: '#C2W (Click-To-Wear) is a VRM avatars collection, and 16 of them will be available to mint as a first drop, after a virtual catwalk on 9th November 2023. The collection is designed for during VCA x Draup Virtual Fashion Residency, exhibited at the Royal Institution for New Codes event by Mad Global, and acclaimed with RedDAO\'s Digital Fashion 1st prize with the member votes.',
+created: '11/23',
+minted: '11/23',
+medium: 'PNG Image',
+dimensions: '1440x1920',
+size: '-',
+tags: ['avatar', 'vrm', 'fashion'],
+links: [
+  { url: 'https://opensea.io/item/ethereum/0xdd0df57dbbf9dc804e778fd907e5a7f5d3051d60/11', name: 'Opensea' }
+]
+},
+{
+id: 'pf5-polaroid-12',
+type: 'image',
+name: 'muzzy redev',
+url: 'https://arweave.net/mtVypKdrJeN1uLzaNXRsfL6lguxPXCiOB-l2UsENq0g',
+description: '#C2W (Click-To-Wear) is a VRM avatars collection, and 16 of them will be available to mint as a first drop, after a virtual catwalk on 9th November 2023. The collection is designed for during VCA x Draup Virtual Fashion Residency, exhibited at the Royal Institution for New Codes event by Mad Global, and acclaimed with RedDAO\'s Digital Fashion 1st prize with the member votes.',
+created: '11/23',
+minted: '11/23',
+medium: 'PNG Image',
+dimensions: '1440x1920',
+size: '-',
+tags: ['avatar', 'vrm', 'fashion'],
+links: [
+  { url: 'https://opensea.io/item/ethereum/0xdd0df57dbbf9dc804e778fd907e5a7f5d3051d60/12', name: 'Opensea' }
+]
+},
+{
+id: 'pf5-polaroid-13',
+type: 'image',
+name: 'muzzy the 2nd, grid',
+url: 'https://arweave.net/KrIgSkSed9GraaHH8Jm4KJjM2Lwz4KIPt7YJa5ZBV6Y',
+description: '#C2W (Click-To-Wear) is a VRM avatars collection, and 16 of them will be available to mint as a first drop, after a virtual catwalk on 9th November 2023. The collection is designed for during VCA x Draup Virtual Fashion Residency, exhibited at the Royal Institution for New Codes event by Mad Global, and acclaimed with RedDAO\'s Digital Fashion 1st prize with the member votes.',
+created: '11/23',
+minted: '11/23',
+medium: 'PNG Image',
+dimensions: '1440x1920',
+size: '-',
+tags: ['avatar', 'vrm', 'fashion'],
+links: [
+  { url: 'https://opensea.io/item/ethereum/0xdd0df57dbbf9dc804e778fd907e5a7f5d3051d60/13', name: 'Opensea' }
+]
+},
+{
+id: 'pf5-polaroid-14',
+type: 'image',
+name: 'when the darkness surrounds',
+url: 'https://arweave.net/B7k2b-IuMf1_z6KLFvha-3ehz4TUb_u-gUGgCVnEzh0',
+description: '#C2W (Click-To-Wear) is a VRM avatars collection, and 16 of them will be available to mint as a first drop, after a virtual catwalk on 9th November 2023. The collection is designed for during VCA x Draup Virtual Fashion Residency, exhibited at the Royal Institution for New Codes event by Mad Global, and acclaimed with RedDAO\'s Digital Fashion 1st prize with the member votes.',
+created: '11/23',
+minted: '11/23',
+medium: 'PNG Image',
+dimensions: '1440x1920',
+size: '-',
+tags: ['avatar', 'vrm', 'fashion'],
+links: [
+  { url: 'https://opensea.io/item/ethereum/0xdd0df57dbbf9dc804e778fd907e5a7f5d3051d60/14', name: 'Opensea' }
+]
+},
+{
+id: 'pf5-polaroid-15',
+type: 'image',
+name: 'void black',
+url: 'https://arweave.net/Yp2hDS7xQKwArTIKP0i6xdmYKjm2k4oqDRAa4UCj5Qs',
+description: '#C2W (Click-To-Wear) is a VRM avatars collection, and 16 of them will be available to mint as a first drop, after a virtual catwalk on 9th November 2023. The collection is designed for during VCA x Draup Virtual Fashion Residency, exhibited at the Royal Institution for New Codes event by Mad Global, and acclaimed with RedDAO\'s Digital Fashion 1st prize with the member votes.',
+created: '11/23',
+minted: '11/23',
+medium: 'PNG Image',
+dimensions: '1440x1920',
+size: '-',
+tags: ['avatar', 'vrm', 'fashion'],
+links: [
+  { url: 'https://opensea.io/item/ethereum/0xdd0df57dbbf9dc804e778fd907e5a7f5d3051d60/15', name: 'Opensea' }
+]
+} ,
+{
+id: 'pf5-polaroid-16',
+type: 'image',
+name: 'hunna mein',
+url: 'https://arweave.net/IRa9294KWUR-jBBlwV3-H86CBw3O4-jy2ZXRJ3V5dDE',
+description: '#C2W (Click-To-Wear) is a VRM avatars collection, and 16 of them will be available to mint as a first drop, after a virtual catwalk on 9th November 2023. The collection is designed for during VCA x Draup Virtual Fashion Residency, exhibited at the Royal Institution for New Codes event by Mad Global, and acclaimed with RedDAO\'s Digital Fashion 1st prize with the member votes.',
+created: '11/23',
+minted: '11/23',
+medium: 'PNG Image',
+dimensions: '1440x1920',
+size: '-',
+tags: ['avatar', 'vrm', 'fashion'],
+links: [
+  { url: 'https://opensea.io/item/ethereum/0xdd0df57dbbf9dc804e778fd907e5a7f5d3051d60/16', name: 'Opensea' }
+]
+}
+            ],
