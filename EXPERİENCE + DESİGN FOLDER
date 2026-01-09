@@ -75,3 +75,65 @@
                 }
             ],
 
+"Gallery": [
+    {
+        id: 'gal-1',
+        type: 'folder',
+        name: 'Scaffold',
+        folderKey: 'Scaffold', // -> Scaffold içeriğine gider
+        description: '3D Architectural Browser. Explore 50 digital topographies.',
+        created: '2025',
+        size: 'Multi',
+        links: []
+    },
+    {
+        id: 'gal-2',
+        type: 'folder',
+        name: 'Retail',
+        folderKey: 'Retail', // -> Retail içeriğine gider
+        description: '3D beings shop for c2w2.vrm.',
+        created: '2025',
+        size: 'Multi',
+        links: []
+    },
+    {
+        id: 'gal-3',
+        type: 'folder',
+        name: 'Neue² Dojo',
+        folderKey: 'Neue² Dojo', // -> Neue² Dojo içeriğine gider
+        description: 'Virtual Art Space & Gallery.',
+        created: '2023',
+        size: 'Multi',
+        links: []
+    },
+    {
+        id: 'gal-4',
+        type: 'folder',
+        name: 'Elements Store',
+        folderKey: 'Elements Store', // -> Elements Store içeriğine gider
+        description: 'Virtual Furniture Gallery for DFW Designs.',
+        created: '2025',
+        size: 'Multi',
+        links: []
+    },
+    {
+        id: 'gal-5',
+        type: 'folder',
+        name: 'Black City',
+        folderKey: 'Black City', // -> Black City içeriğine gider
+        description: 'Decentralized Virtual Roomscape & MOCA ROOMS.',
+        created: '2023',
+        size: 'Multi',
+        links: []
+    },
+    {
+        id: 'gal-6',
+        type: 'folder',
+        name: 'Forge',
+        folderKey: 'Forge', // -> Forge içeriğine gider
+        description: 'NoiseDAO World Design: Music and Art.',
+        created: '2025',
+        size: 'Multi',
+        links: []
+    }
+],
