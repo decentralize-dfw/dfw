@@ -6079,10 +6079,10 @@ function getIcon(item) {
             const scene = container?.querySelector('.circular-scene.active');
             if (!scene) return null;
 
-            // İç ve dış çember yarıçaplarını sahneden alalım
-            const innerItems = scene.querySelectorAll('[data-circle="inner"]');
-            const outerItems = scene.querySelectorAll('[data-circle="outer"]');
-            
+            // İç ve dış çember yarıçaplarını sahneden alalım (SADECE İTEMLARDAN AL)
+            const innerItems = scene.querySelectorAll('.circular-item[data-circle="inner"]');
+            const outerItems = scene.querySelectorAll('.circular-item[data-circle="outer"]');
+
             // Eğer sadece tek çember varsa her yer dış çemberdir
             if (innerItems.length === 0) return 'outer';
 
@@ -6091,7 +6091,7 @@ function getIcon(item) {
 
             // Tam ortadan ikiye bölerek karar ver
             const threshold = (innerRadius + outerRadius) / 2;
-            
+
             // Çok merkeze yakınsa (ölü alan) döndürme yapmayabiliriz ama şimdilik inner diyelim
             return distance < threshold ? 'inner' : 'outer';
         }
@@ -6127,7 +6127,7 @@ function getIcon(item) {
             requestAnimationFrame(animateRotation);
         }
 
-        // ÇARK SİSTEMİ: Wrapper'ları döndüren fonksiyon (Itemlar SABİT pozisyonda kalır)
+        // ÇARK SİSTEMİ: Wrapper'ları döndüren ve itemları düz tutan fonksiyon
         function updatePositionsDOM() {
             const container = document.getElementById('circular-container');
             const scene = container?.querySelector('.circular-scene.active');
@@ -6141,11 +6141,23 @@ function getIcon(item) {
                 // Radyan'dan dereceye çevir (CSS rotate için)
                 const innerAngleDeg = rotationState.inner.currentAngle * (180 / Math.PI);
                 innerWrapper.style.transform = `rotate(${innerAngleDeg}deg)`;
+
+                // İç çemberdeki tüm itemları TERS döndür (counter-rotation - HEP DÜZ GÖRÜNSÜNLER)
+                const innerItems = innerWrapper.querySelectorAll('.circular-item');
+                innerItems.forEach(item => {
+                    item.style.transform = `translate(-50%, -50%) rotate(${-innerAngleDeg}deg)`;
+                });
             }
 
             if (outerWrapper) {
                 const outerAngleDeg = rotationState.outer.currentAngle * (180 / Math.PI);
                 outerWrapper.style.transform = `rotate(${outerAngleDeg}deg)`;
+
+                // Dış çemberdeki tüm itemları TERS döndür (counter-rotation - HEP DÜZ GÖRÜNSÜNLER)
+                const outerItems = outerWrapper.querySelectorAll('.circular-item');
+                outerItems.forEach(item => {
+                    item.style.transform = `translate(-50%, -50%) rotate(${-outerAngleDeg}deg)`;
+                });
             }
         }
 
@@ -6283,18 +6295,18 @@ function getIcon(item) {
             const container = document.getElementById('circular-container');
 
             // MOUSE EVENTLERİ
-            // Container yerine window'a mousedown veriyoruz ama container kontrolü yapıyoruz.
-            // Bu sayede itemlerin üzerinden de tutabilirsin.
+            // SADECE ÇEMBERE BASILINCA DÖNME SİSTEMİ
             container.addEventListener('mousedown', (e) => {
                 // Sadece sol tık (0) çalışsın
                 if (e.button !== 0) return;
-                
+
                 // Eğer bir pencere (pop-up) açıksa, arkadaki çarkı döndürmeyi engelle
                 if (circularNav.openWindowItem) return;
 
-                // Input vb. alanlara tıklanıyorsa engelleme, ama çark için gerek yok
-                // e.preventDefault(); // İptal edildi, tıklamalar çalışsın diye.
-                
+                // SADECE çembere (item veya wrapper) basınca dönmeli, boş alana basınca değil
+                const isOnCircle = e.target.closest('.circular-item') || e.target.closest('.circle-wrapper');
+                if (!isOnCircle) return; // Boş alana basılmış, dönme yok!
+
                 handleDragStart(e.clientX, e.clientY);
             });
 
@@ -6309,6 +6321,11 @@ function getIcon(item) {
             // TOUCH (DOKUNMATİK) EVENTLERİ
             container.addEventListener('touchstart', (e) => {
                 if (circularNav.openWindowItem) return;
+
+                // SADECE çembere basınca dönmeli
+                const isOnCircle = e.target.closest('.circular-item') || e.target.closest('.circle-wrapper');
+                if (!isOnCircle) return;
+
                 const touch = e.touches[0];
                 handleDragStart(touch.clientX, touch.clientY);
             }, { passive: false }); // passive: false önemli, kaydırmayı engellemek için
