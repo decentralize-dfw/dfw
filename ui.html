@@ -6174,15 +6174,9 @@ function getIcon(item) {
                 rotationState.inner.velocity = 0;
             }
 
-            // DOM'u SÜREKLI güncelle (Counter-rotation için önemli!)
-            // Çünkü currentAngle != 0 olsa bile velocity = 0 olabilir
-            // Bu durumda counter-rotation uygulanmazsa itemlar yamuk kalır
-            const hasRotation = Math.abs(rotationState.outer.currentAngle) > 0.001 ||
-                               Math.abs(rotationState.inner.currentAngle) > 0.001;
-
-            if (needsUpdate || rotationState.outer.isDragging || rotationState.inner.isDragging || hasRotation) {
-                updatePositionsDOM();
-            }
+            // HER FRAME updatePositionsDOM çağır - İTEMLAR HER ZAMAN DÜZ KALMALI!
+            // Counter-rotation sürekli uygulanmalı, yoksa hover'da yamuluk oluşur
+            updatePositionsDOM();
 
             requestAnimationFrame(animateRotation);
         }
