@@ -482,13 +482,43 @@
             transform: scale(1);
         }
 
-        #mobile-folder-title {
+        #mobile-folder-header {
             flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            margin-bottom: 3%;
+        }
+
+        #mobile-folder-back-btn {
+            position: absolute;
+            left: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+            color: #333;
+            transition: transform 0.2s ease;
+        }
+
+        #mobile-folder-back-btn:active {
+            transform: scale(0.9);
+        }
+
+        #mobile-folder-back-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        #mobile-folder-title {
             font-size: clamp(14px, 4vw, 18px);
             font-weight: 600;
             color: #333;
             text-align: center;
-            margin-bottom: 3%;
         }
 
         #mobile-folder-pages-wrapper {
@@ -853,6 +883,41 @@
             background: rgba(255,255,255,0.5);
         }
 
+        #circular-sidebar-links {
+            margin-top: 16px;
+            font-size: 14px;
+            color: rgba(255,255,255,0.85);
+            max-width: 350px;
+        }
+
+        .sidebar-link-item {
+            margin-bottom: 8px;
+            padding: 8px 12px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            border-left: 3px solid rgba(59, 130, 246, 0.6);
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .sidebar-link-item:hover {
+            background: rgba(255,255,255,0.2);
+            border-left-color: rgb(59, 130, 246);
+            transform: translateX(4px);
+        }
+
+        .sidebar-link-name {
+            font-weight: 600;
+            color: white;
+            margin-bottom: 4px;
+        }
+
+        .sidebar-link-desc {
+            font-size: 12px;
+            color: rgba(255,255,255,0.7);
+            line-height: 1.4;
+        }
+
         /* Breadcrumb Path */
         #circular-breadcrumb {
             position: fixed;
@@ -1084,7 +1149,14 @@
     <!-- Mobile Folder Overlay -->
     <div id="mobile-folder-overlay">
         <div id="mobile-folder-container">
-            <div id="mobile-folder-title">Folder</div>
+            <div id="mobile-folder-header">
+                <div id="mobile-folder-back-btn">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                    </svg>
+                </div>
+                <div id="mobile-folder-title">Folder</div>
+            </div>
             <div id="mobile-folder-pages-wrapper">
                 <div id="mobile-folder-pages">
                     <!-- Folder pages will be dynamically generated -->
@@ -1128,6 +1200,7 @@
         <div id="circular-sidebar">
             <div id="circular-sidebar-title">DFW website ui</div>
             <div id="circular-sidebar-description">Decentralized Fashion Week - Navigate through files and folders</div>
+            <div id="circular-sidebar-links"></div>
         </div>
 
         <!-- Layout Toggle Buttons -->
@@ -5264,8 +5337,7 @@ function getIcon(item) {
                 // Desktop icon hover - update sidebar
                 itemEl.addEventListener('mouseenter', () => {
                     if (window.innerWidth > 768) {
-                        document.getElementById('circular-sidebar-title').textContent = item.name;
-                        document.getElementById('circular-sidebar-description').textContent = item.description || 'Desktop item';
+                        updateSidebarForWindow(item);
                     }
                 });
 
@@ -5318,17 +5390,33 @@ function getIcon(item) {
 
         // Use mobile icon HTML system
         function getCircularIconHTML(item) {
+            // Priority 1: Check for thumbnailUrl
+            if (item.thumbnailUrl) {
+                return `<img src="${item.thumbnailUrl}" alt="${item.name}" onerror="this.outerHTML='${getDefaultIcon(item).replace(/'/g, "\\'")}';">`;
+            }
+
+            // Priority 2: Check for iconUrl
+            if (item.iconUrl) {
+                return `<img src="${item.iconUrl}" alt="${item.name}" onerror="this.outerHTML='${getDefaultIcon(item).replace(/'/g, "\\'")}';">`;
+            }
+
+            // Priority 3: For images, use the image URL itself as thumbnail
+            if (item.type === 'image' && item.url) {
+                return `<img src="${item.url}" alt="${item.name}" onerror="this.outerHTML='${getDefaultIcon(item).replace(/'/g, "\\'")}';">`;
+            }
+
+            // Priority 4: Default icon based on type
+            return getDefaultIcon(item);
+        }
+
+        function getDefaultIcon(item) {
             if (item.type === 'folder') {
                 return '<svg fill="currentColor" viewBox="0 0 20 20" class="text-blue-400"><path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"></path></svg>';
             }
-            if (item.type === 'image') {
-                return `<img src="${item.url}" alt="${item.name}" onerror="this.parentElement.innerHTML='<svg fill=\\'none\\' stroke=\\'currentColor\\' viewBox=\\'0 0 24 24\\' class=\\'text-gray-400\\'><path stroke-linecap=\\'round\\' stroke-linejoin=\\'round\\' stroke-width=\\'2\\' d=\\'M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l-1.586-1.586a2 2 0 00-2.828 0L6 18m6-6l.01.01\\'></path></svg>';">`;
-            }
-            if ((item.type === 'html' || item.type === 'link') && item.iconUrl) {
-                return `<img src="${item.iconUrl}" alt="${item.name}" onerror="this.parentElement.innerHTML='<svg fill=\\'none\\' stroke=\\'currentColor\\' viewBox=\\'0 0 24 24\\' class=\\'text-gray-500\\'><path stroke-linecap=\\'round\\' stroke-linejoin=\\'round\\' stroke-width=\\'2\\' d=\\'M10 20l4-16m-8 4l-4 4 4 4m16-8l-4 4 4 4\\'></path></svg>';">`;
-            }
+
             // Default icons by type
             const typeIcons = {
+                'image': '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="text-gray-400"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l-1.586-1.586a2 2 0 00-2.828 0L6 18m6-6l.01.01"></path></svg>',
                 'video': '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="text-red-400"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M4 18h10a2 2 0 002-2V8a2 2 0 00-2-2H4a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>',
                 'text': '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="text-gray-500"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>',
                 'html': '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="text-orange-500"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m-8 4l-4 4 4 4m16-8l-4 4 4 4"></path></svg>',
@@ -5408,20 +5496,34 @@ function getIcon(item) {
             // Use 90% of screen height (5% margins top and bottom)
             const availableHeight = window.innerHeight * 0.9;
 
-            // Parametric gap - responsive to icon size and screen size
-            const minGap = Math.max(iconSize * 0.3, 20); // Minimum 30% of icon size or 20px
-            const gap = Math.min(minGap, window.innerWidth * 0.02); // Max 2% of screen width
+            // Estimate optimal column count based on aspect ratio
+            const aspectRatio = availableWidth / availableHeight;
+            let cols = Math.max(3, Math.round(Math.sqrt(count * aspectRatio)));
 
-            // Calculate optimal number of columns based on available width
-            const itemWidthWithGap = iconSize + gap;
-            const cols = Math.max(3, Math.floor((availableWidth + gap) / itemWidthWithGap));
+            // Ensure we don't have too many columns
+            cols = Math.min(cols, Math.floor(availableWidth / (iconSize * 1.5))); // At least 50% gap between items
 
-            // Calculate actual rows needed
+            // Calculate rows needed
             const rows = Math.ceil(count / cols);
 
+            // Calculate icon size and gap to fit perfectly in available space
+            // We want: (cols * iconSize) + ((cols - 1) * gap) = availableWidth
+            // AND: gap should be at least 40% of iconSize for good spacing
+            // Let's solve for gap first, ensuring minimum spacing
+
+            // Total width for all icons
+            const totalIconWidth = availableWidth - (iconSize * 0.4 * (cols - 1)); // Reserve minimum gap
+            const calculatedIconSize = totalIconWidth / cols;
+
+            // Use the smaller of provided iconSize or calculated size
+            const finalIconSize = Math.min(iconSize, calculatedIconSize);
+
+            // Calculate gap - minimum 50% of icon size for proper spacing
+            const gap = Math.max((availableWidth - (cols * finalIconSize)) / (cols - 1), finalIconSize * 0.5);
+
             // Calculate actual grid dimensions
-            const actualGridWidth = (cols * iconSize) + ((cols - 1) * gap);
-            const actualGridHeight = (rows * iconSize) + ((rows - 1) * gap);
+            const actualGridWidth = (cols * finalIconSize) + ((cols - 1) * gap);
+            const actualGridHeight = (rows * finalIconSize) + ((rows - 1) * gap);
 
             // Margins for centering
             const marginLeft = window.innerWidth * 0.2; // 20% left margin
@@ -5435,8 +5537,8 @@ function getIcon(item) {
             for (let i = 0; i < count; i++) {
                 const row = Math.floor(i / cols);
                 const col = i % cols;
-                const x = startX + col * (iconSize + gap) + iconSize / 2;
-                const y = startY + row * (iconSize + gap) + iconSize / 2;
+                const x = startX + col * (finalIconSize + gap) + finalIconSize / 2;
+                const y = startY + row * (finalIconSize + gap) + finalIconSize / 2;
                 positions.push({ x, y });
             }
 
@@ -5549,13 +5651,7 @@ function getIcon(item) {
 
                 // Mouse hover handler - update sidebar
                 itemEl.addEventListener('mouseenter', () => {
-                    if (isRoot) {
-                        document.getElementById('circular-sidebar-title').textContent = item.name;
-                        document.getElementById('circular-sidebar-description').textContent = item.description;
-                    } else {
-                        document.getElementById('circular-sidebar-title').textContent = item.name;
-                        document.getElementById('circular-sidebar-description').textContent = item.description || 'No description available';
-                    }
+                    updateSidebarForWindow(item);
                 });
 
                 // Mouse leave handler - restore folder info
@@ -5602,10 +5698,12 @@ function getIcon(item) {
 
         function updateCircularBreadcrumb() {
             const breadcrumb = document.getElementById('circular-breadcrumb');
-            if (circularNav.history.length === 0) {
+            if (circularNav.currentIndex < 0 || circularNav.history.length === 0) {
                 breadcrumb.textContent = 'DFW/';
             } else {
-                const path = 'DFW/' + circularNav.history.map(h => h.folderName).join('/');
+                // Only show breadcrumb up to current index
+                const currentPath = circularNav.history.slice(0, circularNav.currentIndex + 1);
+                const path = 'DFW/' + currentPath.map(h => h.folderName).join('/');
                 breadcrumb.textContent = path;
             }
         }
@@ -5688,9 +5786,25 @@ function getIcon(item) {
         function updateSidebarForWindow(item) {
             document.getElementById('circular-sidebar-title').textContent = item.name;
             document.getElementById('circular-sidebar-description').textContent = item.description || 'No description available';
+
+            // Display links if available
+            const linksContainer = document.getElementById('circular-sidebar-links');
+            if (item.links && item.links.length > 0) {
+                linksContainer.innerHTML = item.links.map(link => `
+                    <div class="sidebar-link-item" onclick="window.open('${link.url}', '_blank')">
+                        <div class="sidebar-link-name">${link.name || 'Link'}</div>
+                        ${link.description ? `<div class="sidebar-link-desc">${link.description}</div>` : ''}
+                    </div>
+                `).join('');
+            } else {
+                linksContainer.innerHTML = '';
+            }
         }
 
         function restoreFolderSidebar() {
+            // Clear links when restoring folder sidebar
+            document.getElementById('circular-sidebar-links').innerHTML = '';
+
             if (circularNav.currentFolderData) {
                 document.getElementById('circular-sidebar-title').textContent = circularNav.currentFolderData.name;
                 document.getElementById('circular-sidebar-description').textContent = circularNav.currentFolderData.description;
@@ -7108,7 +7222,7 @@ if (thumbnailsEl) {
 
             // Mobile dock folders (5 items)
             const mobileDockFolders = [
-                { key: 'RealDesktop', name: 'Desktop', icon: 'drive' },
+                { key: 'RealDesktop', name: 'Phone', icon: 'drive' },
                 { key: 'DFW', name: 'DFW', icon: 'bolt' },
                 { key: 'Experience', name: 'Experience', icon: 'app' },
                 { key: 'Gallery', name: 'Gallery', icon: 'document' },
@@ -7962,6 +8076,12 @@ if (thumbnailsEl) {
                             closeMobileFolder();
                         }
                     });
+                }
+
+                // Mobile folder back button
+                const folderBackBtn = document.getElementById('mobile-folder-back-btn');
+                if (folderBackBtn) {
+                    folderBackBtn.addEventListener('click', closeMobileFolder);
                 }
 
                 // Close app viewer button
