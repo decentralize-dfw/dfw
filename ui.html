@@ -482,13 +482,43 @@
             transform: scale(1);
         }
 
-        #mobile-folder-title {
+        #mobile-folder-header {
             flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            margin-bottom: 3%;
+        }
+
+        #mobile-folder-back-btn {
+            position: absolute;
+            left: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+            color: #333;
+            transition: transform 0.2s ease;
+        }
+
+        #mobile-folder-back-btn:active {
+            transform: scale(0.9);
+        }
+
+        #mobile-folder-back-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        #mobile-folder-title {
             font-size: clamp(14px, 4vw, 18px);
             font-weight: 600;
             color: #333;
             text-align: center;
-            margin-bottom: 3%;
         }
 
         #mobile-folder-pages-wrapper {
@@ -802,26 +832,92 @@
         }
 
         #circular-sidebar-title {
-            font-size: 42px;
+            font-size: 34px;
             font-weight: 700;
             color: white;
             text-shadow: 0 2px 8px rgba(0,0,0,0.5);
             margin-bottom: 16px;
             line-height: 1.2;
             max-width: 350px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+            letter-spacing: -0.2px;
+            /* Allow title to wrap to next line - no truncation */
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+            white-space: normal;
         }
 
         #circular-sidebar-description {
-            font-size: 16px;
+            font-size: 13px;
             color: rgba(255,255,255,0.9);
             text-shadow: 0 1px 4px rgba(0,0,0,0.5);
             line-height: 1.6;
             max-width: 350px;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            max-height: 200px;
+            letter-spacing: -0.2px;
+            /* Vertical scrollbar for long descriptions */
+            overflow-y: auto;
+            overflow-x: hidden;
+            /* Paragraph formatting with justify */
+            text-align: justify;
+            text-align-last: left; /* Last line left-aligned */
+            white-space: normal;
+            word-wrap: break-word;
+            /* Custom scrollbar styling */
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255,255,255,0.3) transparent;
+        }
+
+        /* WebKit scrollbar for description */
+        #circular-sidebar-description::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        #circular-sidebar-description::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        #circular-sidebar-description::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.3);
+            border-radius: 10px;
+        }
+
+        #circular-sidebar-description::-webkit-scrollbar-thumb:hover {
+            background: rgba(255,255,255,0.5);
+        }
+
+        #circular-sidebar-links {
+            margin-top: 16px;
+            font-size: 14px;
+            color: rgba(255,255,255,0.85);
+            max-width: 350px;
+        }
+
+        .sidebar-link-item {
+            margin-bottom: 8px;
+            padding: 8px 12px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            border-left: 3px solid rgba(59, 130, 246, 0.6);
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .sidebar-link-item:hover {
+            background: rgba(255,255,255,0.2);
+            border-left-color: rgb(59, 130, 246);
+            transform: translateX(4px);
+        }
+
+        .sidebar-link-name {
+            font-weight: 600;
+            color: white;
+            margin-bottom: 4px;
+        }
+
+        .sidebar-link-desc {
+            font-size: 12px;
+            color: rgba(255,255,255,0.7);
+            line-height: 1.4;
         }
 
         /* Breadcrumb Path */
@@ -922,6 +1018,14 @@
             align-items: center;
             justify-content: center;
             transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+
+        #circular-container.dragging {
+            cursor: grabbing !important;
         }
 
         /* Circular Scene */
@@ -970,8 +1074,7 @@
         }
 
         .circular-item-icon {
-            /* Dynamic size set via JS */
-            border-radius: 20px;
+            /* Dynamic size and border-radius set via JS */
             background: rgba(255,255,255,0.15);
             backdrop-filter: blur(20px);
             border: 1px solid rgba(255,255,255,0.2);
@@ -1008,9 +1111,13 @@
             color: white;
             text-shadow: 0 2px 4px rgba(0,0,0,0.5);
             text-align: center;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+            /* Allow multiline wrapping - no ellipsis truncation */
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+            hyphens: auto;
+            line-height: 1.3;
+            /* Remove truncation styles */
+            white-space: normal;
         }
     </style>
 </head>
@@ -1051,7 +1158,14 @@
     <!-- Mobile Folder Overlay -->
     <div id="mobile-folder-overlay">
         <div id="mobile-folder-container">
-            <div id="mobile-folder-title">Folder</div>
+            <div id="mobile-folder-header">
+                <div id="mobile-folder-back-btn">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                    </svg>
+                </div>
+                <div id="mobile-folder-title">Folder</div>
+            </div>
             <div id="mobile-folder-pages-wrapper">
                 <div id="mobile-folder-pages">
                     <!-- Folder pages will be dynamically generated -->
@@ -1093,8 +1207,9 @@
     <div id="circular-navigation">
         <!-- Left Sidebar with Title & Description -->
         <div id="circular-sidebar">
-            <div id="circular-sidebar-title">DFW website ui</div>
-            <div id="circular-sidebar-description">Decentralized Fashion Week - Navigate through files and folders</div>
+            <div id="circular-sidebar-title">DFW</div>
+            <div id="circular-sidebar-description">Digital Forgery Workshop \n\nLETS FORGE THE FUTURE TOGETHER.\n CREATIVE DESIGN STUDIO FOR SPATIAL WEB,  MILAN 2021-2026</div>
+            <div id="circular-sidebar-links"></div>
         </div>
 
         <!-- Layout Toggle Buttons -->
@@ -1297,9 +1412,91 @@
             const fileSystemDB = {
         // --- MASAÜSTÜ İKONLARI ---
         "RealDesktop": [
-            { id: 'rd-1', type: 'video', name: 'iObs.mp4', url: 'https://video.wixstatic.com/video/54a996_6da48d6916b24734aba549bb585d4675/720p/mp4/file.mp4', description: 'Uzay videosu.', created: '2024', size: '15 MB' },
-            { id: 'rd-2', type: 'image', name: 'dfw-logo.png', url: 'https://raw.githubusercontent.com/decentralize-dfw/c2w2runway/main/dfwlogo.png', description: 'pnglogo.', created: '2024', size: '4 MB' },
-            { id: 'rd-3', type: 'html', name: 'AGENTIC GAME.exe', url: 'https://raw.githubusercontent.com/decentralize-dfw/c2w2-game/main/game-v3.html', iconUrl: 'https://raw.githubusercontent.com/decentralize-dfw/c2w2-game/main/agentic.jpg', description: 'C2W2 Game.', created: '2025', size: '12 KB' }
+            { 
+                id: 'rd-info', 
+                type: 'text', 
+                name: 'info', 
+                content: 'WELCOME TO DFW\n\n' +
+                         'WHO WE ARE:\n' +
+                         'We are Digital Forgery Workshop. We design architecture, fashion, and technology for virtual spaces. This site is our interactive office and archive.\n\n' +
+                         'WHAT IS HAPPENING HERE:\n' +
+                         'You are using a file-based browser to explore our work. Everything we create is accessible here. You can move windows, open folders, and enter 3D environments directly from this screen.\n\n' +
+                         'HOW TO NAVIGATE:\n' +
+                         '• DFW: Our studio profile, history, and project list.\n' +
+                         '• Experience: Virtual theaters and fashion runways that you can enter and walk around in.\n' +
+                         '• Gallery: 3D architectural worlds and exhibition spaces.\n' +
+                         '• Item: A collection of individual 3D pieces like furniture, sculptures, and avatars.\n\n' +
+                         'WHAT IS INSIDE A PROJECT (Experience & Gallery):\n' +
+                         'When you open a project folder, you aren’t just looking at a portfolio page. You get the full archive of that work. This includes:\n' +
+                         '- The Experience: The actual 3D world you can launch and explore.\n' +
+                         '- The Story: The ideas and descriptions behind the project.\n' +
+                         '- The Recordings: Videos showing the project in action.\n' +
+                         '- The 3D Models: The original source files used to build the world.\n\n' +
+                         'Interact with any folder to start exploring.',
+                description: 'Technical structure and project categorization brief.',
+                created: '2026',
+                size: '1 KB'
+            },
+            { 
+                id: 'rd-1', 
+                type: 'video', 
+                name: 'iObs.mp4', 
+                url: 'https://video.wixstatic.com/video/54a996_6da48d6916b24734aba549bb585d4675/720p/mp4/file.mp4', 
+                description: 'Orbital observation footage.', 
+                created: '2024', 
+                size: '15 MB' 
+            },
+            { 
+                id: 'rd-2', 
+                type: 'image', 
+                name: 'dfw-logo.png', 
+                url: 'https://raw.githubusercontent.com/decentralize-dfw/c2w2runway/main/dfwlogo.png', 
+                description: 'Digital Forgery Workshop Identity.', 
+                created: '2024', 
+                size: '4 MB' 
+            },
+            {
+                id: 'rd-4',
+                type: 'link',
+                name: 'twitter',
+                url: 'https://x.com/D__F__W__',
+                iconUrl: 'https://img.icons8.com/?size=100&id=60469&format=png&color=000000',
+                description: 'Official X profile.',
+                created: '2025',
+                medium: 'Social',
+                links: [{ url: 'https://x.com/D__F__W__', name: 'Open X' }]
+            },
+            {
+                id: 'rd-mail',
+                type: 'link',
+                name: 'mail',
+                url: 'mailto:main@d--f--w.com?subject=hello',
+                iconUrl: 'https://img.icons8.com/?size=100&id=OumT4lIcOllS&format=png&color=000000',
+                description: 'Direct contact via main@d--f--w.com',
+                created: '2026',
+                medium: 'Email',
+                links: [{ url: 'mailto:main@d--f--w.com?subject=hello', name: 'Say Hello' }]
+            },
+            {
+                id: 'rd-instagram',
+                type: 'link',
+                name: 'instagram',
+                url: 'https://www.instagram.com/d__f__w__/',
+                iconUrl: 'https://img.icons8.com/?size=100&id=13928&format=png&color=000000',
+                description: 'Follow DFW on Instagram.',
+                created: '2026',
+                links: [{ url: 'https://www.instagram.com/d__f__w__/', name: 'Open Instagram' }]
+            },
+            {
+                id: 'rd-meet',
+                type: 'link',
+                name: 'Book a Meeting',
+                url: 'https://calendly.com/d--f--w/meeting?month=2026-01',
+                iconUrl: 'https://img.icons8.com/?size=100&id=IaTeUTQucHMS&format=png&color=000000',
+                description: 'Follow DFW on Instagram.',
+                created: '2026',
+                links: [{ url: 'https://calendly.com/d--f--w/meeting?month=2026-01', name: 'Calendly' }]
+            },
         ],
 
         // --- ANA KLASÖRLER ---
@@ -5050,7 +5247,7 @@ links: [
         // --- GLOBAL STATE ---
         let currentFolder = '';
         let selectedItemId = null;
-        let zIndexCounter = 10;
+        let zIndexCounter = 1000; // Start at 1000 to ensure windows are always above desktop icons (z-index: 100)
         let openWindows = [];
         let currentViewMode = 'grid'; // 'grid', 'list', 'gallery'
         let navHistory = [];
@@ -5231,8 +5428,7 @@ function getIcon(item) {
                 // Desktop icon hover - update sidebar
                 itemEl.addEventListener('mouseenter', () => {
                     if (window.innerWidth > 768) {
-                        document.getElementById('circular-sidebar-title').textContent = item.name;
-                        document.getElementById('circular-sidebar-description').textContent = item.description || 'Desktop item';
+                        updateSidebarForWindow(item);
                     }
                 });
 
@@ -5262,7 +5458,28 @@ function getIcon(item) {
             currentIndex: -1,
             currentFolder: 'root',
             currentFolderData: null,
-            layoutMode: 'circle' // 'circle' or 'grid'
+            layoutMode: 'circle', // 'circle' or 'grid'
+            openWindowItem: null // Track currently open window to prevent sidebar changes
+        };
+
+        // Circle rotation state
+        const rotationState = {
+            outer: {
+                angle: 0,          // Current rotation angle in radians
+                velocity: 0,       // Angular velocity (rad/s)
+                isDragging: false,
+                lastMouseAngle: 0,
+                lastTime: 0
+            },
+            inner: {
+                angle: 0,
+                velocity: 0,
+                isDragging: false,
+                lastMouseAngle: 0,
+                lastTime: 0
+            },
+            friction: 0.95,        // Friction coefficient (0-1, higher = less friction)
+            minVelocity: 0.001     // Minimum velocity before stopping
         };
 
         // Main categories for root level
@@ -5285,17 +5502,42 @@ function getIcon(item) {
 
         // Use mobile icon HTML system
         function getCircularIconHTML(item) {
+            // Priority 1: Check for thumbnailUrl
+            if (item.thumbnailUrl) {
+                return `<img src="${item.thumbnailUrl}" alt="${item.name}" onerror="this.style.display='none'; this.parentElement.insertAdjacentHTML('afterbegin', getDefaultIconForError('${item.type}'));">`;
+            }
+
+            // Priority 2: Check for iconUrl
+            if (item.iconUrl) {
+                return `<img src="${item.iconUrl}" alt="${item.name}" onerror="this.style.display='none'; this.parentElement.insertAdjacentHTML('afterbegin', getDefaultIconForError('${item.type}'));">`;
+            }
+
+            // Priority 3: For images, use the image URL itself as thumbnail
+            if (item.type === 'image' && item.url) {
+                return `<img src="${item.url}" alt="${item.name}" onerror="this.style.display='none'; this.parentElement.insertAdjacentHTML('afterbegin', getDefaultIconForError('image'));">`;
+            }
+
+            // Priority 4: Default icon based on type
+            return getDefaultIcon(item);
+        }
+
+        // Fallback icon for onerror (simplified, without complex escaping)
+        function getDefaultIconForError(type) {
+            if (type === 'folder') {
+                return '<svg fill="currentColor" viewBox="0 0 20 20" class="text-blue-400" style="width:60%;height:60%;color:white;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.3))"><path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"></path></svg>';
+            }
+            // Default file icon for all other types
+            return '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="text-gray-400" style="width:60%;height:60%;color:white;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.3))"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>';
+        }
+
+        function getDefaultIcon(item) {
             if (item.type === 'folder') {
                 return '<svg fill="currentColor" viewBox="0 0 20 20" class="text-blue-400"><path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"></path></svg>';
             }
-            if (item.type === 'image') {
-                return `<img src="${item.url}" alt="${item.name}" onerror="this.parentElement.innerHTML='<svg fill=\\'none\\' stroke=\\'currentColor\\' viewBox=\\'0 0 24 24\\' class=\\'text-gray-400\\'><path stroke-linecap=\\'round\\' stroke-linejoin=\\'round\\' stroke-width=\\'2\\' d=\\'M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l-1.586-1.586a2 2 0 00-2.828 0L6 18m6-6l.01.01\\'></path></svg>';">`;
-            }
-            if ((item.type === 'html' || item.type === 'link') && item.iconUrl) {
-                return `<img src="${item.iconUrl}" alt="${item.name}" onerror="this.parentElement.innerHTML='<svg fill=\\'none\\' stroke=\\'currentColor\\' viewBox=\\'0 0 24 24\\' class=\\'text-gray-500\\'><path stroke-linecap=\\'round\\' stroke-linejoin=\\'round\\' stroke-width=\\'2\\' d=\\'M10 20l4-16m-8 4l-4 4 4 4m16-8l-4 4 4 4\\'></path></svg>';">`;
-            }
+
             // Default icons by type
             const typeIcons = {
+                'image': '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="text-gray-400"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l-1.586-1.586a2 2 0 00-2.828 0L6 18m6-6l.01.01"></path></svg>',
                 'video': '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="text-red-400"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M4 18h10a2 2 0 002-2V8a2 2 0 00-2-2H4a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>',
                 'text': '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="text-gray-500"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>',
                 'html': '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="text-orange-500"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m-8 4l-4 4 4 4m16-8l-4 4 4 4"></path></svg>',
@@ -5309,13 +5551,22 @@ function getIcon(item) {
         }
 
         function calculateDynamicSizes(count) {
-            // Circle is 70% of screen (diameter), radius is 35%
+            // Maximum circle is 70% of screen (diameter), radius is 35%
             const screenSize = Math.min(window.innerWidth, window.innerHeight);
-            const circleRadius = screenSize * 0.35;
+            const maxCircleRadius = screenSize * 0.35;
+
+            // Calculate optimal radius based on item count
+            // For fewer items, use a smaller circle
+            // Minimum 8 items for full circle, scale down for fewer
+            const optimalItems = Math.max(count, 4); // At least consider 4 items for sizing
+            const radiusScale = Math.min(1, optimalItems / 12); // Scale up to 12 items for full size
+            const circleRadius = maxCircleRadius * (0.5 + radiusScale * 0.5); // 50% to 100% of max
 
             // Calculate circumference and divide by items (with spacing)
             const circumference = 2 * Math.PI * circleRadius;
-            const totalSlots = count * 2; // count items + count spaces
+            // More spacing for crowded circles (20+ items get 3x spacing, 10-20 get 2.5x, <10 get 2x)
+            const spacingMultiplier = count > 20 ? 3.5 : (count > 10 ? 3 : 2.5);
+            const totalSlots = count * spacingMultiplier; // count items + spacing
             const slotSize = circumference / totalSlots;
 
             // Icon size is 2x of slot size, then apply ICON_SCALE
@@ -5339,54 +5590,28 @@ function getIcon(item) {
                 const innerRadius = radius * 0.65;
                 const outerRadius = radius;
 
-                // Create inner circle angles
-                const innerAngles = [];
+                // Position inner circle items - PERFECT CIRCLE (no randomness)
                 for (let i = 0; i < innerCount; i++) {
-                    innerAngles.push((Math.PI * 2 * i) / innerCount);
+                    const baseAngle = (Math.PI * 2 * i) / innerCount - Math.PI / 2; // Start from top
+                    const x = centerX + Math.cos(baseAngle) * innerRadius;
+                    const y = centerY + Math.sin(baseAngle) * innerRadius;
+                    positions.push({ x, y, circle: 'inner', baseAngle, radius: innerRadius });
                 }
-                const shuffledInner = shuffleArray(innerAngles);
 
-                // Create outer circle angles
-                const outerAngles = [];
+                // Position outer circle items - PERFECT CIRCLE (no randomness)
                 for (let i = 0; i < outerCount; i++) {
-                    outerAngles.push((Math.PI * 2 * i) / outerCount);
-                }
-                const shuffledOuter = shuffleArray(outerAngles);
-
-                // Position inner circle items
-                for (let i = 0; i < innerCount; i++) {
-                    const angle = shuffledInner[i];
-                    const radiusVar = innerRadius + (Math.random() - 0.5) * 20;
-                    const x = centerX + Math.cos(angle) * radiusVar;
-                    const y = centerY + Math.sin(angle) * radiusVar;
-                    positions.push({ x, y });
-                }
-
-                // Position outer circle items
-                for (let i = 0; i < outerCount; i++) {
-                    const angle = shuffledOuter[i];
-                    const radiusVar = outerRadius + (Math.random() - 0.5) * 30;
-                    const x = centerX + Math.cos(angle) * radiusVar;
-                    const y = centerY + Math.sin(angle) * radiusVar;
-                    positions.push({ x, y });
+                    const baseAngle = (Math.PI * 2 * i) / outerCount - Math.PI / 2; // Start from top
+                    const x = centerX + Math.cos(baseAngle) * outerRadius;
+                    const y = centerY + Math.sin(baseAngle) * outerRadius;
+                    positions.push({ x, y, circle: 'outer', baseAngle, radius: outerRadius });
                 }
             } else {
-                // Single circle for 20 or fewer items
-                const angles = [];
+                // Single PERFECT circle for 20 or fewer items
                 for (let i = 0; i < count; i++) {
-                    angles.push((Math.PI * 2 * i) / count);
-                }
-
-                // Shuffle angles for random positioning
-                const shuffledAngles = shuffleArray(angles);
-
-                for (let i = 0; i < count; i++) {
-                    const angle = shuffledAngles[i];
-                    // Add slight random variation to radius for more organic feel
-                    const radiusVar = radius + (Math.random() - 0.5) * 30;
-                    const x = centerX + Math.cos(angle) * radiusVar;
-                    const y = centerY + Math.sin(angle) * radiusVar;
-                    positions.push({ x, y });
+                    const baseAngle = (Math.PI * 2 * i) / count - Math.PI / 2; // Start from top (-90 degrees)
+                    const x = centerX + Math.cos(baseAngle) * radius;
+                    const y = centerY + Math.sin(baseAngle) * radius;
+                    positions.push({ x, y, circle: 'outer', baseAngle, radius });
                 }
             }
 
@@ -5395,31 +5620,55 @@ function getIcon(item) {
 
         function getGridPositions(count, iconSize) {
             const positions = [];
-            const cols = 7; // Always 7 columns
-            const gap = iconSize * 0.5; // Gap between icons
-            const itemWidth = iconSize + gap;
 
             // Use 60% of screen width (20% margins on each side)
             const availableWidth = window.innerWidth * 0.6;
             // Use 80% of screen height (10% margins top and bottom)
             const availableHeight = window.innerHeight * 0.8;
 
-            // Calculate starting position to center the grid
-            const rows = Math.ceil(count / cols);
-            const totalWidth = (cols * itemWidth) - gap;
-            const totalHeight = (rows * itemWidth) - gap;
+            // Estimate optimal column count based on aspect ratio
+            const aspectRatio = availableWidth / availableHeight;
+            let cols = Math.max(3, Math.round(Math.sqrt(count * aspectRatio)));
 
-            // Center in the available area (which is already centered)
+            // Ensure we don't have too many columns
+            cols = Math.min(cols, Math.floor(availableWidth / (iconSize * 1.5))); // At least 50% gap between items
+
+            // Calculate rows needed
+            const rows = Math.ceil(count / cols);
+
+            // Calculate icon size and gap to fit perfectly in available space
+            // We want: (cols * iconSize) + ((cols - 1) * gap) = availableWidth
+            // AND: gap should be at least 40% of iconSize for good spacing
+            // Let's solve for gap first, ensuring minimum spacing
+
+            // Total width for all icons
+            const totalIconWidth = availableWidth - (iconSize * 0.4 * (cols - 1)); // Reserve minimum gap
+            const calculatedIconSize = totalIconWidth / cols;
+
+            // Use the smaller of provided iconSize or calculated size
+            const finalIconSize = Math.min(iconSize, calculatedIconSize);
+
+            // Calculate gap - minimum 50% of icon size for proper spacing
+            const gap = Math.max((availableWidth - (cols * finalIconSize)) / (cols - 1), finalIconSize * 0.5);
+
+            // Calculate actual grid dimensions
+            const actualGridWidth = (cols * finalIconSize) + ((cols - 1) * gap);
+            const actualGridHeight = (rows * finalIconSize) + ((rows - 1) * gap);
+
+            // Margins for centering
             const marginLeft = window.innerWidth * 0.2; // 20% left margin
             const marginTop = window.innerHeight * 0.1; // 10% top margin
-            const startX = marginLeft + (availableWidth - totalWidth) / 2;
-            const startY = marginTop + (availableHeight - totalHeight) / 2;
 
+            // Center the grid within available area
+            const startX = marginLeft + (availableWidth - actualGridWidth) / 2;
+            const startY = marginTop + (availableHeight - actualGridHeight) / 2;
+
+            // Position items
             for (let i = 0; i < count; i++) {
                 const row = Math.floor(i / cols);
                 const col = i % cols;
-                const x = startX + col * itemWidth + iconSize / 2;
-                const y = startY + row * itemWidth + iconSize / 2;
+                const x = startX + col * (finalIconSize + gap) + finalIconSize / 2;
+                const y = startY + row * (finalIconSize + gap) + finalIconSize / 2;
                 positions.push({ x, y });
             }
 
@@ -5507,11 +5756,19 @@ function getIcon(item) {
                 itemEl.style.top = `${positions[index].y}px`;
                 itemEl.style.transform = 'translate(-50%, -50%)';
 
+                // Store position data for rotation
+                if (positions[index].circle) {
+                    itemEl.dataset.circle = positions[index].circle;
+                    itemEl.dataset.baseAngle = positions[index].baseAngle;
+                    itemEl.dataset.radius = positions[index].radius;
+                }
+
                 const iconContainer = document.createElement('div');
                 iconContainer.className = 'circular-item-icon';
-                // Apply dynamic sizing
+                // Apply dynamic sizing and parametric border-radius
                 iconContainer.style.width = `${iconSize}px`;
                 iconContainer.style.height = `${iconSize}px`;
+                iconContainer.style.borderRadius = `${Math.max(iconSize * 0.15, 8)}px`; // 15% of icon size, min 8px
 
                 // Use mobile-style icons (same as mobile interface)
                 if (isRoot) {
@@ -5532,13 +5789,7 @@ function getIcon(item) {
 
                 // Mouse hover handler - update sidebar
                 itemEl.addEventListener('mouseenter', () => {
-                    if (isRoot) {
-                        document.getElementById('circular-sidebar-title').textContent = item.name;
-                        document.getElementById('circular-sidebar-description').textContent = item.description;
-                    } else {
-                        document.getElementById('circular-sidebar-title').textContent = item.name;
-                        document.getElementById('circular-sidebar-description').textContent = item.description || 'No description available';
-                    }
+                    updateSidebarForWindow(item);
                 });
 
                 // Mouse leave handler - restore folder info
@@ -5585,15 +5836,20 @@ function getIcon(item) {
 
         function updateCircularBreadcrumb() {
             const breadcrumb = document.getElementById('circular-breadcrumb');
-            if (circularNav.history.length === 0) {
+            if (circularNav.currentIndex < 0 || circularNav.history.length === 0) {
                 breadcrumb.textContent = 'DFW/';
             } else {
-                const path = 'DFW/' + circularNav.history.map(h => h.folderName).join('/');
+                // Only show breadcrumb up to current index
+                const currentPath = circularNav.history.slice(0, circularNav.currentIndex + 1);
+                const path = 'DFW/' + currentPath.map(h => h.folderName).join('/');
                 breadcrumb.textContent = path;
             }
         }
 
         function navigateToCircularFolder(folderKey, folderName, folderDescription, targetX = null, targetY = null) {
+            // Clear open window state when navigating to a folder
+            circularNav.openWindowItem = null;
+
             // Update sidebar
             document.getElementById('circular-sidebar-title').textContent = folderName;
             document.getElementById('circular-sidebar-description').textContent = folderDescription;
@@ -5619,6 +5875,9 @@ function getIcon(item) {
         }
 
         function navigateBackCircular() {
+            // Clear open window state when navigating back
+            circularNav.openWindowItem = null;
+
             if (circularNav.currentIndex > 0) {
                 circularNav.currentIndex--;
                 const prev = circularNav.history[circularNav.currentIndex];
@@ -5641,13 +5900,16 @@ function getIcon(item) {
         }
 
         function navigateToCircularRoot() {
+            // Clear open window state when returning to root
+            circularNav.openWindowItem = null;
+
             circularNav.currentIndex = -1;
             circularNav.history = [];
             circularNav.currentFolder = 'root';
             circularNav.currentFolderData = null;
 
-            document.getElementById('circular-sidebar-title').textContent = 'DFW website ui';
-            document.getElementById('circular-sidebar-description').textContent = 'Decentralized Fashion Week - Navigate through files and folders';
+            document.getElementById('circular-sidebar-title').textContent = 'DFW';
+            document.getElementById('circular-sidebar-description').textContent = 'Digital Forgery Workshop \n\nLETS FORGE THE FUTURE TOGETHER.\n CREATIVE DESIGN STUDIO FOR SPATIAL WEB,  MILAN 2021-2026';
             document.getElementById('circular-breadcrumb').textContent = 'DFW/';
             document.getElementById('circular-back-button').classList.remove('visible');
 
@@ -5661,30 +5923,239 @@ function getIcon(item) {
                     window.open(item.url, '_blank');
                 }
             } else {
-                // Update sidebar to show window info
-                updateSidebarForWindow(item);
-                // Open in window using existing openWindow function
+                // Open in window (openWindow will handle sidebar update)
                 openWindow(item);
             }
         }
 
-        function updateSidebarForWindow(item) {
+        function updateSidebarForWindow(item, isWindowOpening = false) {
+            // If a window is already open and we're just hovering, don't update sidebar
+            if (circularNav.openWindowItem && !isWindowOpening) {
+                return;
+            }
+
+            // If opening a window, mark it as open
+            if (isWindowOpening) {
+                circularNav.openWindowItem = item;
+            }
+
             document.getElementById('circular-sidebar-title').textContent = item.name;
             document.getElementById('circular-sidebar-description').textContent = item.description || 'No description available';
+
+            // Display links if available
+            const linksContainer = document.getElementById('circular-sidebar-links');
+            if (item.links && item.links.length > 0) {
+                linksContainer.innerHTML = item.links.map(link => `
+                    <div class="sidebar-link-item" onclick="window.open('${link.url}', '_blank')">
+                        <div class="sidebar-link-name">${link.name || 'Link'}</div>
+                        ${link.description ? `<div class="sidebar-link-desc">${link.description}</div>` : ''}
+                    </div>
+                `).join('');
+            } else {
+                linksContainer.innerHTML = '';
+            }
         }
 
         function restoreFolderSidebar() {
+            // Clear links when restoring folder sidebar
+            document.getElementById('circular-sidebar-links').innerHTML = '';
+
             if (circularNav.currentFolderData) {
                 document.getElementById('circular-sidebar-title').textContent = circularNav.currentFolderData.name;
                 document.getElementById('circular-sidebar-description').textContent = circularNav.currentFolderData.description;
             } else if (circularNav.currentFolder === 'root') {
-                document.getElementById('circular-sidebar-title').textContent = 'DFW website ui';
-                document.getElementById('circular-sidebar-description').textContent = 'Decentralized Fashion Week - Navigate through files and folders';
+                document.getElementById('circular-sidebar-title').textContent = 'DFW';
+                document.getElementById('circular-sidebar-description').textContent = 'Digital Forgery Workshop \n\nLETS FORGE THE FUTURE TOGETHER.\n CREATIVE DESIGN STUDIO FOR SPATIAL WEB,  MILAN 2021-2026';
             } else {
-                document.getElementById('circular-sidebar-title').textContent = 'DFW website ui';
-                document.getElementById('circular-sidebar-description').textContent = 'Decentralized Fashion Week - Navigate through files and folders';
+                document.getElementById('circular-sidebar-title').textContent = 'DFW';
+                document.getElementById('circular-sidebar-description').textContent = 'Digital Forgery Workshop \n\nLETS FORGE THE FUTURE TOGETHER.\n CREATIVE DESIGN STUDIO FOR SPATIAL WEB,  MILAN 2021-2026';
             }
         }
+
+        // ========== CIRCLE ROTATION SYSTEM ==========
+
+        // Get mouse angle relative to center
+        function getMouseAngle(clientX, clientY) {
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+            return Math.atan2(clientY - centerY, clientX - centerX);
+        }
+
+        // Get distance from center
+        function getDistanceFromCenter(clientX, clientY) {
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+            const dx = clientX - centerX;
+            const dy = clientY - centerY;
+            return Math.sqrt(dx * dx + dy * dy);
+        }
+
+        // Determine which circle was clicked (inner/outer)
+        function getClickedCircle(clientX, clientY) {
+            if (circularNav.layoutMode !== 'circle') return null;
+
+            const distance = getDistanceFromCenter(clientX, clientY);
+            const container = document.getElementById('circular-container');
+            const scene = container?.querySelector('.circular-scene.active');
+            if (!scene) return null;
+
+            // Check if there are inner circle items
+            const innerItems = scene.querySelectorAll('[data-circle="inner"]');
+            const outerItems = scene.querySelectorAll('[data-circle="outer"]');
+
+            if (innerItems.length === 0) {
+                // Single circle - treat all as outer
+                return 'outer';
+            }
+
+            // Get radius from first items
+            const innerRadius = innerItems.length > 0 ? parseFloat(innerItems[0].dataset.radius) : 0;
+            const outerRadius = parseFloat(outerItems[0].dataset.radius);
+
+            // Determine which circle based on distance
+            const threshold = (innerRadius + outerRadius) / 2;
+            return distance < threshold ? 'inner' : 'outer';
+        }
+
+        // Update item positions based on rotation
+        function updateCircleRotation() {
+            const container = document.getElementById('circular-container');
+            const scene = container?.querySelector('.circular-scene.active');
+            if (!scene || circularNav.layoutMode !== 'circle') return;
+
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+
+            const items = scene.querySelectorAll('.circular-item[data-circle]');
+            items.forEach(item => {
+                const circle = item.dataset.circle;
+                const baseAngle = parseFloat(item.dataset.baseAngle);
+                const radius = parseFloat(item.dataset.radius);
+
+                // Apply rotation offset
+                const rotationOffset = circle === 'inner' ? rotationState.inner.angle : rotationState.outer.angle;
+                const finalAngle = baseAngle + rotationOffset;
+
+                // Calculate new position
+                const x = centerX + Math.cos(finalAngle) * radius;
+                const y = centerY + Math.sin(finalAngle) * radius;
+
+                // Update position
+                item.style.left = `${x}px`;
+                item.style.top = `${y}px`;
+            });
+        }
+
+        // Physics animation loop
+        let physicsAnimationId = null;
+        function startPhysicsLoop() {
+            if (physicsAnimationId) return; // Already running
+
+            function physicsLoop() {
+                let needsUpdate = false;
+
+                // Update inner circle
+                if (Math.abs(rotationState.inner.velocity) > rotationState.minVelocity && !rotationState.inner.isDragging) {
+                    rotationState.inner.angle += rotationState.inner.velocity;
+                    rotationState.inner.velocity *= rotationState.friction;
+                    needsUpdate = true;
+                } else if (!rotationState.inner.isDragging) {
+                    rotationState.inner.velocity = 0;
+                }
+
+                // Update outer circle
+                if (Math.abs(rotationState.outer.velocity) > rotationState.minVelocity && !rotationState.outer.isDragging) {
+                    rotationState.outer.angle += rotationState.outer.velocity;
+                    rotationState.outer.velocity *= rotationState.friction;
+                    needsUpdate = true;
+                } else if (!rotationState.outer.isDragging) {
+                    rotationState.outer.velocity = 0;
+                }
+
+                if (needsUpdate) {
+                    updateCircleRotation();
+                }
+
+                // Continue loop if there's any motion or dragging
+                if (needsUpdate || rotationState.inner.isDragging || rotationState.outer.isDragging) {
+                    physicsAnimationId = requestAnimationFrame(physicsLoop);
+                } else {
+                    physicsAnimationId = null; // Stop loop
+                }
+            }
+
+            physicsLoop();
+        }
+
+        // Mouse/touch event handlers
+        function handleRotationStart(clientX, clientY) {
+            if (circularNav.layoutMode !== 'circle') return;
+
+            const clickedCircle = getClickedCircle(clientX, clientY);
+            if (!clickedCircle) return;
+
+            const container = document.getElementById('circular-container');
+            container.classList.add('dragging');
+
+            const state = clickedCircle === 'inner' ? rotationState.inner : rotationState.outer;
+            state.isDragging = true;
+            state.lastMouseAngle = getMouseAngle(clientX, clientY);
+            state.lastTime = performance.now();
+            state.velocity = 0; // Stop any momentum
+
+            startPhysicsLoop();
+        }
+
+        function handleRotationMove(clientX, clientY) {
+            const draggingInner = rotationState.inner.isDragging;
+            const draggingOuter = rotationState.outer.isDragging;
+
+            if (!draggingInner && !draggingOuter) return;
+
+            const currentAngle = getMouseAngle(clientX, clientY);
+            const currentTime = performance.now();
+
+            if (draggingInner) {
+                const angleDelta = currentAngle - rotationState.inner.lastMouseAngle;
+                const timeDelta = Math.max(currentTime - rotationState.inner.lastTime, 1);
+
+                rotationState.inner.angle += angleDelta;
+                // Calculate velocity with better time normalization (milliseconds to seconds)
+                if (timeDelta > 0) {
+                    rotationState.inner.velocity = (angleDelta / timeDelta) * 1000 / 60; // Per frame at 60fps
+                }
+
+                rotationState.inner.lastMouseAngle = currentAngle;
+                rotationState.inner.lastTime = currentTime;
+            }
+
+            if (draggingOuter) {
+                const angleDelta = currentAngle - rotationState.outer.lastMouseAngle;
+                const timeDelta = Math.max(currentTime - rotationState.outer.lastTime, 1);
+
+                rotationState.outer.angle += angleDelta;
+                // Calculate velocity with better time normalization
+                if (timeDelta > 0) {
+                    rotationState.outer.velocity = (angleDelta / timeDelta) * 1000 / 60; // Per frame at 60fps
+                }
+
+                rotationState.outer.lastMouseAngle = currentAngle;
+                rotationState.outer.lastTime = currentTime;
+            }
+
+            updateCircleRotation();
+        }
+
+        function handleRotationEnd() {
+            const container = document.getElementById('circular-container');
+            container.classList.remove('dragging');
+
+            rotationState.inner.isDragging = false;
+            rotationState.outer.isDragging = false;
+            startPhysicsLoop(); // Continue with momentum
+        }
+
+        // ========== END CIRCLE ROTATION SYSTEM ==========
 
         // Initialize circular navigation
         function initCircularNavigation() {
@@ -5717,6 +6188,48 @@ function getIcon(item) {
                         renderCircularScene(circularNav.currentFolder, items, false);
                     }
                 }, 300);
+            });
+
+            // Setup rotation event listeners
+            const container = document.getElementById('circular-container');
+
+            // Mouse events
+            container.addEventListener('mousedown', (e) => {
+                // Only start rotation if clicking on empty space (not on items)
+                if (e.target.id === 'circular-container' || e.target.classList.contains('circular-scene')) {
+                    e.preventDefault();
+                    handleRotationStart(e.clientX, e.clientY);
+                }
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (rotationState.inner.isDragging || rotationState.outer.isDragging) {
+                    e.preventDefault();
+                    handleRotationMove(e.clientX, e.clientY);
+                }
+            });
+
+            document.addEventListener('mouseup', () => {
+                handleRotationEnd();
+            });
+
+            // Touch events
+            container.addEventListener('touchstart', (e) => {
+                if (e.target.id === 'circular-container' || e.target.classList.contains('circular-scene')) {
+                    const touch = e.touches[0];
+                    handleRotationStart(touch.clientX, touch.clientY);
+                }
+            }, { passive: true });
+
+            document.addEventListener('touchmove', (e) => {
+                if (rotationState.inner.isDragging || rotationState.outer.isDragging) {
+                    const touch = e.touches[0];
+                    handleRotationMove(touch.clientX, touch.clientY);
+                }
+            }, { passive: true });
+
+            document.addEventListener('touchend', () => {
+                handleRotationEnd();
             });
         }
 
@@ -6099,7 +6612,10 @@ if (thumbnailsEl) {
                 console.warn(`Cannot open window for type 'link'. Use double-click or enter key.`);
                 return;
             }
-            
+
+            // Update sidebar and mark as window opening
+            updateSidebarForWindow(item, true);
+
             zIndexCounter++;
             const windowId = `window-${item.id}-${Date.now()}`;
             
@@ -6261,6 +6777,9 @@ if (thumbnailsEl) {
             const windowEl = document.getElementById(windowId);
             if (windowEl) windowEl.remove();
             openWindows = openWindows.filter(w => w.id !== windowId);
+
+            // Clear open window state
+            circularNav.openWindowItem = null;
 
             // Restore folder sidebar when window is closed
             if (window.innerWidth > 768) {
@@ -7091,11 +7610,11 @@ if (thumbnailsEl) {
 
             // Mobile dock folders (5 items)
             const mobileDockFolders = [
-                { key: 'Cdrive', name: 'C:/', icon: 'drive' },
-                { key: 'Documents', name: 'Documents', icon: 'document' },
-                { key: 'Applications', name: 'Applications', icon: 'app' },
-                { key: 'Recents', name: 'Season 1', icon: 'clock' },
-                { key: 'AirDrop', name: 'DFW', icon: 'bolt' }
+                { key: 'RealDesktop', name: 'Phone', icon: 'drive' },
+                { key: 'DFW', name: 'DFW', icon: 'bolt' },
+                { key: 'Experience', name: 'Experience', icon: 'app' },
+                { key: 'Gallery', name: 'Gallery', icon: 'document' },
+                { key: 'Item', name: 'Item', icon: 'clock' }
             ];
 
             // Global page tracking - all sections rendered side by side
@@ -7107,6 +7626,7 @@ if (thumbnailsEl) {
             let mobileFolderTotalPages = 1;
             let mobileCurrentFolderItems = [];
             let mobileAppViewerSwipeStartY = 0;
+            let mobileFolderHistory = []; // Stack to track folder navigation
 
             // Get dock icon SVG
             function getMobileDockIconSVG(iconType) {
@@ -7240,7 +7760,7 @@ if (thumbnailsEl) {
                             <div class="mobile-app-icon-image">${getMobileIconHTML(item)}</div>
                             <div class="mobile-app-icon-name">${item.name}</div>
                         `;
-                        iconEl.addEventListener('click', () => handleMobileItemClick(item));
+                        iconEl.addEventListener('click', () => handleMobileItemClick(item, true)); // true = from main screen
                         pageEl.appendChild(iconEl);
                     });
 
@@ -7261,9 +7781,9 @@ if (thumbnailsEl) {
             }
 
             // Handle item click
-            function handleMobileItemClick(item) {
+            function handleMobileItemClick(item, isFromMainScreen = false) {
                 if (item.type === 'folder') {
-                    openMobileFolder(item);
+                    openMobileFolder(item, isFromMainScreen);
                 } else if (item.type === 'link') {
                     window.open(item.url, '_blank');
                 } else {
@@ -7272,7 +7792,7 @@ if (thumbnailsEl) {
             }
 
             // Open folder overlay
-            function openMobileFolder(item) {
+            function openMobileFolder(item, isFirstLevel = false) {
                 const folderKey = item.folderKey || item.name;
                 mobileCurrentFolderItems = fileSystemDB[folderKey] || [];
                 mobileFolderTotalPages = Math.max(1, Math.ceil(mobileCurrentFolderItems.length / MOBILE_FOLDER_ITEMS_PER_PAGE));
@@ -7282,8 +7802,22 @@ if (thumbnailsEl) {
                 const title = document.getElementById('mobile-folder-title');
                 const pagesContainer = document.getElementById('mobile-folder-pages');
                 const dotsContainer = document.getElementById('mobile-folder-dots');
+                const backBtn = document.getElementById('mobile-folder-back-btn');
 
-                if (!overlay || !title || !pagesContainer || !dotsContainer) return;
+                if (!overlay || !title || !pagesContainer || !dotsContainer || !backBtn) return;
+
+                const isOverlayVisible = overlay.classList.contains('visible');
+
+                if (isFirstLevel) {
+                    // Opening from main screen - initialize history with this folder
+                    mobileFolderHistory = [item];
+                } else if (isOverlayVisible) {
+                    // Nested navigation - add to history
+                    mobileFolderHistory.push(item);
+                }
+
+                // Show back button only if we have more than 1 item in history
+                backBtn.style.display = mobileFolderHistory.length > 1 ? 'flex' : 'none';
 
                 title.textContent = item.name;
 
@@ -7332,11 +7866,84 @@ if (thumbnailsEl) {
                 setTimeout(() => overlay.classList.add('visible'), 10);
             }
 
+            // Navigate back in mobile folder
+            function navigateMobileFolderBack() {
+                if (mobileFolderHistory.length > 1) {
+                    // Remove current folder from history
+                    mobileFolderHistory.pop();
+
+                    // Get the previous folder (don't remove it)
+                    const previousFolder = mobileFolderHistory[mobileFolderHistory.length - 1];
+
+                    // Re-render the previous folder without adding to history
+                    const folderKey = previousFolder.folderKey || previousFolder.name;
+                    mobileCurrentFolderItems = fileSystemDB[folderKey] || [];
+                    mobileFolderTotalPages = Math.max(1, Math.ceil(mobileCurrentFolderItems.length / MOBILE_FOLDER_ITEMS_PER_PAGE));
+                    mobileFolderCurrentPage = 0;
+
+                    const title = document.getElementById('mobile-folder-title');
+                    const pagesContainer = document.getElementById('mobile-folder-pages');
+                    const dotsContainer = document.getElementById('mobile-folder-dots');
+                    const backBtn = document.getElementById('mobile-folder-back-btn');
+
+                    if (!title || !pagesContainer || !dotsContainer || !backBtn) return;
+
+                    title.textContent = previousFolder.name;
+
+                    // Render folder pages
+                    pagesContainer.innerHTML = '';
+                    for (let pageIndex = 0; pageIndex < mobileFolderTotalPages; pageIndex++) {
+                        const pageEl = document.createElement('div');
+                        pageEl.className = 'mobile-folder-page';
+
+                        const startIdx = pageIndex * MOBILE_FOLDER_ITEMS_PER_PAGE;
+                        const endIdx = Math.min(startIdx + MOBILE_FOLDER_ITEMS_PER_PAGE, mobileCurrentFolderItems.length);
+
+                        for (let i = startIdx; i < endIdx; i++) {
+                            const folderItem = mobileCurrentFolderItems[i];
+                            const iconEl = document.createElement('div');
+                            iconEl.className = 'mobile-folder-icon';
+                            iconEl.innerHTML = `
+                                <div class="mobile-folder-icon-image">${getMobileIconHTML(folderItem)}</div>
+                                <div class="mobile-folder-icon-name">${folderItem.name}</div>
+                            `;
+                            iconEl.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                handleMobileItemClick(folderItem);
+                            });
+                            pageEl.appendChild(iconEl);
+                        }
+
+                        pagesContainer.appendChild(pageEl);
+                    }
+
+                    // Render folder dots
+                    dotsContainer.innerHTML = '';
+                    if (mobileFolderTotalPages > 1) {
+                        for (let i = 0; i < mobileFolderTotalPages; i++) {
+                            const dot = document.createElement('div');
+                            dot.className = 'mobile-folder-dot' + (i === mobileFolderCurrentPage ? ' active' : '');
+                            dotsContainer.appendChild(dot);
+                        }
+                    }
+
+                    // Reset page position
+                    pagesContainer.style.transform = 'translateX(0)';
+
+                    // Update back button visibility
+                    backBtn.style.display = mobileFolderHistory.length > 1 ? 'flex' : 'none';
+                } else {
+                    // At root level of folder overlay, close it
+                    closeMobileFolder();
+                }
+            }
+
             // Close folder overlay
             function closeMobileFolder() {
                 const overlay = document.getElementById('mobile-folder-overlay');
                 if (!overlay) return;
 
+                mobileFolderHistory = []; // Clear history
                 overlay.classList.remove('visible');
                 setTimeout(() => {
                     overlay.style.display = 'none';
@@ -7945,6 +8552,12 @@ if (thumbnailsEl) {
                             closeMobileFolder();
                         }
                     });
+                }
+
+                // Mobile folder back button
+                const folderBackBtn = document.getElementById('mobile-folder-back-btn');
+                if (folderBackBtn) {
+                    folderBackBtn.addEventListener('click', navigateMobileFolderBack);
                 }
 
                 // Close app viewer button
