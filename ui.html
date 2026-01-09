@@ -1029,7 +1029,7 @@
             cursor: grabbing !important;
         }
 
-        /* Circular Scene */
+        /* --- Circular Scene (TEMİZ VE ÇITIR ZOOM-IN VERSİYONU) --- */
         .circular-scene {
             position: absolute;
             width: 100%;
@@ -1039,19 +1039,54 @@
             justify-content: center;
             opacity: 0;
             pointer-events: none;
-            transform: scale(1.3);
-            transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            /* Default giriş (sayfa ilk açıldığında) */
+            transform: scale(1.2); 
+            /* Genel geçiş animasyonu */
+            transition: opacity 0.6s ease, transform 0.8s cubic-bezier(0.2, 1, 0.3, 1);
+            will-change: transform, opacity;
+            /* Dönüşüm merkezi varsayılan olarak orta nokta */
+            transform-origin: center center;
         }
 
+        /* Sahne Aktif Olduğunda (Ekranda dururken) */
         .circular-scene.active {
             opacity: 1;
             pointer-events: all;
-            transform: scale(1);
+            transform: scale(1) !important;
         }
 
-        .circular-scene.zoom-out {
+        /* --- Zoom In EXIT (Klasöre tıklayınca ESKİ sahnenin gidişi) --- */
+        /* BURASI DEĞİŞTİ: Artık devasa büyümüyor */
+        .circular-scene.zoom-in-exit {
             opacity: 0;
-            transform: scale(0.7);
+            /* ÖNEMLİ: scale(3) yerine scale(1.5) yaptık. 
+               Dosya yüzümüze çarpmayacak, hafifçe yaklaşacak. */
+            transform: scale(1.5) !important; 
+            pointer-events: none;
+            
+            /* Opacity çok hızlı (0.2s) kaybolsun ki görüntü net kalsın */
+            transition: opacity 0.2s ease, transform 0.8s cubic-bezier(0.2, 1, 0.3, 1);
+        }
+
+        /* --- Zoom In ENTER (Yeni klasörün içeri gelişi) --- */
+        .circular-scene.zoom-in-enter {
+            opacity: 0;
+            transform: scale(0.5); /* Biraz daha geriden gelsin */
+        }
+
+        /* --- Zoom Out EXIT (Geri tuşuna basınca ESKİ sahnenin gidişi) --- */
+        .circular-scene.zoom-out-exit {
+            opacity: 0;
+            transform: scale(0.5) !important; /* Küçülerek merkeze git */
+            pointer-events: none;
+            /* Geri çıkışın temizliği için buranın opacity hızı da önemli */
+            transition: opacity 0.3s ease, transform 0.8s cubic-bezier(0.2, 1, 0.3, 1);
+        }
+
+        /* --- Zoom Out ENTER (Üst klasörün geri gelişi) --- */
+        .circular-scene.zoom-out-enter {
+            opacity: 0;
+            transform: scale(2); /* Büyükten normale dön */
         }
 
         /* Circular Item */
@@ -5755,100 +5790,99 @@ function getIcon(item) {
 
         
 
-        function renderCircularScene(sceneId, items, isRoot = false, targetX = null, targetY = null) {
+        // targetX ve targetY parametreleri eklendi, transitionType eklendi
+        function renderCircularScene(sceneId, items, isRoot = false, targetX = null, targetY = null, transitionType = 'normal') {
             const container = document.getElementById('circular-container');
 
-            // HER SAYFA BAĞIMSIZ: Yeni sahne açılınca rotation state'i ve drag state'i sıfırla
+            // ROTASYON SIFIRLAMA
             rotationState.outer.currentAngle = 0;
             rotationState.outer.velocity = 0;
             rotationState.outer.isDragging = false;
             rotationState.inner.currentAngle = 0;
             rotationState.inner.velocity = 0;
             rotationState.inner.isDragging = false;
-            hasMovedEnoughToDrag = false; // Grid tıklama için önemli!
 
-            // Calculate dynamic sizes
             const { iconSize, fontSize, radius } = calculateDynamicSizes(items.length);
 
-            // Mark old scene for zoom-out
+            // 1. ESKİ SAHNELERİ YÖNET (Çıkış Animasyonu)
             const oldScenes = container.querySelectorAll('.circular-scene');
             oldScenes.forEach(scene => {
                 if (scene.classList.contains('active')) {
                     scene.classList.remove('active');
-                    scene.classList.add('zoom-out');
-                    setTimeout(() => scene.remove(), 600);
-                } else if (!scene.classList.contains('zoom-out')) {
+                    
+                    // Eğer bir noktaya tıklayıp girdiysek (Zoom In)
+                    if (transitionType === 'in' && targetX !== null && targetY !== null) {
+                        // Tıklanan noktayı merkez alarak büyüsün
+                        // scene.getBoundingClientRect() ile container'a göre konumu düzeltiyoruz
+                        const rect = container.getBoundingClientRect();
+                        const originX = targetX - rect.left;
+                        const originY = targetY - rect.top;
+                        
+                        scene.style.transformOrigin = `${originX}px ${originY}px`;
+                        scene.classList.add('zoom-in-exit');
+                    } 
+                    // Eğer geri gidiyorsak (Zoom Out)
+                    else if (transitionType === 'out') {
+                        scene.style.transformOrigin = 'center center';
+                        scene.classList.add('zoom-out-exit');
+                    }
+                    // Normal açılış
+                    else {
+                        scene.classList.add('zoom-out'); // Fallback css
+                    }
+
+                    // Temizlik
+                    setTimeout(() => scene.remove(), 800);
+                } else {
                     scene.remove();
                 }
             });
 
-            // Create new scene
+            // 2. YENİ SAHNEYİ OLUŞTUR (Giriş Animasyonu Hazırlığı)
             const scene = document.createElement('div');
             scene.className = 'circular-scene';
             scene.dataset.sceneId = sceneId;
 
-            // Set transform origin to clicked item position for zoom effect
-            if (targetX !== null && targetY !== null) {
-                scene.style.transformOrigin = `${targetX}px ${targetY}px`;
-            } else {
+            // Giriş stili belirle
+            if (transitionType === 'in') {
+                scene.classList.add('zoom-in-enter'); // Küçükten başla
+                scene.style.transformOrigin = 'center center'; // Yeni sahne her zaman ortadan doğsun
+            } else if (transitionType === 'out') {
+                scene.classList.add('zoom-out-enter'); // Büyükten başla (içine giriyormuş gibi)
                 scene.style.transformOrigin = 'center center';
             }
 
-            // Get positions based on current layout mode
+            // Layout hesapla
             const positions = circularNav.layoutMode === 'circle'
                 ? getCircularPositions(items.length, radius)
                 : getGridPositions(items.length, iconSize);
 
-            // ÇARK SİSTEMİ: Wrapper'lar SADECE CIRCLE MODUNDA
+            // Wrapper mantığı (Circle mode için)
             let innerWrapper = null;
             let outerWrapper = null;
 
             if (circularNav.layoutMode === 'circle') {
-                // Circle mode: Wrapper'ları oluştur
                 innerWrapper = document.createElement('div');
                 innerWrapper.className = 'circle-wrapper';
                 innerWrapper.dataset.circle = 'inner';
-                innerWrapper.style.position = 'absolute';
-                innerWrapper.style.width = '100%';
-                innerWrapper.style.height = '100%';
-                innerWrapper.style.top = '0';
-                innerWrapper.style.left = '0';
-                innerWrapper.style.transformOrigin = 'center center';
-                innerWrapper.style.pointerEvents = 'none';
-                innerWrapper.style.willChange = 'transform';
+                innerWrapper.style.cssText = 'position:absolute;width:100%;height:100%;top:0;left:0;transform-origin:center center;pointer-events:none;will-change:transform;';
 
                 outerWrapper = document.createElement('div');
                 outerWrapper.className = 'circle-wrapper';
                 outerWrapper.dataset.circle = 'outer';
-                outerWrapper.style.position = 'absolute';
-                outerWrapper.style.width = '100%';
-                outerWrapper.style.height = '100%';
-                outerWrapper.style.top = '0';
-                outerWrapper.style.left = '0';
-                outerWrapper.style.transformOrigin = 'center center';
-                outerWrapper.style.pointerEvents = 'none';
-                outerWrapper.style.willChange = 'transform';
+                outerWrapper.style.cssText = 'position:absolute;width:100%;height:100%;top:0;left:0;transform-origin:center center;pointer-events:none;will-change:transform;';
             }
 
+            // 3. İTEMLERİ EKLE
             items.forEach((item, index) => {
                 const itemEl = document.createElement('div');
                 itemEl.className = 'circular-item';
                 itemEl.style.left = `${positions[index].x}px`;
                 itemEl.style.top = `${positions[index].y}px`;
+                itemEl.style.transform = 'translate(-50%, -50%)';
+                itemEl.style.pointerEvents = 'auto';
 
-                // GRID vs CIRCLE: Transform farklı!
-                if (circularNav.layoutMode === 'grid') {
-                    // GRID: Sadece merkez hizalama, ASLA rotation yok!
-                    itemEl.style.transform = 'translate(-50%, -50%)';
-                } else {
-                    // CIRCLE: Başlangıçta merkez hizalama (counter-rotation updatePositionsDOM'da)
-                    itemEl.style.transform = 'translate(-50%, -50%)';
-                }
-
-                itemEl.style.pointerEvents = 'auto'; // İtemlar tıklama alır
-
-                // Store position data for rotation (SADECE CIRCLE MODUNDA)
-                if (positions[index].circle && circularNav.layoutMode === 'circle') {
+                if (positions[index].circle) {
                     itemEl.dataset.circle = positions[index].circle;
                     itemEl.dataset.baseAngle = positions[index].baseAngle;
                     itemEl.dataset.radius = positions[index].radius;
@@ -5856,12 +5890,10 @@ function getIcon(item) {
 
                 const iconContainer = document.createElement('div');
                 iconContainer.className = 'circular-item-icon';
-                // Apply dynamic sizing and parametric border-radius
                 iconContainer.style.width = `${iconSize}px`;
                 iconContainer.style.height = `${iconSize}px`;
-                iconContainer.style.borderRadius = `${Math.max(iconSize * 0.15, 8)}px`; // 15% of icon size, min 8px
+                iconContainer.style.borderRadius = `${Math.max(iconSize * 0.15, 8)}px`;
 
-                // Use mobile-style icons (same as mobile interface)
                 if (isRoot) {
                     iconContainer.innerHTML = getCircularIconHTML({ type: 'folder', name: item.name });
                 } else {
@@ -5871,71 +5903,56 @@ function getIcon(item) {
                 const nameEl = document.createElement('div');
                 nameEl.className = 'circular-item-name';
                 nameEl.textContent = item.name;
-                // Apply dynamic font size and max width
                 nameEl.style.fontSize = `${fontSize}px`;
                 nameEl.style.maxWidth = `${iconSize * 1.5}px`;
 
                 itemEl.appendChild(iconContainer);
                 itemEl.appendChild(nameEl);
 
-                // Mouse hover handler - update sidebar
+                // Hover events
                 itemEl.addEventListener('mouseenter', () => {
-                    // Eğer bir pencere açıksa HOVER İŞLEMEZ
                     if (circularNav.openWindowItem) return;
                     updateSidebarForWindow(item);
                 });
-
-                // Mouse leave handler - restore folder info
                 itemEl.addEventListener('mouseleave', () => {
-                    // Eğer bir pencere açıksa RESETLEME İŞLEMEZ (Bilgi kalmalı)
                     if (circularNav.openWindowItem) return;
                     restoreFolderSidebar();
                 });
 
-                // Click handler
-                // --- YENİ CLICK HANDLER (Sürükleme Korumalı) ---
+                // CLICK EVENT (KOORDİNAT YAKALAMA)
                 itemEl.addEventListener('click', (e) => {
-                    // SADECE CIRCLE MODUNDA sürükleme kontrolü yap
-                    // Grid modunda her zaman tıklanabilir olmalı!
-                    if (circularNav.layoutMode === 'circle' && hasMovedEnoughToDrag) {
+                    if (hasMovedEnoughToDrag) {
                         e.stopPropagation();
                         e.preventDefault();
                         return;
                     }
 
-                    // Tıklama geçerliyse koordinatları al
-                    const clickX = positions[index].x;
-                    const clickY = positions[index].y;
+                    // Tıklanan koordinatları (Screen coordinates) al
+                    const clickX = e.clientX;
+                    const clickY = e.clientY;
 
                     if (isRoot) {
+                        // Root'tan alt klasöre giriş -> 'in' animasyonu ve koordinat
                         navigateToCircularFolder(item.key, item.name, item.description, clickX, clickY);
                     } else {
                         if (item.type === 'folder' && item.folderKey) {
-                            const subfolderKey = item.folderKey;
-                            const subfolderName = item.name;
-                            const subfolderDesc = item.description || 'Navigate through items';
-                            navigateToCircularFolder(subfolderKey, subfolderName, subfolderDesc, clickX, clickY);
+                            navigateToCircularFolder(item.folderKey, item.name, item.description || 'Navigate', clickX, clickY);
                         } else {
                             handleCircularItemClick(item);
                         }
                     }
                 });
 
-                // Resimlerin ve linklerin sürüklenirken "hayalet" görüntü çıkarmasını engelle
                 itemEl.addEventListener('dragstart', (e) => e.preventDefault());
 
-                // İTEMLERİ EKLE: Circle mode → wrapper, Grid mode → direkt scene
                 if (circularNav.layoutMode === 'circle') {
-                    // CIRCLE MODE: Wrapper'a ekle
                     const targetWrapper = positions[index].circle === 'inner' ? innerWrapper : outerWrapper;
                     targetWrapper.appendChild(itemEl);
                 } else {
-                    // GRID MODE: Direkt scene'e ekle (wrapper YOK!)
                     scene.appendChild(itemEl);
                 }
             });
 
-            // CIRCLE MODE: Wrapper'ları scene'e ekle
             if (circularNav.layoutMode === 'circle') {
                 scene.appendChild(innerWrapper);
                 scene.appendChild(outerWrapper);
@@ -5943,18 +5960,15 @@ function getIcon(item) {
 
             container.appendChild(scene);
 
-            // Activate scene HEMEN (gecikme yok - counter-rotation için gerekli!)
-            // Deactivate old scene
-            oldScenes.forEach(s => s.classList.remove('active'));
-            // Activate new scene
-            scene.classList.add('active');
-
-            // CIRCLE MODE: İlk counter-rotation'u hemen uygula!
-            if (circularNav.layoutMode === 'circle') {
-                requestAnimationFrame(() => {
-                    updatePositionsDOM(); // İlk frame'de counter-rotation uygula
-                });
-            }
+            // 4. ANİMASYONU BAŞLAT (Next Frame)
+            requestAnimationFrame(() => {
+                // Tarayıcı render'ı yakalasın diye çift RAF veya timeout gerekebilir
+                setTimeout(() => {
+                    scene.classList.add('active');
+                    scene.classList.remove('zoom-in-enter');
+                    scene.classList.remove('zoom-out-enter');
+                }, 10);
+            });
         }
 
         function updateCircularBreadcrumb() {
@@ -5970,7 +5984,7 @@ function getIcon(item) {
         }
 
         function navigateToCircularFolder(folderKey, folderName, folderDescription, targetX = null, targetY = null) {
-            // Clear open window state when navigating to a folder
+            // Clear open window state
             circularNav.openWindowItem = null;
 
             // Update sidebar
@@ -5993,19 +6007,18 @@ function getIcon(item) {
             // Show back button
             document.getElementById('circular-back-button').classList.add('visible');
 
-            // Render scene with zoom origin
-            renderCircularScene(folderKey, items, false, targetX, targetY);
+            // Render scene with ZOOM IN effect ('in')
+            renderCircularScene(folderKey, items, false, targetX, targetY, 'in');
         }
 
         function navigateBackCircular() {
-            // Close all open windows when navigating back
+            // Close all open windows
             const existingWindows = document.querySelectorAll('.floating-window');
             existingWindows.forEach(win => {
                 const winId = win.id;
-                closeWindow(winId, true); // true = skip sidebar restore (we're navigating)
+                closeWindow(winId, true);
             });
 
-            // Clear open window state
             circularNav.openWindowItem = null;
 
             if (circularNav.currentIndex > 0) {
@@ -6021,7 +6034,8 @@ function getIcon(item) {
                     circularNav.currentFolderData = prev;
 
                     updateCircularBreadcrumb();
-                    renderCircularScene(prev.folderKey, items, false);
+                    // Render with ZOOM OUT effect ('out')
+                    renderCircularScene(prev.folderKey, items, false, null, null, 'out');
                 }
             } else {
                 // Back to root
@@ -6030,15 +6044,16 @@ function getIcon(item) {
         }
 
         function navigateToCircularRoot() {
-            // Close all open windows when returning to root
             const existingWindows = document.querySelectorAll('.floating-window');
             existingWindows.forEach(win => {
                 const winId = win.id;
-                closeWindow(winId, true); // true = skip sidebar restore
+                closeWindow(winId, true);
             });
 
-            // Clear open window state
             circularNav.openWindowItem = null;
+
+            // Eğer geçmişte bir yerdeysek ve root'a dönüyorsak animasyonlu dönelim
+            const isNavigatingBack = circularNav.currentIndex > -1;
 
             circularNav.currentIndex = -1;
             circularNav.history = [];
@@ -6050,7 +6065,9 @@ function getIcon(item) {
             document.getElementById('circular-breadcrumb').textContent = 'DFW/';
             document.getElementById('circular-back-button').classList.remove('visible');
 
-            renderCircularScene('root', mainCategories, true);
+            // Root'a dönerken de 'out' efekti (eğer başlangıç açılışı değilse)
+            const transitionType = isNavigatingBack ? 'out' : 'normal';
+            renderCircularScene('root', mainCategories, true, null, null, transitionType);
         }
 
         function handleCircularItemClick(item) {
