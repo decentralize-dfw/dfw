@@ -832,13 +832,14 @@
         }
 
         #circular-sidebar-title {
-            font-size: 42px;
+            font-size: 34px;
             font-weight: 700;
             color: white;
             text-shadow: 0 2px 8px rgba(0,0,0,0.5);
             margin-bottom: 16px;
             line-height: 1.2;
             max-width: 350px;
+            letter-spacing: -0.2px;
             /* Allow title to wrap to next line - no truncation */
             overflow-wrap: break-word;
             word-wrap: break-word;
@@ -846,12 +847,13 @@
         }
 
         #circular-sidebar-description {
-            font-size: 16px;
+            font-size: 13px;
             color: rgba(255,255,255,0.9);
             text-shadow: 0 1px 4px rgba(0,0,0,0.5);
             line-height: 1.6;
             max-width: 350px;
             max-height: 200px;
+            letter-spacing: -0.2px;
             /* Vertical scrollbar for long descriptions */
             overflow-y: auto;
             overflow-x: hidden;
@@ -1016,6 +1018,14 @@
             align-items: center;
             justify-content: center;
             transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+
+        #circular-container.dragging {
+            cursor: grabbing !important;
         }
 
         /* Circular Scene */
@@ -5367,7 +5377,8 @@ function getIcon(item) {
             currentIndex: -1,
             currentFolder: 'root',
             currentFolderData: null,
-            layoutMode: 'circle' // 'circle' or 'grid'
+            layoutMode: 'circle', // 'circle' or 'grid'
+            openWindowItem: null // Track currently open window to prevent sidebar changes
         };
 
         // Circle rotation state
@@ -5412,17 +5423,17 @@ function getIcon(item) {
         function getCircularIconHTML(item) {
             // Priority 1: Check for thumbnailUrl
             if (item.thumbnailUrl) {
-                return `<img src="${item.thumbnailUrl}" alt="${item.name}" onerror="this.outerHTML='${getDefaultIcon(item).replace(/'/g, "\\'")}';">`;
+                return `<img src="${item.thumbnailUrl}" alt="${item.name}" onerror="this.parentElement.innerHTML = \`${getDefaultIcon(item).replace(/`/g, '\\`')}\`;">`;
             }
 
             // Priority 2: Check for iconUrl
             if (item.iconUrl) {
-                return `<img src="${item.iconUrl}" alt="${item.name}" onerror="this.outerHTML='${getDefaultIcon(item).replace(/'/g, "\\'")}';">`;
+                return `<img src="${item.iconUrl}" alt="${item.name}" onerror="this.parentElement.innerHTML = \`${getDefaultIcon(item).replace(/`/g, '\\`')}\`;">`;
             }
 
             // Priority 3: For images, use the image URL itself as thumbnail
             if (item.type === 'image' && item.url) {
-                return `<img src="${item.url}" alt="${item.name}" onerror="this.outerHTML='${getDefaultIcon(item).replace(/'/g, "\\'")}';">`;
+                return `<img src="${item.url}" alt="${item.name}" onerror="this.parentElement.innerHTML = \`${getDefaultIcon(item).replace(/`/g, '\\`')}\`;">`;
             }
 
             // Priority 4: Default icon based on type
@@ -5463,7 +5474,9 @@ function getIcon(item) {
 
             // Calculate circumference and divide by items (with spacing)
             const circumference = 2 * Math.PI * circleRadius;
-            const totalSlots = count * 2; // count items + count spaces
+            // More spacing for crowded circles (20+ items get 3x spacing, 10-20 get 2.5x, <10 get 2x)
+            const spacingMultiplier = count > 20 ? 3.5 : (count > 10 ? 3 : 2.5);
+            const totalSlots = count * spacingMultiplier; // count items + spacing
             const slotSize = circumference / totalSlots;
 
             // Icon size is 2x of slot size, then apply ICON_SCALE
@@ -5520,8 +5533,8 @@ function getIcon(item) {
 
             // Use 60% of screen width (20% margins on each side)
             const availableWidth = window.innerWidth * 0.6;
-            // Use 90% of screen height (5% margins top and bottom)
-            const availableHeight = window.innerHeight * 0.9;
+            // Use 70% of screen height (15% margins top and bottom)
+            const availableHeight = window.innerHeight * 0.7;
 
             // Estimate optimal column count based on aspect ratio
             const aspectRatio = availableWidth / availableHeight;
@@ -5554,7 +5567,7 @@ function getIcon(item) {
 
             // Margins for centering
             const marginLeft = window.innerWidth * 0.2; // 20% left margin
-            const marginTop = window.innerHeight * 0.05; // 5% top margin
+            const marginTop = window.innerHeight * 0.15; // 15% top margin
 
             // Center the grid within available area
             const startX = marginLeft + (availableWidth - actualGridWidth) / 2;
@@ -5817,7 +5830,17 @@ function getIcon(item) {
             }
         }
 
-        function updateSidebarForWindow(item) {
+        function updateSidebarForWindow(item, isWindowOpening = false) {
+            // If a window is already open and we're just hovering, don't update sidebar
+            if (circularNav.openWindowItem && !isWindowOpening) {
+                return;
+            }
+
+            // If opening a window, mark it as open
+            if (isWindowOpening) {
+                circularNav.openWindowItem = item;
+            }
+
             document.getElementById('circular-sidebar-title').textContent = item.name;
             document.getElementById('circular-sidebar-description').textContent = item.description || 'No description available';
 
@@ -5973,10 +5996,13 @@ function getIcon(item) {
             const clickedCircle = getClickedCircle(clientX, clientY);
             if (!clickedCircle) return;
 
+            const container = document.getElementById('circular-container');
+            container.classList.add('dragging');
+
             const state = clickedCircle === 'inner' ? rotationState.inner : rotationState.outer;
             state.isDragging = true;
             state.lastMouseAngle = getMouseAngle(clientX, clientY);
-            state.lastTime = Date.now();
+            state.lastTime = performance.now();
             state.velocity = 0; // Stop any momentum
 
             startPhysicsLoop();
@@ -5989,15 +6015,16 @@ function getIcon(item) {
             if (!draggingInner && !draggingOuter) return;
 
             const currentAngle = getMouseAngle(clientX, clientY);
-            const currentTime = Date.now();
+            const currentTime = performance.now();
 
             if (draggingInner) {
                 const angleDelta = currentAngle - rotationState.inner.lastMouseAngle;
-                const timeDelta = currentTime - rotationState.inner.lastTime;
+                const timeDelta = Math.max(currentTime - rotationState.inner.lastTime, 1);
 
                 rotationState.inner.angle += angleDelta;
+                // Calculate velocity with better time normalization (milliseconds to seconds)
                 if (timeDelta > 0) {
-                    rotationState.inner.velocity = angleDelta / timeDelta * 16; // Normalize to 60fps
+                    rotationState.inner.velocity = (angleDelta / timeDelta) * 1000 / 60; // Per frame at 60fps
                 }
 
                 rotationState.inner.lastMouseAngle = currentAngle;
@@ -6006,11 +6033,12 @@ function getIcon(item) {
 
             if (draggingOuter) {
                 const angleDelta = currentAngle - rotationState.outer.lastMouseAngle;
-                const timeDelta = currentTime - rotationState.outer.lastTime;
+                const timeDelta = Math.max(currentTime - rotationState.outer.lastTime, 1);
 
                 rotationState.outer.angle += angleDelta;
+                // Calculate velocity with better time normalization
                 if (timeDelta > 0) {
-                    rotationState.outer.velocity = angleDelta / timeDelta * 16; // Normalize to 60fps
+                    rotationState.outer.velocity = (angleDelta / timeDelta) * 1000 / 60; // Per frame at 60fps
                 }
 
                 rotationState.outer.lastMouseAngle = currentAngle;
@@ -6021,6 +6049,9 @@ function getIcon(item) {
         }
 
         function handleRotationEnd() {
+            const container = document.getElementById('circular-container');
+            container.classList.remove('dragging');
+
             rotationState.inner.isDragging = false;
             rotationState.outer.isDragging = false;
             startPhysicsLoop(); // Continue with momentum
@@ -6483,7 +6514,10 @@ if (thumbnailsEl) {
                 console.warn(`Cannot open window for type 'link'. Use double-click or enter key.`);
                 return;
             }
-            
+
+            // Update sidebar and mark as window opening
+            updateSidebarForWindow(item, true);
+
             zIndexCounter++;
             const windowId = `window-${item.id}-${Date.now()}`;
             
@@ -6645,6 +6679,9 @@ if (thumbnailsEl) {
             const windowEl = document.getElementById(windowId);
             if (windowEl) windowEl.remove();
             openWindows = openWindows.filter(w => w.id !== windowId);
+
+            // Clear open window state
+            circularNav.openWindowItem = null;
 
             // Restore folder sidebar when window is closed
             if (window.innerWidth > 768) {
@@ -7671,16 +7708,18 @@ if (thumbnailsEl) {
 
                 if (!overlay || !title || !pagesContainer || !dotsContainer || !backBtn) return;
 
-                // Add to history only if overlay is already visible (nested folder navigation)
-                if (overlay.classList.contains('visible')) {
+                const isOverlayVisible = overlay.classList.contains('visible');
+
+                if (isFirstLevel) {
+                    // Opening from main screen - initialize history with this folder
+                    mobileFolderHistory = [item];
+                } else if (isOverlayVisible) {
+                    // Nested navigation - add to history
                     mobileFolderHistory.push(item);
-                } else if (isFirstLevel) {
-                    // First level folder from main screen - don't show back button
-                    mobileFolderHistory = [];
                 }
 
-                // Show/hide back button based on history
-                backBtn.style.display = mobileFolderHistory.length > 0 ? 'flex' : 'none';
+                // Show back button only if we have more than 1 item in history
+                backBtn.style.display = mobileFolderHistory.length > 1 ? 'flex' : 'none';
 
                 title.textContent = item.name;
 
@@ -7731,21 +7770,72 @@ if (thumbnailsEl) {
 
             // Navigate back in mobile folder
             function navigateMobileFolderBack() {
-                if (mobileFolderHistory.length > 0) {
-                    // Go back to previous folder
+                if (mobileFolderHistory.length > 1) {
+                    // Remove current folder from history
                     mobileFolderHistory.pop();
 
-                    if (mobileFolderHistory.length > 0) {
-                        // Open the previous folder in history
-                        const previousFolder = mobileFolderHistory[mobileFolderHistory.length - 1];
-                        mobileFolderHistory.pop(); // Remove it so openMobileFolder will add it back
-                        openMobileFolder(previousFolder);
-                    } else {
-                        // No more history, close the overlay
-                        closeMobileFolder();
+                    // Get the previous folder (don't remove it)
+                    const previousFolder = mobileFolderHistory[mobileFolderHistory.length - 1];
+
+                    // Re-render the previous folder without adding to history
+                    const folderKey = previousFolder.folderKey || previousFolder.name;
+                    mobileCurrentFolderItems = fileSystemDB[folderKey] || [];
+                    mobileFolderTotalPages = Math.max(1, Math.ceil(mobileCurrentFolderItems.length / MOBILE_FOLDER_ITEMS_PER_PAGE));
+                    mobileFolderCurrentPage = 0;
+
+                    const title = document.getElementById('mobile-folder-title');
+                    const pagesContainer = document.getElementById('mobile-folder-pages');
+                    const dotsContainer = document.getElementById('mobile-folder-dots');
+                    const backBtn = document.getElementById('mobile-folder-back-btn');
+
+                    if (!title || !pagesContainer || !dotsContainer || !backBtn) return;
+
+                    title.textContent = previousFolder.name;
+
+                    // Render folder pages
+                    pagesContainer.innerHTML = '';
+                    for (let pageIndex = 0; pageIndex < mobileFolderTotalPages; pageIndex++) {
+                        const pageEl = document.createElement('div');
+                        pageEl.className = 'mobile-folder-page';
+
+                        const startIdx = pageIndex * MOBILE_FOLDER_ITEMS_PER_PAGE;
+                        const endIdx = Math.min(startIdx + MOBILE_FOLDER_ITEMS_PER_PAGE, mobileCurrentFolderItems.length);
+
+                        for (let i = startIdx; i < endIdx; i++) {
+                            const folderItem = mobileCurrentFolderItems[i];
+                            const iconEl = document.createElement('div');
+                            iconEl.className = 'mobile-folder-icon';
+                            iconEl.innerHTML = `
+                                <div class="mobile-folder-icon-image">${getMobileIconHTML(folderItem)}</div>
+                                <div class="mobile-folder-icon-name">${folderItem.name}</div>
+                            `;
+                            iconEl.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                handleMobileItemClick(folderItem);
+                            });
+                            pageEl.appendChild(iconEl);
+                        }
+
+                        pagesContainer.appendChild(pageEl);
                     }
+
+                    // Render folder dots
+                    dotsContainer.innerHTML = '';
+                    if (mobileFolderTotalPages > 1) {
+                        for (let i = 0; i < mobileFolderTotalPages; i++) {
+                            const dot = document.createElement('div');
+                            dot.className = 'mobile-folder-dot' + (i === mobileFolderCurrentPage ? ' active' : '');
+                            dotsContainer.appendChild(dot);
+                        }
+                    }
+
+                    // Reset page position
+                    pagesContainer.style.transform = 'translateX(0)';
+
+                    // Update back button visibility
+                    backBtn.style.display = mobileFolderHistory.length > 1 ? 'flex' : 'none';
                 } else {
-                    // No history, just close
+                    // At root level of folder overlay, close it
                     closeMobileFolder();
                 }
             }
