@@ -1,0 +1,616 @@
+"Scaffold": [
+    // --- MANIFESTO / INFO TEXT ---
+    {
+        id: 'scaffold-0',
+        type: 'text',
+        name: 'READ_ME_Scaffold.txt',
+        content: 'SCAFFOLD, 3D Architectural Browser\n\nA silent structure that is built around architectural smart objects. Explore all 50 digital topographies with a single click, or experiment with guided tours via NPCs.\n\nExplore "Scaffold," a 3D browser that showcases 50 digital topographies—unique 3D architectural designs. Drawing inspiration from the lunar landscapes in 2001: A Space Odyssey, Scaffold serves as an open museum, integrating digital models with the existing architecture of DFW.\n\nUnlike traditional 2D websites that require multiple tabs for different designs, Scaffold offers a single, immersive space. Users can navigate through this environment with VR headsets, experiencing each building in a more engaging way.\n\nClick on an image to bring its corresponding building into the center of the courtyard. For a guided experience, use the Promenade+ feature, which displays all 50 buildings in sequence, each for six seconds. Short tutorials on Camera and Teleportation are available from the NPC guide to help you navigate the space more effectively.\n\nThe entire world is lightweight, with a total size of 13 MB and each model averaging 5 MB, ensuring smooth performance on any device.',
+        description: 'Information regarding the 3D Architectural Browser.',
+        created: '2025',
+        minted: 'N/A',
+        medium: 'Text Document',
+        dimensions: 'N/A',
+        size: '2 KB',
+        tags: ['text', 'architecture', 'browser', '3d'],
+        links: []
+    },
+
+    // --- EXPERIENCE LINK ---
+    {
+        id: 'scaffold-link-1',
+        type: 'link',
+        name: 'ENTER_SCAFFOLD.exe',
+        url: 'https://hyperfy.io/scaffold',
+        description: 'Click to enter the Scaffold 3D Architectural Browser on Hyperfy.',
+        created: '2025',
+        minted: 'N/A',
+        medium: 'External Link',
+        dimensions: 'N/A',
+        size: '0 KB',
+        tags: ['web', 'experience', 'hyperfy', 'architecture'],
+        links: [
+            { url: 'https://hyperfy.io/scaffold', name: 'Hyperfy World' }
+        ]
+    },
+
+    // --- PROMO VIDEO ---
+    {
+        id: 'scaffold-vid-1',
+        type: 'video',
+        name: 'Scaffold_Promo.mp4',
+        url: 'https://video.wixstatic.com/video/54a996_ac819c2d59714a1e9059aa9019f8443c/1080p/mp4/file.mp4',
+        description: 'Promotional video showcasing the Scaffold environment and digital topographies.',
+        created: '2025',
+        minted: 'N/A',
+        medium: 'MP4 Video',
+        dimensions: '1920x1080',
+        size: '15 MB',
+        tags: ['video', 'promo', 'architecture'],
+        links: []
+    },
+
+    // --- ORDER / ACQUIRE LINK ---
+    {
+        id: 'scaffold-link-2',
+        type: 'link', // HTML'de iframe olarak verilmiş, burada link olarak sunuyoruz
+        name: 'Order_Acquire_Designs',
+        url: 'https://www.digitalforgerywork.shop/order-acquire',
+        description: 'Page to order or acquire the displayed architectural designs.',
+        created: '2025',
+        minted: 'N/A',
+        medium: 'External Link',
+        dimensions: 'N/A',
+        size: '0 KB',
+        tags: ['web', 'shop', 'order'],
+        links: [
+            { url: 'https://www.digitalforgerywork.shop/order-acquire', name: 'DFW Shop' }
+        ]
+    }
+],
+
+
+
+
+"Retail": [
+    // --- MANIFESTO / INFO TEXT ---
+    {
+        id: 'retail-0',
+        type: 'text',
+        name: 'READ_ME_Manifesto.txt',
+        content: 'RETAIL, 3d beings shop for c2w2.vrm, 2025\n\nRetail in the metaverse bridges the gap between fashion and daily life, offering a unique platform for connection and innovation. The concept of retail extends beyond mere transactions; it serves as a vital link that introduces individuals to new cultures and innovations through fashion. As the digital and physical realms converge, especially in the metaverse, this connection evolves, presenting untapped potential for immersive brand experiences. The challenge lies in reimagining retail in a space where traditional physical interactions are absent, yet the opportunity to engage and educate remains paramount.\n\nA hybrid retail model combines the best aspects of physical and digital shopping experiences, offering personalized, immersive interactions. This innovative approach is realized through a virtual space that allows consumers to instantly try on items on their digital counterparts, merging the tactile satisfaction of in-store shopping with the convenience of online platforms. Within this virtual environment, the retail experience is elevated through the integration of AI-driven assistance and the ability to customize one\'s experience in real-time. Notably, the store features four distinct architectural designs and four unique DJ music sets, which, when combined, create 16 different atmospheric experiences. This level of customization ensures that each visit can offer a new and engaging experience, encouraging exploration and repeated engagement.\n\nThe ultimate goal is to create a cohesive and immersive brand experience that transcends traditional shopping. By carefully designing every aspect of the virtual retail environment, from the architectural choices to the musical ambiance, brands can craft a narrative that resonates deeply with their audience. The selection of four buildings and accompanying DJ sets exemplifies this commitment to diversity and personalization, ensuring that visitors can tailor their experience to suit their preferences, thereby fostering a deeper connection with the brand. This approach not only enhances the narrative of the collection but also redefines the possibilities of digital retail, offering a glimpse into the future of brand engagement in the metaverse.',
+        description: 'Manifesto: 3d beings shop for c2w2.vrm, 2025.',
+        created: '2025',
+        minted: 'N/A',
+        medium: 'Text Document',
+        dimensions: 'N/A',
+        size: '3 KB',
+        tags: ['text', 'retail', 'manifesto', 'metaverse'],
+        links: []
+    },
+
+    // --- EXPERIENCE LINK ---
+    {
+        id: 'retail-link-1',
+        type: 'link',
+        name: 'ENTER_RETAIL.exe',
+        url: 'https://hyperfy.io/retail',
+        description: 'Click to enter the Retail 3D Beings Shop on Hyperfy.',
+        created: '2025',
+        minted: 'N/A',
+        medium: 'External Link',
+        dimensions: 'N/A',
+        size: '0 KB',
+        tags: ['web', 'experience', 'hyperfy', 'retail'],
+        links: [
+            { url: 'https://hyperfy.io/retail', name: 'Hyperfy World' }
+        ]
+    },
+
+    // --- VIDEOS & MEDIA ---
+    {
+        id: 'retail-vid-info',
+        type: 'video',
+        name: 'Retail_Promo_Main.mp4',
+        url: 'https://video.wixstatic.com/video/54a996_ac819c2d59714a1e9059aa9019f8443c/1080p/mp4/file.mp4',
+        description: 'Main promotional video for the Retail experience.',
+        created: '2025',
+        minted: 'N/A',
+        medium: 'MP4 Video',
+        dimensions: '1920x1080',
+        size: '15 MB',
+        tags: ['video', 'promo', 'retail'],
+        links: []
+    },
+    {
+        id: 'retail-vid-1',
+        type: 'video',
+        name: 'Retail_Store_v3_2024.mp4',
+        url: 'https://video.wixstatic.com/video/54a996_738b1c24604b445da67f2ecc7dbf51ef/1080p/mp4/file.mp4',
+        thumbnailUrl: "https://static.wixstatic.com/media/54a996_7adf5b10696949b7a639ef2a54f1cecd~mv2.png",
+        description: 'Showcase of Retail Store version 3.',
+        created: '2024',
+        minted: 'N/A',
+        medium: 'MP4 Video',
+        dimensions: '1920x1080',
+        size: '15 MB',
+        tags: ['video', 'store', 'v3'],
+        links: []
+    },
+    {
+        id: 'retail-vid-2',
+        type: 'video',
+        name: 'Retail_Store_v4_2024.mp4',
+        url: 'https://video.wixstatic.com/video/54a996_06defe414c564bad88e1c59ee38ae459/1080p/mp4/file.mp4',
+        thumbnailUrl: "https://static.wixstatic.com/media/54a996_7adf5b10696949b7a639ef2a54f1cecd~mv2.png",
+        description: 'Showcase of Retail Store version 4.',
+        created: '2024',
+        minted: 'N/A',
+        medium: 'MP4 Video',
+        dimensions: '1920x1080',
+        size: '15 MB',
+        tags: ['video', 'store', 'v4'],
+        links: []
+    },
+    {
+        id: 'retail-vid-3',
+        type: 'video',
+        name: 'Retail_Song_for_v5_2024.mp4',
+        url: 'https://video.wixstatic.com/video/54a996_2b529cb35fda488f8486f0a11871ee5c/1080p/mp4/file.mp4',
+        thumbnailUrl: "https://static.wixstatic.com/media/54a996_7adf5b10696949b7a639ef2a54f1cecd~mv2.png",
+        description: 'Music video/promo featuring the song for Retail version 5.',
+        created: '2024',
+        minted: 'N/A',
+        medium: 'MP4 Video',
+        dimensions: '1920x1080',
+        size: '15 MB',
+        tags: ['video', 'song', 'promo'],
+        links: []
+    },
+    {
+        id: 'retail-vid-4',
+        type: 'video',
+        name: 'Retail_Store_v2_2023.mp4',
+        url: 'https://video.wixstatic.com/video/54a996_8a65570df8c04cfd994e8a8f3a2c4a46/1080p/mp4/file.mp4',
+        thumbnailUrl: "https://static.wixstatic.com/media/54a996_7adf5b10696949b7a639ef2a54f1cecd~mv2.png",
+        description: 'Showcase of the earlier Retail Store version 2.',
+        created: '2023',
+        minted: 'N/A',
+        medium: 'MP4 Video',
+        dimensions: '1920x1080',
+        size: '15 MB',
+        tags: ['video', 'store', 'v2'],
+        links: []
+    }
+],
+
+"Neue² Dojo": [
+    // --- MANIFESTO / INFO TEXT ---
+    {
+        id: 'neue-0',
+        type: 'text',
+        name: 'READ_ME_Manifesto.txt',
+        content: 'NEUE² DOJO GALLERY\n\nNeue² Dojo Gallery stands at the forefront of a cultural revolution, exemplifying how art and technology can coalesce to create entirely new paradigms for cultural expression and engagement.\n\nNeue² Dojo is 26th of digital topographies, designed between 21.12.2023 to 24.12.2023. In Neue² Dojo, 340 artworks made by decentralize* from 2017 until now are curated and exhibited in a museum form. Each room or corridor has its context of aesthetics and time, carefully designed to create a meaningful promenade scenario. Categories like digital art, digital painting, physical painting, crypto art, and photography could be experienced virtually over a manipulated surface.\n\nThe essence of the Neue² Dojo Gallery lies in its exploration of the flexible nature of virtual architecture. Unlike traditional galleries, where the physical constraints of the building dictate the scope and scale of exhibitions, the Neue² Dojo Gallery is liberated from these limitations. Each exhibition can be accompanied by a complete redesign of the gallery\'s virtual structure, allowing for an unprecedented level of thematic and conceptual integration between the space and the art it displays.\n\nThe decision to anchor the gallery on the blockchain is both a philosophical and practical one. It serves as a testament to the gallery\'s commitment to the principles of decentralization, transparency, and accessibility. Artworks hosted in the Neue² Dojo Gallery are immortalized on the blockchain, ensuring their provenance and ownership are clear and indisputable.\n\nThe gallery\'s presence on the 3D web democratizes access to art and culture. Visitors from around the globe can explore the gallery\'s ever-changing spaces and exhibitions without the barriers of geography or physical accessibility.\n\nThe Neue² Dojo Gallery is more than just a space for displaying art; it is a dynamic, evolving entity that reflects the fluidity and expansiveness of virtual architecture. Its design philosophy, grounded in the flexibility and adaptability of virtual spaces, not only allows for a more immersive and integrated exhibition experience but also champions the gallery as a site of cultural innovation and experimentation.\n\nThe design principle, deeply rooted in the mathematical elegance and spatial clarity reminiscent of Ludwig Mies van der Rohe\'s work, is meticulously applied to the Gallery’s layout. It presents a plan that champions simplicity and precision, serving as a testament to the power of restrained design. Yet, this adherence to minimalism in the plan phase sets the stage for a remarkable transformation when the design ascends into three-dimensional space, where the essence of minimalism paves the way for creative and complex expressions of form.\n\nAs the Gallery\'s design transitions from two-dimensional plans to three-dimensional reality, it embarks on a bold departure from minimalism, embracing an aggressive interpretation of space. This dramatic evolution is characterized by the imaginative extrusion of structural lines into the third dimension, where architectural elements are reinvented with a daring flair.\n\n"Since I am Based && Existentialist Transhuman" Exhibition articulates the transitional phase of humanity. As Nietzsche posited the Übermensch as a goal for humanity to surpass its current state, this exhibition explores the concept that our generation may indeed be the bridge between the human and the transhuman, the organic and the mechanical.',
+        description: 'Manifesto: A cultural revolution in virtual art and architecture.',
+        created: '2023',
+        minted: 'N/A',
+        medium: 'Text Document',
+        dimensions: 'N/A',
+        size: '5 KB',
+        tags: ['text', 'gallery', 'manifesto', 'art'],
+        links: []
+    },
+
+    // --- EXPERIENCE LINK ---
+    {
+        id: 'neue-link-1',
+        type: 'link',
+        name: 'ENTER_DOJO.exe',
+        url: 'https://hyperfy.io/neue2dojo',
+        description: 'Click to enter the Neue² Dojo Gallery on Hyperfy.',
+        created: '2023',
+        minted: 'N/A',
+        medium: 'External Link',
+        dimensions: 'N/A',
+        size: '0 KB',
+        tags: ['web', 'experience', 'hyperfy', 'gallery'],
+        links: [
+            { url: 'https://hyperfy.io/neue2dojo', name: 'Hyperfy World' }
+        ]
+    },
+
+    // --- HERITAGE VIDEO ---
+    {
+        id: 'neue-vid-1',
+        type: 'video',
+        name: 'Heritage_Overview.mp4',
+        url: 'https://video.wixstatic.com/video/54a996_df82de7db8f14f1e8f165cbabc6cd914/1080p/mp4/file.mp4',
+        description: 'Overview of the heritage and history behind the gallery and artworks.',
+        created: '2023',
+        minted: 'N/A',
+        medium: 'MP4 Video',
+        dimensions: '1920x1080',
+        size: '15 MB',
+        tags: ['video', 'heritage', 'history'],
+        links: []
+    },
+
+    // --- INFO VIDEO (Background) ---
+    {
+        id: 'neue-vid-2',
+        type: 'video',
+        name: 'Dojo_Ambient_Loop.mp4',
+        url: 'https://video.wixstatic.com/video/54a996_ef95007416634bfb947f326f863bb810/1080p/mp4/file.mp4',
+        description: 'Ambient background loop showcasing the gallery atmosphere.',
+        created: '2023',
+        minted: 'N/A',
+        medium: 'MP4 Video',
+        dimensions: '1920x1080',
+        size: '15 MB',
+        tags: ['video', 'ambient', 'loop'],
+        links: []
+    },
+
+    // --- COLLECTION LINK ---
+    {
+        id: 'neue-link-2',
+        type: 'link',
+        name: 'View_Collection',
+        url: 'https://www.neue2dojo.com/c1',
+        description: 'View the curated collection of artworks.',
+        created: '2023',
+        minted: 'N/A',
+        medium: 'External Link',
+        dimensions: 'N/A',
+        size: '0 KB',
+        tags: ['web', 'collection', 'art'],
+        links: [
+            { url: 'https://www.neue2dojo.com/c1', name: 'Collection Site' }
+        ]
+    }
+],
+
+
+"Elements Store": [
+    // --- MANIFESTO / INFO TEXT ---
+    {
+        id: 'elements-0',
+        type: 'text',
+        name: 'READ_ME_Manifesto.txt',
+        content: 'ELEMENTS STORE\n\nVirtual Furniture Gallery for DFW Designs\n\nHoused in a futuristic, minimalist structure within Hyperfy, the Elements Store showcases DFW\'s design legacy—starting with the iconic Mermaid Chair and expanding to include furniture, sculptures, and vehicles.\n\nSpanning three floors, each with four customizable interior styles, the gallery offers 15,625 unique spatial variations. Users can navigate freely across this adaptive environment, explore works from 2021 to today, and personalize their journey through an intuitive UI—adjusting floor layouts, colors, and materials in real time.\n\nGuided by the concept of “sampling and chopping,” borrowed from experimental music production, the gallery embraces deconstruction and remixing of the architectural environment. This transforms the space into an evolving visual composition—where abstract collage elements and surreal overlays shift the mood and perception of the gallery itself.\n\nThe Elements Store is more than a showroom—it’s a spatial instrument for experiencing digital design through play, layering, and choice.',
+        description: 'Manifesto: Virtual Furniture Gallery for DFW Designs.',
+        created: '2025',
+        minted: 'N/A',
+        medium: 'Text Document',
+        dimensions: 'N/A',
+        size: '2 KB',
+        tags: ['text', 'gallery', 'furniture', 'design'],
+        links: []
+    },
+
+    // --- EXPERIENCE LINK ---
+    {
+        id: 'elements-link-1',
+        type: 'link',
+        name: 'ENTER_STORE.exe',
+        url: 'https://hyperfy.io/dfw',
+        description: 'Click to enter the Elements Store on Hyperfy.',
+        created: '2025',
+        minted: 'N/A',
+        medium: 'External Link',
+        dimensions: 'N/A',
+        size: '0 KB',
+        tags: ['web', 'experience', 'hyperfy', 'store'],
+        links: [
+            { url: 'https://hyperfy.io/dfw', name: 'Hyperfy World' }
+        ]
+    },
+
+    // --- PROMO VIDEO ---
+    {
+        id: 'elements-vid-1',
+        type: 'video',
+        name: 'Elements_Store_Promo.mp4',
+        url: 'https://video.twimg.com/ext_tw_video/1878077102919958529/pu/vid/avc1/1802x1080/A_5kd2gBFkEQPQdl.mp4?tag=14',
+        description: 'Promotional video showcasing the Elements Store and its customizable environments.',
+        created: '2025',
+        minted: 'N/A',
+        medium: 'MP4 Video',
+        dimensions: '1802x1080',
+        size: '12 MB',
+        tags: ['video', 'promo', 'store', 'furniture'],
+        links: []
+    }
+],
+
+"Black City": [
+    // --- MANIFESTO / INFO TEXT ---
+    {
+        id: 'blackcity-0',
+        type: 'text',
+        name: 'READ_ME_Manifesto.txt',
+        content: 'BLACK CITY, Decentralized Virtual Roomscape\n\nA virtual city with 8 independent museums (MOCA ROOMS), designed by DFW and curated on-chain by their citizens, 2023\n\nDFW has constructed a city within a decentralized landscape, featuring two series of four curatable virtual museum buildings, resulting in a total of 240 empty frames ready for curation by Roomies. In addition to the eight museums, visitors can explore pxlDuomo to experience 2Pac\'s "Black City" and a Concept Furniture Store showcasing DFW designs, either by walking or utilizing the convenience of the Central Office. The Transparent Animal Rooms drop has been completed, and the launch of the Space Time Rooms is anticipated soon, marking the next phase in the evolution of Black City.\n\nLaunched by MOCA (Museum of Crypto Art), ROOMs are engine agnostic, virtual-world-interoperable, 1-of-1 architectural objects. They are decentralized extensions of the Museum itself. With a ROOM NFT, holders can independently and permissionless-ly curate, exhibit, and deploy art exhibitions, shows, and spatial experiences.\n\nDuring the launch of Transparent Animal Rooms, we employed an array of innovative and disruptive marketing videos to create widespread awareness and excitement about both the unique designs and the software product itself. These videos were strategically shared across various social media platforms, leveraging their wide reach and engagement potential to maximize the impact.\n\nAs the second Room series by DFW, Transparent Animal Rooms are primarily motivated by the thought of pulling themselves back to a point in the volume without losing their silhouettes since museum buildings are a typology that nearly transforms into an artwork itself with an attitude that stands out very much as a typology. However, this retreat is "humble" enough to allow users to explore artworks from many angles while also realizing that the museums themselves are a creation of art or design.\n\nIn terms of both form and function, it is a fusion of two concepts in this quadrilateral series as well as an investigation into how these concepts might be infused with equal or varying energies in each design. The first strategy investigates the informal relationships of the arcs inspired by Untitled xyz\'s works. The second one is based on a sketch of Le Corbusier\'s Museum of Unlimited Growth, which resembles a labyrinth that spins over the core to create functional corridors.\n\nThe 64-slot Museum of Unlimited Growth is a transparent digital recreation of Corbusier\'s drawing. The 32-slot Spyder Mosk and the 16-slot Spyder Mosk Piccolo explore the idea of an arch-based structure, similar to Salvador Dalí\'s elephants in mosque proportions, with the larger one also incorporating a labyrinthine spiral system. Differently representing the blending of these two concepts is the 8-Slot Fly Club.',
+        description: 'Manifesto: A virtual city with 8 independent museums.',
+        created: '2023',
+        minted: 'N/A',
+        medium: 'Text Document',
+        dimensions: 'N/A',
+        size: '4 KB',
+        tags: ['text', 'city', 'manifesto', 'moca'],
+        links: []
+    },
+
+    // --- EXPERIENCE LINK ---
+    {
+        id: 'blackcity-link-1',
+        type: 'link',
+        name: 'ENTER_BLACK_CITY.exe',
+        url: 'https://hyperfy.io/blackcity',
+        description: 'Click to enter Black City on Hyperfy.',
+        created: '2023',
+        minted: 'N/A',
+        medium: 'External Link',
+        dimensions: 'N/A',
+        size: '0 KB',
+        tags: ['web', 'experience', 'hyperfy', 'city'],
+        links: [
+            { url: 'https://hyperfy.io/blackcity', name: 'Hyperfy World' }
+        ]
+    },
+
+    // --- ROOMS LINK ---
+    {
+        id: 'blackcity-link-2',
+        type: 'link',
+        name: 'MOCA_ROOMS_Dashboard',
+        url: 'https://rooms.museumofcryptoart.com/',
+        description: 'Access MOCA ROOMS dashboard to curate and explore.',
+        created: '2023',
+        minted: 'N/A',
+        medium: 'External Link',
+        dimensions: 'N/A',
+        size: '0 KB',
+        tags: ['web', 'moca', 'rooms'],
+        links: [
+            { url: 'https://rooms.museumofcryptoart.com/', name: 'MOCA ROOMS' }
+        ]
+    },
+
+    // --- MAIN PROMO VIDEO ---
+    {
+        id: 'blackcity-vid-info',
+        type: 'video',
+        name: 'Black_City_Overview.mp4',
+        url: 'https://video.wixstatic.com/video/54a996_f74cb85449ab4cf2a2c7ce8e82585f88/1080p/mp4/file.mp4',
+        description: 'Main overview video of Black City.',
+        created: '2023',
+        minted: 'N/A',
+        medium: 'MP4 Video',
+        dimensions: '1920x1080',
+        size: '15 MB',
+        tags: ['video', 'promo', 'overview'],
+        links: []
+    },
+
+    // --- MEDIA CAROUSEL VIDEOS ---
+    {
+        id: 'blackcity-vid-1',
+        type: 'video',
+        name: 'TAR_Collection_Launch.mp4',
+        url: 'https://video.wixstatic.com/video/54a996_0861f4ca6b454f719eb9afe8851ebcfc/1080p/mp4/file.mp4',
+        thumbnailUrl: "https://cdn-icons-png.flaticon.com/512/711/711245.png",
+        description: 'Transparent Animal Rooms collection launch promo.',
+        created: '2023',
+        minted: 'N/A',
+        medium: 'MP4 Video',
+        dimensions: '1920x1080',
+        size: '15 MB',
+        tags: ['video', 'promo', 'tar'],
+        links: []
+    },
+    {
+        id: 'blackcity-vid-2',
+        type: 'video',
+        name: 'Rick_and_Morty_Promo.mp4',
+        url: 'https://video.wixstatic.com/video/54a996_df4ea133f9f64943b97aee9c47650ea5/1080p/mp4/file.mp4',
+        thumbnailUrl: "https://cdn-icons-png.flaticon.com/512/711/711245.png",
+        description: 'Rick and Morty themed promo video.',
+        created: '2023',
+        minted: 'N/A',
+        medium: 'MP4 Video',
+        dimensions: '1920x1080',
+        size: '15 MB',
+        tags: ['video', 'promo', 'fun'],
+        links: []
+    },
+    {
+        id: 'blackcity-vid-3',
+        type: 'video',
+        name: 'MUOG_II_Design_Shot.mp4',
+        url: 'https://video.wixstatic.com/video/54a996_1f5a007d60f94833bd633d63f4da54de/1080p/mp4/file.mp4',
+        thumbnailUrl: "https://cdn-icons-png.flaticon.com/512/711/711245.png",
+        description: 'Design shot of Museum of Unlimited Growth II.',
+        created: '2023',
+        minted: 'N/A',
+        medium: 'MP4 Video',
+        dimensions: '1920x1080',
+        size: '15 MB',
+        tags: ['video', 'design', 'muog'],
+        links: []
+    },
+    {
+        id: 'blackcity-vid-4',
+        type: 'video',
+        name: 'Palpatine_Presents_Store.mp4',
+        url: 'https://video.wixstatic.com/video/54a996_ac4ca67a28094ee5b839437ec2bc50c7/1080p/mp4/file.mp4',
+        thumbnailUrl: "https://cdn-icons-png.flaticon.com/512/711/711245.png",
+        description: 'Palpatine presents Concept Furniture Store.',
+        created: '2023',
+        minted: 'N/A',
+        medium: 'MP4 Video',
+        dimensions: '1920x1080',
+        size: '15 MB',
+        tags: ['video', 'promo', 'store'],
+        links: []
+    },
+    {
+        id: 'blackcity-vid-5',
+        type: 'video',
+        name: 'Spyder_Mosk_Piccolo_Song.mp4',
+        url: 'https://video.wixstatic.com/video/54a996_b7c142458cf845489773ab7d9ecc164e/1080p/mp4/file.mp4',
+        thumbnailUrl: "https://cdn-icons-png.flaticon.com/512/711/711245.png",
+        description: 'Music video for Spyder Mosk Piccolo.',
+        created: '2023',
+        minted: 'N/A',
+        medium: 'MP4 Video',
+        dimensions: '1920x1080',
+        size: '15 MB',
+        tags: ['video', 'song', 'spyder'],
+        links: []
+    },
+    {
+        id: 'blackcity-vid-6',
+        type: 'video',
+        name: 'Launch_Vintage_Promo.mp4',
+        url: 'https://video.wixstatic.com/video/54a996_d4027f442dc842268c6cbd578aacb6f0/1080p/mp4/file.mp4',
+        thumbnailUrl: "https://cdn-icons-png.flaticon.com/512/711/711245.png",
+        description: 'Vintage style launch promo.',
+        created: '2023',
+        minted: 'N/A',
+        medium: 'MP4 Video',
+        dimensions: '1920x1080',
+        size: '15 MB',
+        tags: ['video', 'promo', 'vintage'],
+        links: []
+    },
+    {
+        id: 'blackcity-vid-7',
+        type: 'video',
+        name: 'Space_Time_Rooms.mp4',
+        url: 'https://video.wixstatic.com/video/54a996_f1badb8e4dea43d59eae277d5b2c94be/1080p/mp4/file.mp4',
+        thumbnailUrl: "https://cdn-icons-png.flaticon.com/512/711/711245.png",
+        description: 'Preview of Space Time Rooms.',
+        created: '2023',
+        minted: 'N/A',
+        medium: 'MP4 Video',
+        dimensions: '1920x1080',
+        size: '15 MB',
+        tags: ['video', 'promo', 'spacetime'],
+        links: []
+    },
+    {
+        id: 'blackcity-vid-8',
+        type: 'video',
+        name: 'Launch_Vintage_Promo_2.mp4',
+        url: 'https://video.wixstatic.com/video/54a996_929721be955d47faad82cfba66c17fd0/1080p/mp4/file.mp4',
+        thumbnailUrl: "https://cdn-icons-png.flaticon.com/512/711/711245.png",
+        description: 'Second vintage style launch promo.',
+        created: '2023',
+        minted: 'N/A',
+        medium: 'MP4 Video',
+        dimensions: '1920x1080',
+        size: '15 MB',
+        tags: ['video', 'promo', 'vintage'],
+        links: []
+    },
+    {
+        id: 'blackcity-vid-9',
+        type: 'video',
+        name: 'MUOG_II_Explanation.mp4',
+        url: 'https://video.wixstatic.com/video/54a996_f6870c2274574dd9b08871e4d974273c/1080p/mp4/file.mp4',
+        thumbnailUrl: "https://cdn-icons-png.flaticon.com/512/711/711245.png",
+        description: 'Explanation video for Museum of Unlimited Growth II.',
+        created: '2023',
+        minted: 'N/A',
+        medium: 'MP4 Video',
+        dimensions: '1920x1080',
+        size: '15 MB',
+        tags: ['video', 'explanation', 'muog'],
+        links: []
+    },
+    {
+        id: 'blackcity-vid-10',
+        type: 'video',
+        name: 'TAR23_Bloom_Test_Radiohead.mp4',
+        url: 'https://video.wixstatic.com/video/54a996_1845172bc83342878d5b3ea69f0f1b71/1080p/mp4/file.mp4',
+        thumbnailUrl: "https://cdn-icons-png.flaticon.com/512/711/711245.png",
+        description: 'TAR23 bloom test with Radiohead music.',
+        created: '2023',
+        minted: 'N/A',
+        medium: 'MP4 Video',
+        dimensions: '1920x1080',
+        size: '15 MB',
+        tags: ['video', 'test', 'bloom'],
+        links: []
+    }
+],
+
+"Forge": [
+    // --- MANIFESTO / INFO TEXT ---
+    {
+        id: 'forge-0',
+        type: 'text',
+        name: 'READ_ME_Manifesto.txt',
+        content: 'FORGE, NoiseDao\n\nNoiseDAO World Design: A Decentralized Approach to Music and Art\n\nNoiseDAO, a decentralized autonomous organization, has embarked on a mission to support, acquire, and innovate within the music industry alongside its members. With a commendable collection at its disposal, NoiseDAO sought diverse solutions to showcase works across various dimensions. This initiative unfolded within DAOTown, a virtual city crafted by NeonBuidl and M3, designed as a haven for relaxation and education about DAOs.\n\nThe project commenced with thorough research into NoiseDAO\'s preferences and collections, leading to the creation of a mood board to align the vision. The initial keywords—black and white, pixel/glitch, metamorphosis, sound-sensitive, primitive/aggressive, sharp geometries, dark, underground, zen-like villain or reverse, minimalist—guided the generation of AI visuals. The initial approach aimed to consolidate multiple functions within a single volume, yet to enhance the experience, it was decided to distribute functions across various structures within the world.\n\nSubsequent urban planning sketches catered to the diverse needs of the collections, proposing an organic central space surrounded by related uses. This urban design was brought to life in a Hyperfy world, allowing for the testing of spatial arrangements and skybox/hdr options.\n\nNoiseDAO members identified the need for six distinct spaces: five for exhibiting collections and one each for meetings and music-related activities.\n\nThe High-Frequency Building (Centipede), features 16 listening hubs within a single structure, with potential expansion based on future publications. The design incorporates floating techno bungalows linked to a horizontally flowing structure, with hubs distinguished by frosted glass floors reflecting interior lighting.\n\nThe Experimental Audio Museum (0PP13) adopts a metaversal approach, utilizing spheres to represent museum rooms, interconnected to a larger central sphere serving as the entrance and patio. This futuristic design, inspired by basic chemical shapes, accommodates ten sections of experimental audio.\n\nThe Music Collection (Metaboilerism), introduces a new tower, blending elements of the NY Guggenheim and Nagakin Capsule Tower, with modular listening hubs and vertical ramps guiding artwork visits. To avoid spatial audio interference, artworks are hosted via Webviewer, isolating music for individual users.\n\nPerformance Hall (PH) offers a virtual post-industrial ambiance with skatepark elements, designed for live sets and performances by resident artists. The building features audio-reactive bloom layers and a virtual drum machine, hinting at future immersive performance possibilities.\n\nLastly, a Temporary Exhibition Space (TES) and a contextual silent black city provide a cohesive backdrop, ensuring each edifice is showcased optimally. This comprehensive approach by NoiseDAO illustrates a pioneering venture into decentralized music and art exhibition, setting a new standard for digital creativity and community engagement.',
+        description: 'Manifesto: NoiseDAO World Design - A Decentralized Approach to Music and Art.',
+        created: '2025',
+        minted: 'N/A',
+        medium: 'Text Document',
+        dimensions: 'N/A',
+        size: '4 KB',
+        tags: ['text', 'music', 'dao', 'manifesto', 'noisedao'],
+        links: []
+    },
+
+    // --- EXPERIENCE LINK ---
+    {
+        id: 'forge-link-1',
+        type: 'link',
+        name: 'ENTER_FORGE.exe',
+        url: 'https://hyperfy.io/noise',
+        description: 'Click to enter the NoiseDAO Forge World on Hyperfy.',
+        created: '2025',
+        minted: 'N/A',
+        medium: 'External Link',
+        dimensions: 'N/A',
+        size: '0 KB',
+        tags: ['web', 'experience', 'hyperfy', 'music'],
+        links: [
+            { url: 'https://hyperfy.io/noise', name: 'Hyperfy World' }
+        ]
+    },
+
+    // --- NOISEDAO WEBSITE LINK ---
+    {
+        id: 'forge-link-2',
+        type: 'link',
+        name: 'NoiseDAO_Website',
+        url: 'https://noisedao.xyz',
+        description: 'Visit the official NoiseDAO website.',
+        created: '2025',
+        minted: 'N/A',
+        medium: 'External Link',
+        dimensions: 'N/A',
+        size: '0 KB',
+        tags: ['web', 'dao', 'official'],
+        links: [
+            { url: 'https://noisedao.xyz', name: 'NoiseDAO Site' }
+        ]
+    },
+
+    // --- PROMO VIDEO ---
+    {
+        id: 'forge-vid-1',
+        type: 'video',
+        name: 'Forge_World_Promo.mp4',
+        url: 'https://video.wixstatic.com/video/54a996_1fceb8b2f9764eafa5d97be26f3bee6a/1080p/mp4/file.mp4',
+        description: 'Promotional video showcasing the Forge world and its diverse architectural spaces.',
+        created: '2025',
+        minted: 'N/A',
+        medium: 'MP4 Video',
+        dimensions: '1920x1080',
+        size: '15 MB',
+        tags: ['video', 'promo', 'music', 'architecture'],
+        links: []
+    }
+],
+
