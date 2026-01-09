@@ -5823,30 +5823,36 @@ function getIcon(item) {
                 ? getCircularPositions(items.length, radius)
                 : getGridPositions(items.length, iconSize);
 
-            // ÇARK SİSTEMİ: Her çember için wrapper oluştur
-            const innerWrapper = document.createElement('div');
-            innerWrapper.className = 'circle-wrapper';
-            innerWrapper.dataset.circle = 'inner';
-            innerWrapper.style.position = 'absolute';
-            innerWrapper.style.width = '100%';
-            innerWrapper.style.height = '100%';
-            innerWrapper.style.top = '0';
-            innerWrapper.style.left = '0';
-            innerWrapper.style.transformOrigin = 'center center';
-            innerWrapper.style.pointerEvents = 'none'; // Wrapper tıklama almaz, itemlar alır
-            innerWrapper.style.willChange = 'transform'; // Performance optimization
+            // ÇARK SİSTEMİ: Wrapper'lar SADECE CIRCLE MODUNDA
+            let innerWrapper = null;
+            let outerWrapper = null;
 
-            const outerWrapper = document.createElement('div');
-            outerWrapper.className = 'circle-wrapper';
-            outerWrapper.dataset.circle = 'outer';
-            outerWrapper.style.position = 'absolute';
-            outerWrapper.style.width = '100%';
-            outerWrapper.style.height = '100%';
-            outerWrapper.style.top = '0';
-            outerWrapper.style.left = '0';
-            outerWrapper.style.transformOrigin = 'center center';
-            outerWrapper.style.pointerEvents = 'none';
-            outerWrapper.style.willChange = 'transform';
+            if (circularNav.layoutMode === 'circle') {
+                // Circle mode: Wrapper'ları oluştur
+                innerWrapper = document.createElement('div');
+                innerWrapper.className = 'circle-wrapper';
+                innerWrapper.dataset.circle = 'inner';
+                innerWrapper.style.position = 'absolute';
+                innerWrapper.style.width = '100%';
+                innerWrapper.style.height = '100%';
+                innerWrapper.style.top = '0';
+                innerWrapper.style.left = '0';
+                innerWrapper.style.transformOrigin = 'center center';
+                innerWrapper.style.pointerEvents = 'none';
+                innerWrapper.style.willChange = 'transform';
+
+                outerWrapper = document.createElement('div');
+                outerWrapper.className = 'circle-wrapper';
+                outerWrapper.dataset.circle = 'outer';
+                outerWrapper.style.position = 'absolute';
+                outerWrapper.style.width = '100%';
+                outerWrapper.style.height = '100%';
+                outerWrapper.style.top = '0';
+                outerWrapper.style.left = '0';
+                outerWrapper.style.transformOrigin = 'center center';
+                outerWrapper.style.pointerEvents = 'none';
+                outerWrapper.style.willChange = 'transform';
+            }
 
             items.forEach((item, index) => {
                 const itemEl = document.createElement('div');
@@ -5933,14 +5939,22 @@ function getIcon(item) {
                 // Resimlerin ve linklerin sürüklenirken "hayalet" görüntü çıkarmasını engelle
                 itemEl.addEventListener('dragstart', (e) => e.preventDefault());
 
-                // İTEMLERİ İLGİLİ WRAPPER'A EKLE (ÇARK SİSTEMİ)
-                const targetWrapper = positions[index].circle === 'inner' ? innerWrapper : outerWrapper;
-                targetWrapper.appendChild(itemEl);
+                // İTEMLERİ EKLE: Circle mode → wrapper, Grid mode → direkt scene
+                if (circularNav.layoutMode === 'circle') {
+                    // CIRCLE MODE: Wrapper'a ekle
+                    const targetWrapper = positions[index].circle === 'inner' ? innerWrapper : outerWrapper;
+                    targetWrapper.appendChild(itemEl);
+                } else {
+                    // GRID MODE: Direkt scene'e ekle (wrapper YOK!)
+                    scene.appendChild(itemEl);
+                }
             });
 
-            // Wrapper'ları scene'e ekle
-            scene.appendChild(innerWrapper);
-            scene.appendChild(outerWrapper);
+            // CIRCLE MODE: Wrapper'ları scene'e ekle
+            if (circularNav.layoutMode === 'circle') {
+                scene.appendChild(innerWrapper);
+                scene.appendChild(outerWrapper);
+            }
 
             container.appendChild(scene);
 
