@@ -901,10 +901,15 @@
             border-radius: 0;
             padding: 0;
             backdrop-filter: none;
-            pointer-events: auto;
+             pointer-events: auto !important; /* Tıklamaların algılanması için şart */
             flex-shrink: 0;
+           
+    z-index: 20; /* Üstte durması için */
         }
-
+.plan-room-shape:hover {
+    fill-opacity: 0.6 !important;
+    transition: all 0.2s ease;
+}
         #parametric-plan-container svg {
             width: 100%;
             height: 100%;
@@ -1011,19 +1016,28 @@
         .sidebar-link-name { font-weight: 600; color: white; margin-bottom: 4px; }
         .sidebar-link-desc { font-size: 12px; color: rgba(255,255,255,0.7); line-height: 1.4; }
 
+
+.plan-label { 
+            pointer-events: none !important;
+            text-anchor: middle; 
+            dominant-baseline: central; 
+            alignment-baseline: central;
+            fill: #ffffff !important; 
+            text-shadow: 0 2px 4px rgba(0,0,0,0.9);
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+            /* Animasyon geçiş hızı */
+            transition: transform 0.3s ease, stroke-width 0.3s ease;
+            /* Scale (büyüme) işleminin merkezden yapılması için */
+            transform-box: fill-box;
+            transform-origin: center;
+            /* Stroke (Kontur) ayarları */
+            stroke: #ffffff;
+            stroke-width: 0px; /* Başlangıçta kontur yok */
+            stroke-linejoin: round;
+            paint-order: markers stroke fill;
+        }
         /* Plan üzerindeki yazılar */
-       .plan-label { 
-    pointer-events: none; 
-    text-anchor: middle; /* Yatayda tam merkezleme */
-    dominant-baseline: central; /* Dikeyde tam merkezleme */
-    alignment-baseline: central; /* Bazı tarayıcılar için ek dikey merkezleme */
-    fill: #ffffff !important; 
-    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif; 
-    paint-order: stroke;
-    /* Yazıların bulunduğu koordinattan kaymasını engellemek için: */
-    transform-box: fill-box;
-    transform-origin: center;
-}
+     
        .plan-label-main { 
     font-size: 16px; 
     font-weight: 900; 
@@ -1042,8 +1056,9 @@
 /* Küçük oda isimleri (Görünmesini istiyorsan) */
 .plan-label-room { 
     display: block; /* Kapalıydı, görünmesi için block yaptık */
-    font-size: 12px; 
-    font-weight: 300; 
+    font-size: 16px; 
+    font-weight: 500; 
+    letter-spacing: -0.5px;
     fill: rgba(255, 255, 255, 0.9) !important; 
     text-shadow: 0 0 3px rgba(0,0,0,0.8);
 }
@@ -5695,38 +5710,83 @@ links: [
             }
 
             // ROOMS
-            const roomGroups = roomLayer.selectAll("g")
-                .data(nodes).enter().append("g")
-                .attr("transform", d => `translate(${d.x}, ${d.y})`)
-                .attr("data-folder", d => d.folderMatch);
+            // ROOMS (Tıklanabilir ve Klasör Açan Versiyon)
+const roomGroups = roomLayer.selectAll("g")
+    .data(nodes).enter().append("g")
+    .attr("transform", d => `translate(${d.x}, ${d.y})`)
+    .attr("data-folder", d => d.folderMatch)
+    // TIKLAMA ÖZELLİĞİ:
+    .style("cursor", "pointer")
+    .on("click", function(event, d) {
+        event.stopPropagation();
+        
+        // Eğer tıkladığımız bir klasör anahtarı (folderMatch) içeriyorsa
+        if (d.folderMatch) {
+            // Root (Lobby) ise ana dizine dön
+            if (d.folderMatch === 'root') {
+                navigateToCircularRoot();
+            } else {
+                // Diğer her şey için o klasöre zoom yaparak git
+                // d.x ve d.y koordinatlarını tıklama noktası olarak gönderiyoruz
+                const folderData = fileSystemDB[d.folderMatch];
+                const folderName = d.id;
+                const folderDesc = "Navigated via Plan";
 
-            roomGroups.append("path")
-                .attr("class", d => {
-                    if (d.type === 'root') return "plan-room-shape hub";
-                    if (d.type === 'hub') return "plan-room-shape hub";
-                    if (d.type === 'sub-hub') return "plan-room-shape sub-hub";
-                    return "plan-room-shape";
-                })
-                .attr("d", d => d.pathData)
-                .attr("fill", d => d.color)
-                .style("opacity", "0.25");
+                // Mevcut dairesel navigasyon fonksiyonunu çağırıyoruz
+                navigateToCircularFolder(d.folderMatch, folderName, folderDesc, event.clientX, event.clientY);
+            }
+        }
+    });
 
-            // LABELS
-            labelLayer.selectAll("text")
-    .data(nodes)
-    .enter()
-    .append("text")
+roomGroups.append("path")
     .attr("class", d => {
-        if (d.type === 'root') return "plan-label-main";
-        if (d.type === 'hub' || d.type === 'sub-hub') return "plan-label-hub";
-        return "plan-label-room";
+        if (d.type === 'root') return "plan-room-shape hub";
+        if (d.type === 'hub') return "plan-room-shape hub";
+        if (d.type === 'sub-hub') return "plan-room-shape sub-hub";
+        return "plan-room-shape";
     })
-    // X ve Y koordinatları doğrudan node'un merkez (intersection) noktasıdır
-    .attr("x", d => d.x)
-    .attr("y", d => d.y)
-    .attr("text-anchor", "middle") // Yatay merkezleme garantisi
-    .attr("dominant-baseline", "central") // Dikey merkezleme garantisi
-    .text(d => d.id === 'LOBBY' ? "LOBBY" : d.id);
+    .attr("d", d => d.pathData)
+    .attr("fill", d => d.color)
+    .style("opacity", "0.25")
+    .on("mouseover", function(event, d) {
+        // 1. Odayı parlat
+        d3.select(this).style("stroke-opacity", "1").style("stroke-width", "3px");
+        
+        // 2. Yazıyı bul ve koordinatları bozmadan büyüt
+        const label = labelLayer.selectAll("text").filter(node => node.id === d.id);
+        
+        // Mevcut font size'ı alıp %20 artırıyoruz (Scale kullanmıyoruz, kayma yapmaz)
+        const currentSize = d.type === 'root' ? 16 : (d.type === 'hub' ? 11 : 8);
+        
+        label.style("font-size", (currentSize * 1.2) + "px")
+             .style("stroke-width", "2px"); // Beyaz stroke
+    })
+    .on("mouseout", function(event, d) {
+        // 1. Odayı eski haline getir
+        d3.select(this).style("stroke-opacity", "0.2").style("stroke-width", "1px");
+        
+        // 2. Yazıyı orijinal boyutuna döndür
+        const label = labelLayer.selectAll("text").filter(node => node.id === d.id);
+        const originalSize = d.type === 'root' ? 16 : (d.type === 'hub' ? 11 : 8);
+        
+        label.style("font-size", originalSize + "px")
+             .style("stroke-width", "0px");
+    });
+            // LABELS
+            // LABELS (Tıklama reddetme özelliği eklendi)
+            labelLayer.selectAll("text")
+                .data(nodes).enter().append("text")
+                .attr("class", d => {
+                    if (d.type === 'root') return "plan-label-main";
+                    if (d.type === 'hub' || d.type === 'sub-hub') return "plan-label-hub";
+                    return "plan-label-room";
+                })
+                .attr("x", d => d.x)
+                .attr("y", d => d.y)
+                .attr("pointer-events", "none") // Tıklama olaylarını bu katmanda tamamen iptal eder
+                .attr("text-anchor", "middle")
+                .attr("dominant-baseline", "central")
+                .text(d => d.id === 'LOBBY' ? "LOBBY" : d.id);
 
             parametricPlanNodes = nodes;
             parametricPlanSVG = svg;
