@@ -5719,20 +5719,19 @@ const roomGroups = roomLayer.selectAll("g")
     .style("cursor", "pointer")
     .on("click", function(event, d) {
         event.stopPropagation();
-        
+
         // Eğer tıkladığımız bir klasör anahtarı (folderMatch) içeriyorsa
         if (d.folderMatch) {
             // Root (Lobby) ise ana dizine dön
             if (d.folderMatch === 'root') {
                 navigateToCircularRoot();
             } else {
-                // Diğer her şey için o klasöre zoom yaparak git
-                // d.x ve d.y koordinatlarını tıklama noktası olarak gönderiyoruz
-                const folderData = fileSystemDB[d.folderMatch];
-                const folderName = d.id;
-                const folderDesc = "Navigated via Plan";
+                // Get folder info from hierarchy
+                const folderInfo = folderHierarchy[d.folderMatch];
+                const folderName = folderInfo ? folderInfo.name : d.id;
+                const folderDesc = folderInfo ? folderInfo.description : '';
 
-                // Mevcut dairesel navigasyon fonksiyonunu çağırıyoruz
+                // Navigate to folder with proper info
                 navigateToCircularFolder(d.folderMatch, folderName, folderDesc, event.clientX, event.clientY);
             }
         }
@@ -6071,56 +6070,54 @@ function getIcon(item) {
         // Folder hierarchy - maps each folder to its parent
         const folderHierarchy = {
             // Root level categories have no parent (null)
-            'DFW': { parent: null, name: 'DFW' },
-            'Experience': { parent: null, name: 'EXPERIENCE' },
-            'Gallery': { parent: null, name: 'GALLERY' },
-            'Item': { parent: null, name: 'ITEM' },
+            'DFW': { parent: null, name: 'DFW', description: 'Manifesto, Blog & Works' },
+            'Experience': { parent: null, name: 'EXPERIENCE', description: 'Theaters & Runways' },
+            'Gallery': { parent: null, name: 'GALLERY', description: 'Architectural Spaces' },
+            'Item': { parent: null, name: 'ITEM', description: 'Space, Avatar & Design' },
 
             // DFW sub-folders
-            'Works': { parent: 'DFW', name: 'Works' },
+            'Works': { parent: 'DFW', name: 'Works', description: 'DFW Works Collection' },
 
             // Item sub-folders
-            'Space': { parent: 'Item', name: 'Space' },
-            'Avatar': { parent: 'Item', name: 'Avatar' },
-            'Design': { parent: 'Item', name: 'Design' },
+            'Space': { parent: 'Item', name: 'Space', description: 'Virtual Spaces' },
+            'Avatar': { parent: 'Item', name: 'Avatar', description: 'Digital Identities' },
+            'Design': { parent: 'Item', name: 'Design', description: 'Furniture, Sculptures, Automobiles and more' },
 
             // Experience sub-folders
-            'Why We Exist?': { parent: 'Experience', name: 'Why We Exist?' },
-            'Balloon': { parent: 'Experience', name: 'Balloon' },
-            'Hatch': { parent: 'Experience', name: 'Hatch' },
-            'C2W Runway': { parent: 'Experience', name: 'C2W Runway' },
-            'C2W2 Runway': { parent: 'Experience', name: 'C2W2 Runway' },
+            'Why We Exist?': { parent: 'Experience', name: 'Why We Exist?', description: 'Virtual Theater Experience' },
+            'Balloon': { parent: 'Experience', name: 'Balloon', description: 'Virtual Theater Experience' },
+            'Hatch': { parent: 'Experience', name: 'Hatch', description: 'Virtual Theater Experience' },
+            'C2W Runway': { parent: 'Experience', name: 'C2W Runway', description: 'Season 1 Fashion Runway' },
+            'C2W2 Runway': { parent: 'Experience', name: 'C2W2 Runway', description: 'Season 2 Fashion Runway' },
 
             // Gallery sub-folders
-            'Scaffold': { parent: 'Gallery', name: 'Scaffold' },
-            'Retail': { parent: 'Gallery', name: 'Retail' },
-            'Neue² Dojo': { parent: 'Gallery', name: 'Neue² Dojo' },
-            'Elements Store': { parent: 'Gallery', name: 'Elements Store' },
-            'Black City': { parent: 'Gallery', name: 'Black City' },
-            'Forge': { parent: 'Gallery', name: 'Forge' },
+            'Scaffold': { parent: 'Gallery', name: 'Scaffold', description: '3D Architectural Browser' },
+            'Retail': { parent: 'Gallery', name: 'Retail', description: '3D beings shop' },
+            'Neue² Dojo': { parent: 'Gallery', name: 'Neue² Dojo', description: 'Virtual Art Space' },
+            'Elements Store': { parent: 'Gallery', name: 'Elements Store', description: 'Furniture Gallery' },
+            'Black City': { parent: 'Gallery', name: 'Black City', description: 'Decentralized Roomscape' },
+            'Forge': { parent: 'Gallery', name: 'Forge', description: 'NoiseDAO World' },
 
             // Design sub-folders
-            'des_furniture': { parent: 'Design', name: 'FURNITURE' },
-            'des_sculpture': { parent: 'Design', name: 'SCULPTURE' },
-            'des_automobile': { parent: 'Design', name: 'AUTOMOBILE' },
-            'des_chair': { parent: 'Design', name: 'CHAIR' },
-            'des_sofa': { parent: 'Design', name: 'SOFA' },
-            'des_table': { parent: 'Design', name: 'TABLE' },
-            'des_music': { parent: 'Design', name: 'MUSIC' },
-            'des_carpet': { parent: 'Design', name: 'CARPET' },
+            'des_furniture': { parent: 'Design', name: 'FURNITURE', description: 'Collection of Chairs, Sofas...' },
+            'des_sculpture': { parent: 'Design', name: 'SCULPTURE', description: 'Abstract and digital sculptures' },
+            'des_automobile': { parent: 'Design', name: 'AUTOMOBILE', description: 'Digital vehicles' },
+            'des_chair': { parent: 'Design', name: 'CHAIR', description: 'Seating units' },
+            'des_sofa': { parent: 'Design', name: 'SOFA', description: 'Lounge units' },
+            'des_table': { parent: 'Design', name: 'TABLE', description: 'Surfaces' },
+            'des_music': { parent: 'Design', name: 'MUSIC', description: 'DJ sets' },
+            'des_carpet': { parent: 'Design', name: 'CARPET', description: 'Floor designs' },
 
             // Space sub-folders
-            'dt_models': { parent: 'Space', name: 'Digital Topographies' },
+            'dt_models': { parent: 'Space', name: 'Digital Topographies', description: 'Collection of 50+ Digital Topography 3D Models' },
 
-            // Avatar sub-folders (if any)
-            'c2w.vrm': { parent: 'Avatar', name: 'C2W' },
-            'c2w.media': { parent: 'Avatar', name: 'C2W.media' },
-            'polaroid': { parent: 'Avatar', name: 'Polaroid' },
-
-            // Other sub-folders
-            'c_text': { parent: 'Avatar', name: 'C2W2' },
-            'Sample_3d': { parent: 'Avatar', name: 'Sample_3d' },
-            'hyperfy_mp4': { parent: 'Avatar', name: 'Hyperfy_mp4' }
+            // Avatar sub-folders
+            'c2w.vrm': { parent: 'Avatar', name: 'C2W', description: 'C2W Avatar Collection' },
+            'c2w.media': { parent: 'Avatar', name: 'C2W.media', description: 'C2W Media Files' },
+            'polaroid': { parent: 'Avatar', name: 'Polaroid', description: 'Polaroid Collection' },
+            'c_text': { parent: 'Avatar', name: 'C2W2', description: 'C2W2 Avatar Collection' },
+            'Sample_3d': { parent: 'Avatar', name: 'Sample_3d', description: '3D Samples' },
+            'hyperfy_mp4': { parent: 'Avatar', name: 'Hyperfy_mp4', description: 'Hyperfy Videos' }
         };
 
         // Helper function to get full hierarchical path
@@ -6616,20 +6613,41 @@ function getIcon(item) {
 
             // If at root, just show DFW/
             if (!circularNav.currentFolder || circularNav.currentFolder === 'root') {
-                breadcrumb.textContent = 'DFW/';
+                breadcrumb.innerHTML = '<span class="breadcrumb-item" onclick="navigateToCircularRoot()" style="cursor: pointer;">DFW/</span>';
                 return;
             }
 
             // Get hierarchical path for current folder
             const hierarchicalPath = getHierarchicalPath(circularNav.currentFolder);
 
-            // Build breadcrumb from hierarchical path
+            // Build clickable breadcrumb from hierarchical path
             if (hierarchicalPath.length > 0) {
-                const path = 'DFW/' + hierarchicalPath.map(p => p.name).join('/');
-                breadcrumb.textContent = path;
+                let breadcrumbHTML = '<span class="breadcrumb-item" onclick="navigateToCircularRoot()" style="cursor: pointer;">DFW</span>';
+
+                hierarchicalPath.forEach((pathItem, index) => {
+                    const isLast = index === hierarchicalPath.length - 1;
+                    if (isLast) {
+                        // Last item is not clickable (current location)
+                        breadcrumbHTML += `/<span class="breadcrumb-item" style="cursor: default;">${pathItem.name}</span>`;
+                    } else {
+                        // Previous items are clickable
+                        breadcrumbHTML += `/<span class="breadcrumb-item" onclick="navigateToBreadcrumbLevel('${pathItem.key}')" style="cursor: pointer; text-decoration: underline;">${pathItem.name}</span>`;
+                    }
+                });
+
+                breadcrumb.innerHTML = breadcrumbHTML;
             } else {
-                breadcrumb.textContent = 'DFW/';
+                breadcrumb.innerHTML = '<span class="breadcrumb-item" onclick="navigateToCircularRoot()" style="cursor: pointer;">DFW/</span>';
             }
+        }
+
+        // Navigate to a specific breadcrumb level
+        function navigateToBreadcrumbLevel(folderKey) {
+            const folderInfo = folderHierarchy[folderKey];
+            if (!folderInfo) return;
+
+            const items = fileSystemDB[folderKey] || [];
+            navigateToCircularFolder(folderKey, folderInfo.name, folderInfo.description || '', null, null);
         }
 
         function navigateToCircularFolder(folderKey, folderName, folderDescription, targetX = null, targetY = null) {
