@@ -5498,21 +5498,36 @@ links: [
         function initParametricPlan() {
             const rawData = {
                 "Design": [
-                    { name: 'FURNITURE' }, { name: 'SCULPTURE' }, { name: 'AUTOMOBILE' },
-                    { name: 'CHAIR' }, { name: 'SOFA' }, { name: 'TABLE' },
-                    { name: 'MUSIC' }, { name: 'CARPET' }
+                    { name: 'FURNITURE', folderKey: 'des_furniture' },
+                    { name: 'SCULPTURE', folderKey: 'des_sculpture' },
+                    { name: 'AUTOMOBILE', folderKey: 'des_automobile' },
+                    { name: 'CHAIR', folderKey: 'des_chair' },
+                    { name: 'SOFA', folderKey: 'des_sofa' },
+                    { name: 'TABLE', folderKey: 'des_table' },
+                    { name: 'MUSIC', folderKey: 'des_music' },
+                    { name: 'CARPET', folderKey: 'des_carpet' }
                 ],
-                "Avatar": [{ name: 'C2W' }, { name: 'C2W2' }],
-                "Space": [{ name: 'Digital Topographies' }],
+                "Avatar": [
+                    { name: 'C2W', folderKey: 'c2w.vrm' },
+                    { name: 'C2W2', folderKey: 'c_text' }
+                ],
+                "Space": [{ name: 'Digital Topographies', folderKey: 'dt_models' }],
                 "Experience": [
-                    { name: 'Why We Exist?' }, { name: 'Balloon' }, { name: 'Hatch' },
-                    { name: 'C2W Runway' }, { name: 'C2W2 Runway' }
+                    { name: 'Why We Exist?', folderKey: 'Why We Exist?' },
+                    { name: 'Balloon', folderKey: 'Balloon' },
+                    { name: 'Hatch', folderKey: 'Hatch' },
+                    { name: 'C2W Runway', folderKey: 'C2W Runway' },
+                    { name: 'C2W2 Runway', folderKey: 'C2W2 Runway' }
                 ],
                 "Gallery": [
-                    { name: 'Scaffold' }, { name: 'Retail' }, { name: 'Neue² Dojo' },
-                    { name: 'Elements Store' }, { name: 'Black City' }, { name: 'Forge' }
+                    { name: 'Scaffold', folderKey: 'Scaffold' },
+                    { name: 'Retail', folderKey: 'Retail' },
+                    { name: 'Neue² Dojo', folderKey: 'Neue² Dojo' },
+                    { name: 'Elements Store', folderKey: 'Elements Store' },
+                    { name: 'Black City', folderKey: 'Black City' },
+                    { name: 'Forge', folderKey: 'Forge' }
                 ],
-                "DFW": [{ name: 'Works' }]
+                "DFW": [{ name: 'Works', folderKey: 'Works' }]
             };
 
             const nodes = [];
@@ -5606,7 +5621,7 @@ links: [
                         color: getPlanColor(group),
                         targetX: subTarget.x,
                         targetY: subTarget.y,
-                        folderMatch: item.name
+                        folderMatch: item.folderKey || item.name
                     };
                     nodes.push(subNode);
 
@@ -5794,46 +5809,7 @@ roomGroups.append("path")
         function updateParametricPlan(currentFolderKey) {
             if (!parametricPlanSVG) return;
 
-            // Normalize folder key
-            let normalizedFolder = currentFolderKey;
-
-            // Map UI folder names to plan folder names
-            const folderMapping = {
-                'Cdrive': 'root',
-                'root': 'root',
-                'Item': 'Item',
-                'Design': 'Design',
-                'Avatar': 'Avatar',
-                'Space': 'Space',
-                'Gallery': 'Gallery',
-                'Experience': 'Experience',
-                'DFW': 'DFW',
-                // Specific folders
-                'des_furniture': 'FURNITURE',
-                'des_sculpture': 'SCULPTURE',
-                'des_automobile': 'AUTOMOBILE',
-                'des_chair': 'CHAIR',
-                'des_sofa': 'SOFA',
-                'des_table': 'TABLE',
-                'des_music': 'MUSIC',
-                'des_carpet': 'CARPET',
-                'dt_models': 'Digital Topographies',
-                'Why We Exist?': 'Why We Exist?',
-                'Balloon': 'Balloon',
-                'Hatch': 'Hatch',
-                'C2W Runway': 'C2W Runway',
-                'C2W2 Runway': 'C2W2 Runway',
-                'Scaffold': 'Scaffold',
-                'Retail': 'Retail',
-                'Neue² Dojo': 'Neue² Dojo',
-                'Elements Store': 'Elements Store',
-                'Black City': 'Black City',
-                'Forge': 'Forge'
-            };
-
-            normalizedFolder = folderMapping[currentFolderKey] || currentFolderKey;
-
-            // Update all shapes
+            // Update all shapes - now folderMatch already uses correct keys (des_furniture, dt_models, etc)
             const allShapes = parametricPlanSVG.selectAll('.plan-room-shape');
 
             allShapes.classed('active', false)
@@ -5843,7 +5819,7 @@ roomGroups.append("path")
                 const group = d3.select(this.parentNode);
                 const folderMatch = group.attr('data-folder');
 
-                if (folderMatch === normalizedFolder) {
+                if (folderMatch === currentFolderKey) {
                     d3.select(this).classed('active', true);
                 } else {
                     d3.select(this).classed('inactive', true);
