@@ -1988,15 +1988,7 @@
         tags: ['event', 'experience', 'metaverse'],
         links: []
     },
-    {
-        id: 'rec-2',
-        type: 'folder',
-        name: 'VRM Avatars',
-        folderKey: 'c2w.vrm', // -> Aşağıdaki "c2w.vrm" dizisine bağlanır
-        created: 'Monday, September 3, 2024 at 4:38 PM',
-        size: '1.2 GB',
-        links: []
-    },
+   
     {
         id: 'rec-3',
         type: 'folder',
@@ -5436,7 +5428,17 @@ links: [
             { url: 'https://monaverse.com/collections/8453/0xc9ee3a17f48c61795711968eb774241b7a5e63d2/1', name: 'Monaverse Asset' }
         ]
     }],
-        "Avatar": [],
+        "Avatar": [
+           {
+        id: 'rec-2',
+        type: 'folder',
+        name: 'Season 1 (c2w, 2023)',
+        folderKey: 'c2w.vrm', // -> Aşağıdaki "c2w.vrm" dizisine bağlanır
+        created: 'Monday, September 3, 2024 at 4:38 PM',
+        size: '1.2 GB',
+        links: []
+    },
+        ],
         "logos": [],
         "songs": [],
         "Writings": [],
@@ -5498,21 +5500,36 @@ links: [
         function initParametricPlan() {
             const rawData = {
                 "Design": [
-                    { name: 'FURNITURE' }, { name: 'SCULPTURE' }, { name: 'AUTOMOBILE' },
-                    { name: 'CHAIR' }, { name: 'SOFA' }, { name: 'TABLE' },
-                    { name: 'MUSIC' }, { name: 'CARPET' }
+                    { name: 'FURNITURE', folderKey: 'des_furniture' },
+                    { name: 'SCULPTURE', folderKey: 'des_sculpture' },
+                    { name: 'AUTOMOBILE', folderKey: 'des_automobile' },
+                    { name: 'CHAIR', folderKey: 'des_chair' },
+                    { name: 'SOFA', folderKey: 'des_sofa' },
+                    { name: 'TABLE', folderKey: 'des_table' },
+                    { name: 'MUSIC', folderKey: 'des_music' },
+                    { name: 'CARPET', folderKey: 'des_carpet' }
                 ],
-                "Avatar": [{ name: 'C2W' }, { name: 'C2W2' }],
-                "Space": [{ name: 'Digital Topographies' }],
+                "Avatar": [
+                    { name: 'C2W', folderKey: 'c2w.vrm' },
+                    { name: 'C2W2', folderKey: 'c_text' }
+                ],
+                "Space": [{ name: 'Digital Topographies', folderKey: 'dt_models' }],
                 "Experience": [
-                    { name: 'Why We Exist?' }, { name: 'Balloon' }, { name: 'Hatch' },
-                    { name: 'C2W Runway' }, { name: 'C2W2 Runway' }
+                    { name: 'Why We Exist?', folderKey: 'Why We Exist?' },
+                    { name: 'Balloon', folderKey: 'Balloon' },
+                    { name: 'Hatch', folderKey: 'Hatch' },
+                    { name: 'C2W Runway', folderKey: 'C2W Runway' },
+                    { name: 'C2W2 Runway', folderKey: 'C2W2 Runway' }
                 ],
                 "Gallery": [
-                    { name: 'Scaffold' }, { name: 'Retail' }, { name: 'Neue² Dojo' },
-                    { name: 'Elements Store' }, { name: 'Black City' }, { name: 'Forge' }
+                    { name: 'Scaffold', folderKey: 'Scaffold' },
+                    { name: 'Retail', folderKey: 'Retail' },
+                    { name: 'Neue² Dojo', folderKey: 'Neue² Dojo' },
+                    { name: 'Elements Store', folderKey: 'Elements Store' },
+                    { name: 'Black City', folderKey: 'Black City' },
+                    { name: 'Forge', folderKey: 'Forge' }
                 ],
-                "DFW": [{ name: 'Works' }]
+                "DFW": [{ name: 'Works', folderKey: 'Works' }]
             };
 
             const nodes = [];
@@ -5606,7 +5623,7 @@ links: [
                         color: getPlanColor(group),
                         targetX: subTarget.x,
                         targetY: subTarget.y,
-                        folderMatch: item.name
+                        folderMatch: item.folderKey || item.name
                     };
                     nodes.push(subNode);
 
@@ -5719,20 +5736,19 @@ const roomGroups = roomLayer.selectAll("g")
     .style("cursor", "pointer")
     .on("click", function(event, d) {
         event.stopPropagation();
-        
+
         // Eğer tıkladığımız bir klasör anahtarı (folderMatch) içeriyorsa
         if (d.folderMatch) {
             // Root (Lobby) ise ana dizine dön
             if (d.folderMatch === 'root') {
                 navigateToCircularRoot();
             } else {
-                // Diğer her şey için o klasöre zoom yaparak git
-                // d.x ve d.y koordinatlarını tıklama noktası olarak gönderiyoruz
-                const folderData = fileSystemDB[d.folderMatch];
-                const folderName = d.id;
-                const folderDesc = "Navigated via Plan";
+                // Get folder info from hierarchy
+                const folderInfo = folderHierarchy[d.folderMatch];
+                const folderName = folderInfo ? folderInfo.name : d.id;
+                const folderDesc = folderInfo ? folderInfo.description : '';
 
-                // Mevcut dairesel navigasyon fonksiyonunu çağırıyoruz
+                // Navigate to folder with proper info
                 navigateToCircularFolder(d.folderMatch, folderName, folderDesc, event.clientX, event.clientY);
             }
         }
@@ -5795,46 +5811,7 @@ roomGroups.append("path")
         function updateParametricPlan(currentFolderKey) {
             if (!parametricPlanSVG) return;
 
-            // Normalize folder key
-            let normalizedFolder = currentFolderKey;
-
-            // Map UI folder names to plan folder names
-            const folderMapping = {
-                'Cdrive': 'root',
-                'root': 'root',
-                'Item': 'Item',
-                'Design': 'Design',
-                'Avatar': 'Avatar',
-                'Space': 'Space',
-                'Gallery': 'Gallery',
-                'Experience': 'Experience',
-                'DFW': 'DFW',
-                // Specific folders
-                'des_furniture': 'FURNITURE',
-                'des_sculpture': 'SCULPTURE',
-                'des_automobile': 'AUTOMOBILE',
-                'des_chair': 'CHAIR',
-                'des_sofa': 'SOFA',
-                'des_table': 'TABLE',
-                'des_music': 'MUSIC',
-                'des_carpet': 'CARPET',
-                'dt_models': 'Digital Topographies',
-                'Why We Exist?': 'Why We Exist?',
-                'Balloon': 'Balloon',
-                'Hatch': 'Hatch',
-                'C2W Runway': 'C2W Runway',
-                'C2W2 Runway': 'C2W2 Runway',
-                'Scaffold': 'Scaffold',
-                'Retail': 'Retail',
-                'Neue² Dojo': 'Neue² Dojo',
-                'Elements Store': 'Elements Store',
-                'Black City': 'Black City',
-                'Forge': 'Forge'
-            };
-
-            normalizedFolder = folderMapping[currentFolderKey] || currentFolderKey;
-
-            // Update all shapes
+            // Update all shapes - now folderMatch already uses correct keys (des_furniture, dt_models, etc)
             const allShapes = parametricPlanSVG.selectAll('.plan-room-shape');
 
             allShapes.classed('active', false)
@@ -5844,7 +5821,7 @@ roomGroups.append("path")
                 const group = d3.select(this.parentNode);
                 const folderMatch = group.attr('data-folder');
 
-                if (folderMatch === normalizedFolder) {
+                if (folderMatch === currentFolderKey) {
                     d3.select(this).classed('active', true);
                 } else {
                     d3.select(this).classed('inactive', true);
@@ -6062,13 +6039,97 @@ function getIcon(item) {
 
         // Circular navigation state
         const circularNav = {
-            history: [],
-            currentIndex: -1,
             currentFolder: 'root',
             currentFolderData: null,
             layoutMode: 'circle', // 'circle' or 'grid'
             openWindowItem: null // Track currently open window to prevent sidebar changes
         };
+
+        // Folder hierarchy - maps each folder to its parent
+        const folderHierarchy = {
+            // Root level categories have no parent (null)
+            'DFW': { parent: null, name: 'DFW', description: 'Manifesto, Blog & Works' },
+            'Experience': { parent: null, name: 'EXPERIENCE', description: 'Theaters & Runways' },
+            'Gallery': { parent: null, name: 'GALLERY', description: 'Architectural Spaces' },
+            'Item': { parent: null, name: 'ITEM', description: 'Space, Avatar & Design' },
+
+            // DFW sub-folders
+            'Works': { parent: 'DFW', name: 'Works', description: 'DFW Works Collection' },
+
+            // Item sub-folders
+            'Space': { parent: 'Item', name: 'Space', description: 'Virtual Spaces' },
+            'Avatar': { parent: 'Item', name: 'Avatar', description: 'Digital Identities' },
+            'Design': { parent: 'Item', name: 'Design', description: 'Furniture, Sculptures, Automobiles and more' },
+
+            // Experience sub-folders
+            'Why We Exist?': { parent: 'Experience', name: 'Why We Exist?', description: 'Virtual Theater Experience' },
+            'Balloon': { parent: 'Experience', name: 'Balloon', description: 'Virtual Theater Experience' },
+            'Hatch': { parent: 'Experience', name: 'Hatch', description: 'Virtual Theater Experience' },
+            'C2W Runway': { parent: 'Experience', name: 'C2W Runway', description: 'Season 1 Fashion Runway' },
+            'C2W2 Runway': { parent: 'Experience', name: 'C2W2 Runway', description: 'Season 2 Fashion Runway' },
+
+            // Gallery sub-folders
+            'Scaffold': { parent: 'Gallery', name: 'Scaffold', description: '3D Architectural Browser' },
+            'Retail': { parent: 'Gallery', name: 'Retail', description: '3D beings shop' },
+            'Neue² Dojo': { parent: 'Gallery', name: 'Neue² Dojo', description: 'Virtual Art Space' },
+            'Elements Store': { parent: 'Gallery', name: 'Elements Store', description: 'Furniture Gallery' },
+            'Black City': { parent: 'Gallery', name: 'Black City', description: 'Decentralized Roomscape' },
+            'Forge': { parent: 'Gallery', name: 'Forge', description: 'NoiseDAO World' },
+
+            // Design sub-folders
+            'des_furniture': { parent: 'Design', name: 'FURNITURE', description: 'Collection of Chairs, Sofas...' },
+            'des_sculpture': { parent: 'Design', name: 'SCULPTURE', description: 'Abstract and digital sculptures' },
+            'des_automobile': { parent: 'Design', name: 'AUTOMOBILE', description: 'Digital vehicles' },
+            'des_chair': { parent: 'Design', name: 'CHAIR', description: 'Seating units' },
+            'des_sofa': { parent: 'Design', name: 'SOFA', description: 'Lounge units' },
+            'des_table': { parent: 'Design', name: 'TABLE', description: 'Surfaces' },
+            'des_music': { parent: 'Design', name: 'MUSIC', description: 'DJ sets' },
+            'des_carpet': { parent: 'Design', name: 'CARPET', description: 'Floor designs' },
+
+            // Space sub-folders
+            'dt_models': { parent: 'Space', name: 'Digital Topographies', description: 'Collection of 50+ Digital Topography 3D Models' },
+
+            // Avatar sub-folders
+            'c2w.vrm': { parent: 'Avatar', name: 'C2W', description: 'C2W Avatar Collection' },
+            'c2w.media': { parent: 'Avatar', name: 'C2W.media', description: 'C2W Media Files' },
+            'polaroid': { parent: 'Avatar', name: 'Polaroid', description: 'Polaroid Collection' },
+            'c_text': { parent: 'Avatar', name: 'C2W2', description: 'C2W2 Avatar Collection' },
+            'Sample_3d': { parent: 'Avatar', name: 'Sample_3d', description: '3D Samples' },
+            'hyperfy_mp4': { parent: 'Avatar', name: 'Hyperfy_mp4', description: 'Hyperfy Videos' }
+        };
+
+        // Helper function to get full hierarchical path
+        function getHierarchicalPath(folderKey) {
+            if (!folderKey || folderKey === 'root') {
+                return [];
+            }
+
+            const path = [];
+            let current = folderKey;
+
+            while (current && folderHierarchy[current]) {
+                path.unshift({
+                    key: current,
+                    name: folderHierarchy[current].name
+                });
+                current = folderHierarchy[current].parent;
+            }
+
+            return path;
+        }
+
+        // Helper function to get parent folder
+        function getParentFolder(folderKey) {
+            if (!folderKey || folderKey === 'root') {
+                return null;
+            }
+
+            if (folderHierarchy[folderKey]) {
+                return folderHierarchy[folderKey].parent;
+            }
+
+            return null;
+        }
 
         // Circle rotation state
         // GELİŞMİŞ FİZİK MOTORU STATE'İ
@@ -6527,14 +6588,44 @@ function getIcon(item) {
 
         function updateCircularBreadcrumb() {
             const breadcrumb = document.getElementById('circular-breadcrumb');
-            if (circularNav.currentIndex < 0 || circularNav.history.length === 0) {
-                breadcrumb.textContent = 'DFW/';
-            } else {
-                // Only show breadcrumb up to current index
-                const currentPath = circularNav.history.slice(0, circularNav.currentIndex + 1);
-                const path = 'DFW/' + currentPath.map(h => h.folderName).join('/');
-                breadcrumb.textContent = path;
+
+            // If at root, just show DFW/
+            if (!circularNav.currentFolder || circularNav.currentFolder === 'root') {
+                breadcrumb.innerHTML = '<span class="breadcrumb-item" onclick="navigateToCircularRoot()" style="cursor: pointer;">DFW/</span>';
+                return;
             }
+
+            // Get hierarchical path for current folder
+            const hierarchicalPath = getHierarchicalPath(circularNav.currentFolder);
+
+            // Build clickable breadcrumb from hierarchical path
+            if (hierarchicalPath.length > 0) {
+                let breadcrumbHTML = '<span class="breadcrumb-item" onclick="navigateToCircularRoot()" style="cursor: pointer;">DFW</span>';
+
+                hierarchicalPath.forEach((pathItem, index) => {
+                    const isLast = index === hierarchicalPath.length - 1;
+                    if (isLast) {
+                        // Last item is not clickable (current location)
+                        breadcrumbHTML += `/<span class="breadcrumb-item" style="cursor: default;">${pathItem.name}</span>`;
+                    } else {
+                        // Previous items are clickable
+                        breadcrumbHTML += `/<span class="breadcrumb-item" onclick="navigateToBreadcrumbLevel('${pathItem.key}')" style="cursor: pointer; text-decoration: underline;">${pathItem.name}</span>`;
+                    }
+                });
+
+                breadcrumb.innerHTML = breadcrumbHTML;
+            } else {
+                breadcrumb.innerHTML = '<span class="breadcrumb-item" onclick="navigateToCircularRoot()" style="cursor: pointer;">DFW/</span>';
+            }
+        }
+
+        // Navigate to a specific breadcrumb level
+        function navigateToBreadcrumbLevel(folderKey) {
+            const folderInfo = folderHierarchy[folderKey];
+            if (!folderInfo) return;
+
+            const items = fileSystemDB[folderKey] || [];
+            navigateToCircularFolder(folderKey, folderInfo.name, folderInfo.description || '', null, null);
         }
 
         function navigateToCircularFolder(folderKey, folderName, folderDescription, targetX = null, targetY = null) {
@@ -6548,17 +6639,14 @@ function getIcon(item) {
             // Get folder items
             const items = fileSystemDB[folderKey] || [];
 
-            // Update history
-            circularNav.history = circularNav.history.slice(0, circularNav.currentIndex + 1);
-            circularNav.history.push({ folderKey, folderName, folderDescription });
-            circularNav.currentIndex++;
+            // Update current folder (no history needed - we use hierarchy)
             circularNav.currentFolder = folderKey;
             circularNav.currentFolderData = { key: folderKey, name: folderName, description: folderDescription };
 
             // Update parametric plan
             updateParametricPlan(folderKey);
 
-            // Update breadcrumb
+            // Update breadcrumb (will show hierarchical path)
             updateCircularBreadcrumb();
 
             // Show back button
@@ -6578,27 +6666,29 @@ function getIcon(item) {
 
             circularNav.openWindowItem = null;
 
-            if (circularNav.currentIndex > 0) {
-                circularNav.currentIndex--;
-                const prev = circularNav.history[circularNav.currentIndex];
+            // Get hierarchical parent instead of using history
+            const parentKey = getParentFolder(circularNav.currentFolder);
 
-                if (prev) {
-                    document.getElementById('circular-sidebar-title').textContent = prev.folderName;
-                    document.getElementById('circular-sidebar-description').textContent = prev.folderDescription;
+            if (parentKey) {
+                // Navigate to hierarchical parent
+                const parentInfo = folderHierarchy[parentKey];
+                const items = fileSystemDB[parentKey] || [];
 
-                    const items = fileSystemDB[prev.folderKey] || [];
-                    circularNav.currentFolder = prev.folderKey;
-                    circularNav.currentFolderData = prev;
+                document.getElementById('circular-sidebar-title').textContent = parentInfo.name;
+                document.getElementById('circular-sidebar-description').textContent = '';
 
-                    // Update parametric plan
-                    updateParametricPlan(prev.folderKey);
+                circularNav.currentFolder = parentKey;
+                circularNav.currentFolderData = { key: parentKey, name: parentInfo.name, description: '' };
 
-                    updateCircularBreadcrumb();
-                    // Render with ZOOM OUT effect ('out')
-                    renderCircularScene(prev.folderKey, items, false, null, null, 'out');
-                }
+                // Update parametric plan
+                updateParametricPlan(parentKey);
+
+                updateCircularBreadcrumb();
+
+                // Render with ZOOM OUT effect ('out')
+                renderCircularScene(parentKey, items, false, null, null, 'out');
             } else {
-                // Back to root
+                // No parent means we're at top level, go to root
                 navigateToCircularRoot();
             }
         }
@@ -6612,11 +6702,9 @@ function getIcon(item) {
 
             circularNav.openWindowItem = null;
 
-            // Eğer geçmişte bir yerdeysek ve root'a dönüyorsak animasyonlu dönelim
-            const isNavigatingBack = circularNav.currentIndex > -1;
+            // Check if we're navigating back from somewhere
+            const isNavigatingBack = circularNav.currentFolder && circularNav.currentFolder !== 'root';
 
-            circularNav.currentIndex = -1;
-            circularNav.history = [];
             circularNav.currentFolder = 'root';
             circularNav.currentFolderData = null;
 
@@ -9384,4 +9472,3 @@ if (thumbnailsEl) {
     </script>
 </body>
 </html>
-
