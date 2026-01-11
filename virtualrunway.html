@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MANIFESTO | VIRTUAL RUNWAY</title>
+    <style>
+        /* --- CORE SETTINGS --- */
+        @import url('https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap');
+
+        :root {
+            --neon-green: #ccff00;
+            --neon-blue: #00f3ff;
+            --neon-pink: #ff0055;
+            --neon-purple: #bc13fe;
+            --bg-color: #050505;
+            --text-color: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: none; /* Custom cursor active */
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Space Mono', monospace;
+            overflow-x: hidden;
+            height: 100vh;
+            scroll-snap-type: y mandatory;
+            overflow-y: scroll;
+            scroll-behavior: smooth;
+        }
+
+        /* --- CUSTOM CURSOR --- */
+        .cursor {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--neon-green);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            transition: width 0.3s, height 0.3s, background-color 0.3s, border-color 0.3s;
+            mix-blend-mode: difference;
+        }
+        .cursor.hovered {
+            width: 80px;
+            height: 80px;
+            background-color: var(--neon-green);
+            opacity: 0.5;
+            border: none;
+        }
+
+        /* --- NOISE OVERLAY --- */
+        .noise {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 900;
+            opacity: 0.07;
+            background: url('https://grainy-gradients.vercel.app/noise.svg');
+        }
+
+        /* --- SECTIONS --- */
+        section {
+            height: 100vh;
+            width: 100vw;
+            scroll-snap-align: start;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        /* --- VIDEO BACKGROUND --- */
+        .video-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 0;
+            opacity: 0.4;
+            filter: grayscale(100%) contrast(120%);
+            transition: all 0.5s ease;
+        }
+        
+        section:hover .video-bg {
+            opacity: 0.6;
+            filter: grayscale(0%) contrast(110%);
+        }
+
+        .overlay-gradient {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, transparent 0%, #000 90%);
+            z-index: 1;
+        }
+
+        /* --- TYPOGRAPHY --- */
+        .content-wrapper {
+            z-index: 10;
+            text-align: center;
+            max-width: 85%;
+            position: relative;
+            mix-blend-mode: difference;
+        }
+
+        .section-tag {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.9rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--neon-green);
+            margin-bottom: 10px;
+            display: block;
+            opacity: 0.8;
+        }
+
+        h1 {
+            font-family: 'Syncopate', sans-serif;
+            font-weight: 700;
+            font-size: 5vw;
+            line-height: 0.95;
+            text-transform: uppercase;
+            letter-spacing: -2px;
+            margin-bottom: 25px;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .active h1 {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        p.manifesto-text {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            max-width: 700px;
+            margin: 0 auto;
+            border-left: 2px solid var(--neon-green);
+            padding-left: 25px;
+            text-align: left;
+            opacity: 0;
+            transform: translateX(-50px);
+            transition: opacity 0.8s ease 0.3s, transform 0.8s ease 0.3s;
+        }
+
+        .active p.manifesto-text {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        /* --- MARQUEE --- */
+        .marquee-container {
+            position: absolute;
+            width: 100%;
+            overflow: hidden;
+            white-space: nowrap;
+            z-index: 5;
+            background: var(--neon-green);
+            color: #000;
+            font-weight: bold;
+            font-size: 1.2rem;
+            padding: 5px 0;
+            transform: rotate(-2deg) scale(1.1);
+        }
+        .marquee-content {
+            display: inline-block;
+            animation: marquee 20s linear infinite;
+        }
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* --- GLITCH EFFECT --- */
+        .glitch { position: relative; }
+        .glitch::before, .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-color);
+        }
+        .glitch::before {
+            left: 2px; text-shadow: -2px 0 var(--neon-pink);
+            clip: rect(24px, 550px, 90px, 0);
+            animation: glitch-anim-2 3s infinite linear alternate-reverse;
+        }
+        .glitch::after {
+            left: -2px; text-shadow: -2px 0 var(--neon-blue);
+            clip: rect(85px, 550px, 140px, 0);
+            animation: glitch-anim 2.5s infinite linear alternate-reverse;
+        }
+        @keyframes glitch-anim {
+            0% { clip: rect(10px, 9999px, 30px, 0); }
+            100% { clip: rect(10px, 9999px, 30px, 0); }
+        }
+        @keyframes glitch-anim-2 {
+            0% { clip: rect(50px, 9999px, 60px, 0); }
+            100% { clip: rect(30px, 9999px, 40px, 0); }
+        }
+
+        /* --- BUTTONS --- */
+        .btn-main {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 15px 40px;
+            background: transparent;
+            border: 1px solid var(--neon-green);
+            color: var(--neon-green);
+            font-family: 'Syncopate', sans-serif;
+            font-weight: 700;
+            text-decoration: none;
+            text-transform: uppercase;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+        .btn-main:hover {
+            background: var(--neon-green);
+            color: #000;
+            box-shadow: 0 0 30px var(--neon-green);
+        }
+
+        .scroll-hint {
+            position: absolute;
+            bottom: 30px;
+            font-size: 0.7rem;
+            opacity: 0.5;
+            animation: pulse 2s infinite;
+            letter-spacing: 2px;
+        }
+
+        @keyframes pulse { 0% { opacity: 0.2; } 50% { opacity: 0.8; } 100% { opacity: 0.2; } }
+
+        /* --- SPECIFIC COLORS --- */
+        .text-blue { color: var(--neon-blue); }
+        .text-pink { color: var(--neon-pink); }
+        .text-purple { color: var(--neon-purple); }
+        .border-pink { border-left-color: var(--neon-pink) !important; }
+        .border-blue { border-left-color: var(--neon-blue) !important; }
+        .border-purple { border-left-color: var(--neon-purple) !important; }
+
+    </style>
+</head>
+<body>
+
+    <div class="cursor"></div>
+    <div class="noise"></div>
+
+    <!-- ============================================ -->
+    <!-- PART I: THE MANIFESTO (EXTENDED)             -->
+    <!-- ============================================ -->
+
+    <!-- 1. INTRO -->
+    <section id="intro">
+        <video class="video-bg" autoplay muted loop playsinline>
+            <source src="https://video.wixstatic.com/video/54a996_ec462c493fd541a6801a7b1e1ccd59fb/1080p/mp4/file.mp4" type="video/mp4">
+        </video>
+        <div class="overlay-gradient"></div>
+        <div class="content-wrapper">
+            <span class="section-tag">WELCOME TO THE VOID</span>
+            <h1 class="glitch" data-text="VIRTUAL RUNWAY">VIRTUAL RUNWAY</h1>
+            <p class="manifesto-text" style="text-align: center; border: none;">
+                ABANDON THE LIMITS OF THE PHYSICAL BODY.<br>
+                ENTER THE NEW REALITY.
+            </p>
+        </div>
+        <div class="scroll-hint">SCROLL TO INITIALIZE SEQUENCE</div>
+    </section>
+
+    <!-- 2. TECHNICAL FREEDOM -->
+    <section>
+        <div class="video-bg" style="background: #000;"></div>
+        <div class="marquee-container" style="top: 30%; transform: rotate(3deg);">
+            <div class="marquee-content">
+                NO DOWNLOADS • NO INSTALLATION • BROWSER BASED • REAL TIME RENDERING • PURE DATA • ACCESSIBLE ANYWHERE •
+            </div>
+        </div>
+        <div class="content-wrapper">
+            <span class="section-tag">PROTOCOL 01</span>
+            <h1>TECHNICAL<br><span class="text-blue">FREEDOM</span></h1>
+            <p class="manifesto-text border-blue">
+                No apps to install. No heavy files to download.<br>
+                Just a link. A high-fidelity universe running directly in your browser, rendered in real-time.
+                <strong>Accessibility is the ultimate revolution.</strong>
+            </p>
+        </div>
+    </section>
+
+    <!-- 3. IDENTITY OVER CLOTHING -->
+    <section>
+        <video class="video-bg" autoplay muted loop playsinline>
+            <source src="https://video.wixstatic.com/video/54a996_06faa3498bf146b5aa739b4c1012aadd/1080p/mp4/file.mp4" type="video/mp4">
+        </video>
+        <div class="overlay-gradient"></div>
+        <div class="content-wrapper">
+            <span class="section-tag">PROTOCOL 02</span>
+            <h1>NOT FABRIC<br><span class="text-pink">BUT CODE</span></h1>
+            <p class="manifesto-text border-pink">
+                We do not design clothes. We design identities.<br>
+                Your avatar is the projection of your digital soul. 
+                Polygons replace textiles. Algorithms replace stitching.
+            </p>
+        </div>
+    </section>
+
+    <!-- 4. DEMOCRATIZATION -->
+    <section>
+        <video class="video-bg" autoplay muted loop playsinline>
+            <source src="https://video.wixstatic.com/video/54a996_008a92463e2c490bae5c5176ccd0fa13/1080p/mp4/file.mp4" type="video/mp4">
+        </video>
+        <div class="overlay-gradient"></div>
+        <div class="content-wrapper">
+            <span class="section-tag">PROTOCOL 03</span>
+            <h1>FRONT ROW<br><span style="color: #fff;">FOR EVERYONE</span></h1>
+            <p class="manifesto-text">
+                The hierarchy of the fashion week is dismantled.<br>
+                In the metaverse, every angle is the best angle. Every user is a VIP.
+                Fashion is no longer a gated community; it is an open server.
+            </p>
+        </div>
+    </section>
+
+    <!-- 5. SUSTAINABILITY -->
+    <section>
+        <div class="video-bg" style="background: linear-gradient(180deg, #111, #000);"></div>
+        <div class="content-wrapper">
+            <span class="section-tag">PROTOCOL 04</span>
+            <h1>ZERO WASTE<br><span class="text-blue">INFINITE STYLE</span></h1>
+            <p class="manifesto-text border-blue">
+                Physical fashion pollutes. Digital fashion evolves.<br>
+                No water wasted. No fabric discarded. Only electricity and imagination.
+                The cleanest form of expression exists on the blockchain.
+            </p>
+        </div>
+    </section>
+
+    <!-- 6. IMMERSION -->
+    <section>
+        <video class="video-bg" autoplay muted loop playsinline>
+            <source src="https://video.wixstatic.com/video/54a996_21a2c46e200b4c8d872f84bc1ae72f48/1080p/mp4/file.mp4" type="video/mp4">
+        </video>
+        <div class="overlay-gradient"></div>
+        <div class="content-wrapper">
+            <span class="section-tag">PROTOCOL 05</span>
+            <h1>IMMERSIVE<br><span class="text-purple">REALITY</span></h1>
+            <p class="manifesto-text border-purple">
+                Control the camera. Walk the runway. Feel the light.<br>
+                This is not a video recording. This is a spatial experience where you are the director.
+            </p>
+        </div>
+    </section>
+
+    <!-- ============================================ -->
+    <!-- PART II: C2W (ARCHIVE 2023)                  -->
+    <!-- ============================================ -->
+
+    <!-- 7. C2W: ORIGIN -->
+    <section id="c2w-start">
+        <video class="video-bg" autoplay muted loop playsinline>
+            <source src="https://video.wixstatic.com/video/54a996_0232a6790a7647ef862d91e3f8e7a223/1080p/mp4/file.mp4" type="video/mp4">
+        </video>
+        <div class="overlay-gradient"></div>
+        <div class="content-wrapper">
+            <span class="section-tag" style="color: var(--neon-blue);">ARCHIVE 2023 / PART I</span>
+            <h1>THE ORIGIN<br><span class="text-blue">NEW CODES</span></h1>
+            <p class="manifesto-text border-blue">
+                It started in London. The "New Codes" exhibition.<br>
+                A bridge between the physical gallery and the digital ether.
+                VCA x Draup residency culminated in a pivotal moment for digital fashion.
+            </p>
+        </div>
+    </section>
+
+    <!-- 8. C2W: THE COLLECTION -->
+    <section>
+        <video class="video-bg" autoplay muted loop playsinline>
+            <source src="https://video.wixstatic.com/video/54a996_06faa3498bf146b5aa739b4c1012aadd/1080p/mp4/file.mp4" type="video/mp4">
+        </video>
+        <div class="overlay-gradient"></div>
+        <div class="content-wrapper">
+            <span class="section-tag" style="color: var(--neon-blue);">ARCHIVE 2023 / PART II</span>
+            <h1>THE<br><span class="text-blue">VIEWER</span></h1>
+            <p class="manifesto-text border-blue">
+                60 Avatars born from code.<br>
+                16 Unique Personas curated for the show.<br>
+                "The Viewer" is not just an avatar; it is a statement of observation and participation in a decentralized world.
+            </p>
+        </div>
+    </section>
+
+    <!-- 9. C2W: RECOGNITION (CTA) -->
+    <section>
+        <video class="video-bg" autoplay muted loop playsinline>
+            <source src="https://video.wixstatic.com/video/54a996_99bf250049af451596a557301c399b48/1080p/mp4/file.mp4" type="video/mp4">
+        </video>
+        <div class="overlay-gradient"></div>
+        <div class="content-wrapper">
+            <span class="section-tag" style="color: var(--neon-blue);">ARCHIVE 2023 / PART III</span>
+            <h1 class="glitch" data-text="RED DAO">RED DAO<br><span class="text-blue">WINNER</span></h1>
+            <p class="manifesto-text border-blue">
+                Awarded 1st Place by RedDAO.<br>
+                A testament to innovation and aesthetic disruption.
+                Witness the archive that started it all.
+            </p>
+            <a href="#" onclick="alert('Launching C2W Experience...')" class="btn-main" style="border-color: var(--neon-blue); color: var(--neon-blue);">EXPLORE C2W</a>
+        </div>
+    </section>
+
+    <!-- ============================================ -->
+    <!-- PART III: C2W2 (FUTURE 2025)                 -->
+    <!-- ============================================ -->
+
+    <!-- 10. C2W2: CONCEPT -->
+    <section id="c2w2-start">
+        <video class="video-bg" autoplay muted loop playsinline>
+            <source src="https://video.wixstatic.com/video/54a996_029c9577e1d245f386a0ebe2c64a9b6e/1080p/mp4/file.mp4" type="video/mp4">
+        </video>
+        <div class="overlay-gradient"></div>
+        <div class="content-wrapper">
+            <span class="section-tag" style="color: var(--neon-pink);">FUTURE 2025 / PART I</span>
+            <h1>TRANSHUMAN<br><span class="text-pink">EVOLUTION</span></h1>
+            <p class="manifesto-text border-pink">
+                AI Powered Design.<br>
+                The line between creator and tool has vanished.
+                We explore the "Mutant Meaning" of art where traditional forms decay and digital lifeforms rise.
+            </p>
+        </div>
+    </section>
+
+    <!-- 11. C2W2: STRUCTURE -->
+    <section>
+        <div class="video-bg" style="background: linear-gradient(45deg, #1a000d, #000);"></div>
+        <div class="content-wrapper">
+            <span class="section-tag" style="color: var(--neon-pink);">FUTURE 2025 / PART II</span>
+            <h1>6 PHASES<br><span class="text-pink">30 MINUTES</span></h1>
+            <p class="manifesto-text border-pink">
+                1. Traditional Art<br>
+                2. Virtual Fashion<br>
+                3. NFT as Medium<br>
+                4. AI-Powered Design<br>
+                5. Transhumanism<br>
+                6. Mutant Meaning
+            </p>
+        </div>
+    </section>
+
+    <!-- 12. C2W2: EXPERIENCE (CTA) -->
+    <section>
+        <video class="video-bg" autoplay muted loop playsinline>
+            <source src="https://video.wixstatic.com/video/54a996_029c9577e1d245f386a0ebe2c64a9b6e/1080p/mp4/file.mp4" type="video/mp4">
+        </video>
+        <div class="overlay-gradient"></div>
+        <div class="content-wrapper">
+            <span class="section-tag" style="color: var(--neon-pink);">FUTURE 2025 / PART III</span>
+            <h1 class="glitch" data-text="HYPERFY">HYPERFY<br><span class="text-pink">EXPERIENCE</span></h1>
+            <p class="manifesto-text border-pink">
+                Nearly 50 AI-designed avatars.<br>
+                A minimalist, sacred digital space.<br>
+                Dramatic lighting. A seamless narrative.
+                <strong>The Future is Now.</strong>
+            </p>
+            <a href="#" onclick="alert('Launching C2W2 Experience...')" class="btn-main" style="border-color: var(--neon-pink); color: var(--neon-pink);">ENTER C2W2</a>
+        </div>
+        <div style="position: absolute; bottom: 10px; font-size: 0.6rem; opacity: 0.4; letter-spacing: 2px;">
+            DIGITAL FORGERY WORKSHOP © 2026
+        </div>
+    </section>
+
+    <script>
+        // CURSOR LOGIC
+        const cursor = document.querySelector('.cursor');
+        const interactiveElements = document.querySelectorAll('a, .btn-main');
+
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+
+        interactiveElements.forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                cursor.classList.add('hovered');
+                // Change cursor color based on context if needed
+                if(el.style.borderColor) {
+                   cursor.style.backgroundColor = el.style.borderColor; 
+                }
+            });
+            el.addEventListener('mouseleave', () => {
+                cursor.classList.remove('hovered');
+                cursor.style.backgroundColor = ''; // Reset
+            });
+        });
+
+        // SECTION ACTIVATION LOGIC
+        const observerOptions = {
+            threshold: 0.5
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    const vid = entry.target.querySelector('video');
+                    if(vid) vid.play();
+                } else {
+                    entry.target.classList.remove('active');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('section').forEach(section => {
+            observer.observe(section);
+        });
+    </script>
+</body>
+</html>
