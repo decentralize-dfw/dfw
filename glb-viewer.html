@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GLB Viewer - High Quality</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #000;
+        }
+        #viewer-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            outline: none;
+        }
+        #loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 18px;
+            z-index: 10;
+            text-align: center;
+        }
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div id="viewer-container">
+        <div id="loading">
+            <div class="spinner"></div>
+            <div>Loading 3D Model...</div>
+        </div>
+    </div>
+
+    <!-- Three.js ve gerekli kütüphaneler -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r158/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/examples/js/loaders/DRACOLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/examples/js/loaders/RGBELoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/examples/js/postprocessing/EffectComposer.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/examples/js/postprocessing/RenderPass.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/examples/js/postprocessing/SSAOPass.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/examples/js/shaders/CopyShader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/examples/js/shaders/FXAAShader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/examples/js/postprocessing/ShaderPass.js"></script>
+
+    <script>
+        class GLBViewer {
+            constructor() {
+                this.container = document.getElementById('viewer-container');
+                this.loading = document.getElementById('loading');
+                this.quality = 'high'; // HIGH quality mode
+                this.devicePixelRatio = 1.0; // HIGH mode: 1.0
+
+                this.init();
+                this.setupLights();
+                this.setupPostProcessing();
+                this.animate();
+
+                // Handle window resize and fullscreen
+                window.addEventListener('resize', () => this.onWindowResize());
+                document.addEventListener('fullscreenchange', () => this.onFullscreenChange());
+            }
+
+            init() {
+                // Scene
+                this.scene = new THREE.Scene();
+                this.scene.background = new THREE.Color(0x000000);
+
+                // Camera - FOV 45 for orbit mode (like realestate2)
+                this.camera = new THREE.PerspectiveCamera(
+                    45,
+                    window.innerWidth / window.innerHeight,
+                    0.1,
+                    2000
+                );
+                this.camera.position.set(0, 2, 5);
+
+                // Renderer with HIGH quality settings
+                this.renderer = new THREE.WebGLRenderer({
+                    antialias: false, // As per realestate2
+                    powerPreference: 'high-performance',
+                    preserveDrawingBuffer: true,
+                    alpha: false
+                });
+                this.renderer.setPixelRatio(this.devicePixelRatio);
+                this.renderer.setSize(window.innerWidth, window.innerHeight);
+                this.renderer.shadowMap.enabled = true;
+                this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+                this.renderer.toneMapping = THREE.ACESFilmicToneMapping; // ACES Filmic like realestate2
+                this.renderer.toneMappingExposure = 1.0;
+                this.renderer.outputEncoding = THREE.sRGBEncoding;
+
+                this.container.appendChild(this.renderer.domElement);
+
+                // Controls - AUTO-ROTATE DISABLED
+                this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
+                this.controls.enableDamping = true;
+                this.controls.dampingFactor = 0.05;
+                this.controls.autoRotate = false; // DISABLED as requested
+                this.controls.autoRotateSpeed = 0;
+                this.controls.minDistance = 0.5;
+                this.controls.maxDistance = 100;
+                this.controls.enablePan = true;
+                this.controls.enableZoom = true;
+            }
+
+            setupLights() {
+                // Ambient Light - HIGH quality: 0.5-0.8 intensity
+                this.ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+                this.scene.add(this.ambientLight);
+
+                // Directional Light with shadows (as per realestate2)
+                this.directionalLight = new THREE.DirectionalLight(0xfff9f0, 2.8);
+                this.directionalLight.position.set(10, 50, 20);
+                this.directionalLight.castShadow = true;
+
+                // Shadow map: 2048x2048 for HIGH mode
+                this.directionalLight.shadow.mapSize.width = 2048;
+                this.directionalLight.shadow.mapSize.height = 2048;
+                this.directionalLight.shadow.camera.near = 0.5;
+                this.directionalLight.shadow.camera.far = 500;
+                this.directionalLight.shadow.camera.left = -50;
+                this.directionalLight.shadow.camera.right = 50;
+                this.directionalLight.shadow.camera.top = 50;
+                this.directionalLight.shadow.camera.bottom = -50;
+                this.directionalLight.shadow.bias = -0.0001;
+
+                this.scene.add(this.directionalLight);
+
+                // Hemisphere Light for better ambient
+                this.hemisphereLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.4);
+                this.scene.add(this.hemisphereLight);
+
+                // Environment map (simplified version without HDRI loader for now)
+                const pmremGenerator = new THREE.PMREMGenerator(this.renderer);
+                this.scene.environment = pmremGenerator.fromScene(
+                    new THREE.RoomEnvironment(),
+                    0.04
+                ).texture;
+            }
+
+            setupPostProcessing() {
+                // Effect Composer for post-processing
+                this.composer = new THREE.EffectComposer(this.renderer);
+
+                // Render Pass
+                const renderPass = new THREE.RenderPass(this.scene, this.camera);
+                this.composer.addPass(renderPass);
+
+                // SSAO Pass - HIGH mode: 32 samples
+                if (typeof THREE.SSAOPass !== 'undefined') {
+                    const ssaoPass = new THREE.SSAOPass(
+                        this.scene,
+                        this.camera,
+                        window.innerWidth,
+                        window.innerHeight
+                    );
+                    ssaoPass.kernelRadius = 16;
+                    ssaoPass.minDistance = 0.001;
+                    ssaoPass.maxDistance = 0.1;
+                    ssaoPass.output = THREE.SSAOPass.OUTPUT.Default;
+                    this.composer.addPass(ssaoPass);
+                }
+
+                // Bloom Pass - HIGH mode: 0.5 intensity
+                if (typeof THREE.UnrealBloomPass !== 'undefined') {
+                    const bloomPass = new THREE.UnrealBloomPass(
+                        new THREE.Vector2(window.innerWidth, window.innerHeight),
+                        0.5,  // strength (HIGH mode)
+                        0.4,  // radius
+                        0.85  // threshold
+                    );
+                    this.composer.addPass(bloomPass);
+                }
+
+                // FXAA for anti-aliasing
+                if (typeof THREE.ShaderPass !== 'undefined' && THREE.FXAAShader) {
+                    const fxaaPass = new THREE.ShaderPass(THREE.FXAAShader);
+                    const pixelRatio = this.renderer.getPixelRatio();
+                    fxaaPass.material.uniforms['resolution'].value.x = 1 / (window.innerWidth * pixelRatio);
+                    fxaaPass.material.uniforms['resolution'].value.y = 1 / (window.innerHeight * pixelRatio);
+                    this.composer.addPass(fxaaPass);
+                }
+            }
+
+            async loadGLB(url) {
+                return new Promise((resolve, reject) => {
+                    const loader = new THREE.GLTFLoader();
+
+                    // Setup Draco decoder
+                    const dracoLoader = new THREE.DRACOLoader();
+                    dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
+                    loader.setDRACOLoader(dracoLoader);
+
+                    loader.load(
+                        url,
+                        (gltf) => {
+                            const model = gltf.scene;
+
+                            // Setup shadows for all meshes
+                            model.traverse((child) => {
+                                if (child.isMesh) {
+                                    child.castShadow = true;
+                                    child.receiveShadow = true;
+
+                                    // Ensure materials are properly configured
+                                    if (child.material) {
+                                        child.material.envMapIntensity = 0.8;
+                                        child.material.needsUpdate = true;
+                                    }
+                                }
+                            });
+
+                            // Add model to scene
+                            this.scene.add(model);
+                            this.model = model;
+
+                            // Auto-fit model to screen
+                            this.fitModelToScreen();
+
+                            this.loading.style.display = 'none';
+                            resolve(model);
+                        },
+                        (progress) => {
+                            const percent = (progress.loaded / progress.total * 100).toFixed(0);
+                            this.loading.querySelector('div:last-child').textContent = `Loading 3D Model... ${percent}%`;
+                        },
+                        (error) => {
+                            console.error('Error loading GLB:', error);
+                            this.loading.querySelector('div:last-child').textContent = 'Error loading model';
+                            reject(error);
+                        }
+                    );
+                });
+            }
+
+            fitModelToScreen() {
+                if (!this.model) return;
+
+                // Calculate bounding box
+                const box = new THREE.Box3().setFromObject(this.model);
+                const size = box.getSize(new THREE.Vector3());
+                const center = box.getCenter(new THREE.Vector3());
+
+                // Calculate max dimension
+                const maxDim = Math.max(size.x, size.y, size.z);
+                const fov = this.camera.fov * (Math.PI / 180);
+                let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
+
+                // Add some padding
+                cameraZ *= 1.5;
+
+                // Position camera
+                this.camera.position.set(center.x, center.y, center.z + cameraZ);
+
+                // Point camera at center
+                this.camera.lookAt(center);
+
+                // Update controls target
+                this.controls.target.copy(center);
+                this.controls.update();
+
+                // Adjust near/far planes
+                this.camera.near = cameraZ / 100;
+                this.camera.far = cameraZ * 100;
+                this.camera.updateProjectionMatrix();
+            }
+
+            onWindowResize() {
+                const width = window.innerWidth;
+                const height = window.innerHeight;
+
+                this.camera.aspect = width / height;
+                this.camera.updateProjectionMatrix();
+
+                this.renderer.setSize(width, height);
+                this.composer.setSize(width, height);
+
+                // Update FXAA resolution
+                if (this.composer.passes) {
+                    this.composer.passes.forEach(pass => {
+                        if (pass.material && pass.material.uniforms && pass.material.uniforms.resolution) {
+                            const pixelRatio = this.renderer.getPixelRatio();
+                            pass.material.uniforms.resolution.value.x = 1 / (width * pixelRatio);
+                            pass.material.uniforms.resolution.value.y = 1 / (height * pixelRatio);
+                        }
+                    });
+                }
+
+                // Re-fit model when window resizes
+                if (this.model) {
+                    this.fitModelToScreen();
+                }
+            }
+
+            onFullscreenChange() {
+                // Wait a bit for the fullscreen transition to complete
+                setTimeout(() => {
+                    this.onWindowResize();
+                }, 100);
+            }
+
+            animate() {
+                requestAnimationFrame(() => this.animate());
+
+                this.controls.update();
+
+                // Render using composer for post-processing
+                if (this.composer) {
+                    this.composer.render();
+                } else {
+                    this.renderer.render(this.scene, this.camera);
+                }
+            }
+        }
+
+        // Initialize viewer
+        const viewer = new GLBViewer();
+
+        // Function to load GLB from URL (can be called from parent)
+        window.loadGLBModel = function(url) {
+            // Remove existing model if any
+            if (viewer.model) {
+                viewer.scene.remove(viewer.model);
+                viewer.model = null;
+            }
+
+            // Show loading
+            viewer.loading.style.display = 'block';
+            viewer.loading.querySelector('div:last-child').textContent = 'Loading 3D Model...';
+
+            // Load new model
+            return viewer.loadGLB(url);
+        };
+
+        // Auto-load if URL parameter is present
+        const urlParams = new URLSearchParams(window.location.search);
+        const modelUrl = urlParams.get('model');
+        if (modelUrl) {
+            window.loadGLBModel(decodeURIComponent(modelUrl));
+        }
+
+        // Listen for messages from parent window
+        window.addEventListener('message', (event) => {
+            if (event.data && event.data.type === 'loadGLB' && event.data.url) {
+                window.loadGLBModel(event.data.url);
+            }
+        });
+    </script>
+</body>
+</html>
