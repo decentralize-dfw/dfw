@@ -25,9 +25,22 @@
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             overflow: hidden;
-            background-image: url('https://raw.githubusercontent.com/decentralize-dfw/c2w2art/main/c2w2artcover.jpg');
+            
+            /* DÜZELTME: Ghost resmi sildik, masaüstü yüklenirken sadece SİYAH görünecek */
+            background-color: #000000;
+            background-image: none;
             background-size: cover;
             background-position: center;
+        }
+
+        /* DÜZELTME: Sadece mobilde senin istediğin özel arka plan çıkacak */
+        @media (max-width: 768px) {
+            body {
+                background-image: url('https://static.wixstatic.com/media/54a996_5cfadd5f901b4ecba127c43faef51e8a~mv2.jpg');
+                background-size: cover;
+                background-position: center;
+                background-repeat: no-repeat;
+            }
         }
 
         /* --- Seçim Stilleri --- */
@@ -811,6 +824,7 @@
         }
 
         /* Circular navigation behind desktop icons */
+       /* Mevcut #circular-navigation kuralını bul ve background özelliklerini kaldırıp bunu yapıştır */
         #circular-navigation {
             display: none;
             position: fixed;
@@ -820,11 +834,33 @@
             height: 100vh;
             overflow: hidden;
             z-index: 1;
+            /* background-image BURADAN SİLİNDİ, ::before içine taşındı */
+            background: transparent !important; 
         }
 
-        /* Left Sidebar for Title & Description */
-        //buraya kopyala 
+        /* YENİ: Arka plan resmi bu sanal katmanda olacak */
+        #circular-navigation::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1; /* İçeriklerin arkasında kalsın */
+            
+            /* JS ile buraya --desktop-bg değişkeni atayacağız */
+            background-image: var(--desktop-bg); 
+            
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            
+            /* Animasyon Ayarı: 1 saniye git, 1 saniye gel */
+            opacity: 1;
+            transition: opacity 1s ease-in-out; 
+        }
 
+        /* YENİ: Bu sınıf eklendiğinde arka plan kararacak */
+        #circular-navigation.changing-bg::before {
+            opacity: 0;
+        }
        
 
         
@@ -1522,11 +1558,7 @@
             <div class="bg-selector-btn" data-bg="5">5</div>
             <div class="bg-selector-btn" data-bg="6">6</div>
             <div class="bg-selector-btn" data-bg="7">7</div>
-            <div class="bg-selector-btn" data-bg="8">8</div>
-            <div class="bg-selector-btn" data-bg="9">9</div>
-            <div class="bg-selector-btn" data-bg="10">10</div>
-            <div class="bg-selector-btn" data-bg="11">11</div>
-            <div class="bg-selector-btn" data-bg="12">12</div>
+            
         </div>
 
         <!-- Back Button -->
@@ -8050,47 +8082,56 @@ function getIcon(item) {
             });
 
             // ======== BACKGROUND SELECTOR ======== //
+             // ======== BACKGROUND SELECTOR (FADE EFFECT) ======== //
+            
+            // 1. Diziyi Tanımla
             const backgrounds = [
-                'https://static.wixstatic.com/media/54a996_bc69d7289894459fb3a50091dbabc2e4~mv2.jpg', // 1 - Digital Topographies
-                'https://static.wixstatic.com/media/54a996_3243206499e746e99f403f1865458700~mv2.jpg', // 2 - DFW?
-                'https://static.wixstatic.com/media/54a996_2598bd0a3bab4c419b1939d8cee8b485~mv2.png', // 3 - DFW Design Market
-                'https://static.wixstatic.com/media/54a996_6af9880c704747ee91e6760a6c6443ad~mv2.jpg', // 4 - NEUE² DOJO GALLERY
-                'https://static.wixstatic.com/media/54a996_1bb979e7beeb40caa7e8b9455e1688bb~mv2.jpg', // 5 - MERMAID CHAIR
-                'https://static.wixstatic.com/media/54a996_1bf139412d244fbcb4dc993840416acc~mv2.jpg', // 6 - ZEN BUBBLE RIDER
-                'https://static.wixstatic.com/media/54a996_26886a672f784198b9f8af4c4c93a5b9~mv2.jpg', // 7 - HATCH
-                'https://static.wixstatic.com/media/54a996_c9415cfa41d943a7ae7ec18cc8a81a63~mv2.png', // 8 - BALLOON
-                'https://static.wixstatic.com/media/54a996_ba80e31fd25540a5b648f40640b7eaae~mv2.jpg', // 9 - WHY WE EXIST?
-                'https://static.wixstatic.com/media/54a996_8ea705af2b04470db99ed4122b5bbb5a~mv2.jpg', // 10 - C2W2 (Avatars)
-                'https://static.wixstatic.com/media/54a996_a4275b8206ae43d3ae134f283411acf2~mv2.jpg', // 11 - SCAFFOLD
-                'https://static.wixstatic.com/media/54a996_d7c0f7edddad4724bf78fa801b49da3a~mv2.jpg'  // 12 - BLACK CITY
+                'https://static.wixstatic.com/media/54a996_f30b1a66dd614f218faf61af3545c208~mv2.jpg',
+                'https://static.wixstatic.com/media/54a996_3d4cccedaf914f7cba9e480ed49a7650~mv2.jpg',
+                'https://static.wixstatic.com/media/54a996_e33e3701a1b04ddaa00b15280249efd1~mv2.jpg',
+                'https://static.wixstatic.com/media/54a996_8b3a92002e9d4dbb99bf9247e7885944~mv2.jpg',
+                
+                'https://static.wixstatic.com/media/54a996_28419c1654b14235bb2c695ab3a437e2~mv2.jpg',
+                'https://static.wixstatic.com/media/54a996_0619c73049ca43f8aba1702365c15b5d~mv2.jpg',
+                'https://static.wixstatic.com/media/54a996_ba80e31fd25540a5b648f40640b7eaae~mv2.jpg'
             ];
 
-            // Set initial background
+            // 2. Başlangıç Resmini Ayarla (CSS Variable Olarak)
             const circularNav3D = document.getElementById('circular-navigation');
-            circularNav3D.style.backgroundImage = `url('${backgrounds[0]}')`;
-            circularNav3D.style.backgroundSize = 'cover';
-            circularNav3D.style.backgroundPosition = 'center';
-            circularNav3D.style.backgroundRepeat = 'no-repeat';
-
-            // Mobile: Always use first background
-            const isMobile = window.innerWidth <= 768;
-            if (isMobile) {
-                circularNav3D.style.backgroundImage = `url('${backgrounds[0]}')`;
+            if (circularNav3D) {
+                // background-image yerine setProperty kullanıyoruz
+                circularNav3D.style.setProperty('--desktop-bg', `url('${backgrounds[0]}')`);
             }
 
-            // Desktop: Add click handlers for background buttons
+            // 3. Tıklama Mantığı (Desktop Kontrolü)
+            const isMobile = window.innerWidth <= 768;
             if (!isMobile) {
                 const bgButtons = document.querySelectorAll('.bg-selector-btn');
+                
                 bgButtons.forEach((btn) => {
                     btn.addEventListener('click', () => {
+                        // Eğer zaten bir geçiş animasyonu varsa tıklamayı engelle (üst üste binmemesi için)
+                        if (circularNav3D.classList.contains('changing-bg')) return;
+
                         const bgIndex = parseInt(btn.getAttribute('data-bg')) - 1;
+                        if (backgrounds[bgIndex]) {
+                            
+                            // A) Butonların aktiflik durumunu hemen güncelle
+                            bgButtons.forEach(b => b.classList.remove('active'));
+                            btn.classList.add('active');
 
-                        // Update background
-                        circularNav3D.style.backgroundImage = `url('${backgrounds[bgIndex]}')`;
+                            // B) Fade Out Başlat (Karart)
+                            circularNav3D.classList.add('changing-bg');
 
-                        // Update active state
-                        bgButtons.forEach(b => b.classList.remove('active'));
-                        btn.classList.add('active');
+                            // C) 1 Saniye Bekle (CSS transition süresi kadar)
+                            setTimeout(() => {
+                                // Resmi değiştir (Karanlıkta olduğu için kullanıcı değişimi görmez)
+                                circularNav3D.style.setProperty('--desktop-bg', `url('${backgrounds[bgIndex]}')`);
+                                
+                                // D) Fade In Başlat (Aydınlat)
+                                circularNav3D.classList.remove('changing-bg');
+                            }, 1000); // 1000ms = 1 saniye
+                        }
                     });
                 });
             }
