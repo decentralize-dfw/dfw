@@ -74,6 +74,62 @@
             font-weight: 600;
             color: #3b82f6;
         }
+
+        /* Model Info Panel */
+        #model-info {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 12px;
+            max-width: 300px;
+            display: none;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        #model-info.visible {
+            display: block;
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .info-row:last-child {
+            border-bottom: none;
+        }
+        .info-label {
+            color: #888;
+            margin-right: 10px;
+        }
+        .info-value {
+            color: #fff;
+            font-weight: 500;
+        }
+        .compression-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+            margin-left: 5px;
+        }
+        .badge-draco {
+            background: #ff6b6b;
+        }
+        .badge-meshopt {
+            background: #4ecdc4;
+        }
+        .badge-ktx2 {
+            background: #95e1d3;
+        }
+        .badge-webp {
+            background: #f38181;
+        }
     </style>
 </head>
 <body>
@@ -90,9 +146,40 @@
             </div>
             <div class="loading-text">Loading</div>
         </div>
+
+        <!-- Model Info Panel -->
+        <div id="model-info">
+            <div class="info-row">
+                <span class="info-label">Format:</span>
+                <span class="info-value" id="info-format">-</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Vertices:</span>
+                <span class="info-value" id="info-vertices">-</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Triangles:</span>
+                <span class="info-value" id="info-triangles">-</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Materials:</span>
+                <span class="info-value" id="info-materials">-</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Textures:</span>
+                <span class="info-value" id="info-textures">-</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Compression:</span>
+                <span class="info-value" id="info-compression">None</span>
+            </div>
+        </div>
     </div>
 
-    <!-- Three.js r160 - Modern version with Transmission/Volume/VRM support -->
+    <!-- Meshopt Decoder -->
+    <script src="https://cdn.jsdelivr.net/npm/meshoptimizer@0.18.1/meshopt_decoder.js"></script>
+
+    <!-- Three.js r160 - Modern version with full compression support -->
     <script type="importmap">
     {
         "imports": {
@@ -106,6 +193,8 @@
         import * as THREE from 'three';
         import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
         import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+        import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';
+        import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
         import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
         import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
         import { VRMLoaderPlugin } from 'three/addons/loaders/VRMLoaderPlugin.js';
@@ -114,7 +203,10 @@
             constructor() {
                 this.container = document.getElementById('viewer-container');
                 this.loading = document.getElementById('loading');
+                this.modelInfo = document.getElementById('model-info');
                 this.devicePixelRatio = Math.min(window.devicePixelRatio, 2);
+
+                this.compressionUsed = [];
 
                 this.init();
                 this.setupLights();
@@ -231,14 +323,79 @@
                 percentText.textContent = Math.round(percent) + '%';
             }
 
+            updateModelInfo(gltf) {
+                let vertices = 0;
+                let triangles = 0;
+                const materials = new Set();
+                const textures = new Set();
+
+                if (this.model) {
+                    this.model.traverse((child) => {
+                        if (child.isMesh) {
+                            if (child.geometry) {
+                                const positions = child.geometry.attributes.position;
+                                if (positions) vertices += positions.count;
+                                if (child.geometry.index) {
+                                    triangles += child.geometry.index.count / 3;
+                                }
+                            }
+                            if (child.material) {
+                                if (Array.isArray(child.material)) {
+                                    child.material.forEach(m => materials.add(m));
+                                } else {
+                                    materials.add(child.material);
+                                }
+                            }
+                        }
+                    });
+
+                    materials.forEach(mat => {
+                        if (mat.map) textures.add(mat.map);
+                        if (mat.normalMap) textures.add(mat.normalMap);
+                        if (mat.roughnessMap) textures.add(mat.roughnessMap);
+                        if (mat.metalnessMap) textures.add(mat.metalnessMap);
+                        if (mat.emissiveMap) textures.add(mat.emissiveMap);
+                    });
+                }
+
+                // Update UI
+                document.getElementById('info-format').textContent = this.vrm ? 'VRM' : 'GLB/GLTF';
+                document.getElementById('info-vertices').textContent = vertices.toLocaleString();
+                document.getElementById('info-triangles').textContent = Math.floor(triangles).toLocaleString();
+                document.getElementById('info-materials').textContent = materials.size;
+                document.getElementById('info-textures').textContent = textures.size;
+
+                // Compression badges
+                const compressionEl = document.getElementById('info-compression');
+                if (this.compressionUsed.length > 0) {
+                    compressionEl.innerHTML = this.compressionUsed.map(c =>
+                        `<span class="compression-badge badge-${c.toLowerCase()}">${c}</span>`
+                    ).join('');
+                } else {
+                    compressionEl.textContent = 'None';
+                }
+
+                this.modelInfo.classList.add('visible');
+            }
+
             async loadModel(url) {
                 return new Promise((resolve, reject) => {
                     const loader = new GLTFLoader();
+                    this.compressionUsed = [];
 
-                    // Draco decoder
+                    // Draco decoder for compressed geometry
                     const dracoLoader = new DRACOLoader();
                     dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
                     loader.setDRACOLoader(dracoLoader);
+
+                    // Meshopt decoder for compressed geometry
+                    loader.setMeshoptDecoder(MeshoptDecoder);
+
+                    // KTX2 loader for compressed textures
+                    const ktx2Loader = new KTX2Loader();
+                    ktx2Loader.setTranscoderPath('https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/libs/basis/');
+                    ktx2Loader.detectSupport(this.renderer);
+                    loader.setKTX2Loader(ktx2Loader);
 
                     // VRM support
                     loader.register((parser) => {
@@ -250,6 +407,34 @@
                         (gltf) => {
                             let model;
 
+                            // Detect compression types
+                            if (gltf.parser && gltf.parser.json) {
+                                const json = gltf.parser.json;
+
+                                if (json.extensionsUsed) {
+                                    if (json.extensionsUsed.includes('KHR_draco_mesh_compression')) {
+                                        this.compressionUsed.push('DRACO');
+                                    }
+                                    if (json.extensionsUsed.includes('EXT_meshopt_compression')) {
+                                        this.compressionUsed.push('MESHOPT');
+                                    }
+                                    if (json.extensionsUsed.includes('KHR_texture_basisu')) {
+                                        this.compressionUsed.push('KTX2');
+                                    }
+                                }
+
+                                // Check for WebP textures
+                                if (json.images) {
+                                    json.images.forEach(img => {
+                                        if (img.mimeType === 'image/webp' || (img.uri && img.uri.endsWith('.webp'))) {
+                                            if (!this.compressionUsed.includes('WEBP')) {
+                                                this.compressionUsed.push('WEBP');
+                                            }
+                                        }
+                                    });
+                                }
+                            }
+
                             // Check if this is a VRM model
                             if (gltf.userData.vrm) {
                                 model = gltf.userData.vrm.scene;
@@ -260,25 +445,17 @@
                             }
 
                             // CRITICAL: DO NOT override material properties from GLB/VRM!
-                            // The model already has correct transmission/volume/ior values
                             model.traverse((child) => {
                                 if (child.isMesh) {
                                     child.castShadow = true;
                                     child.receiveShadow = true;
 
                                     if (child.material) {
-                                        // Only adjust envMapIntensity based on material type
-                                        // DO NOT change transmission, ior, thickness - model has correct values!
-
                                         if (child.material.transmission !== undefined && child.material.transmission > 0) {
-                                            // This is a transmission material (glass)
-                                            // Reduce env map reflection for subtle look
                                             child.material.envMapIntensity = 0.3;
                                         } else if (child.material.metalness !== undefined && child.material.metalness > 0.5) {
-                                            // Metallic materials - higher reflection
                                             child.material.envMapIntensity = 1.0;
                                         } else {
-                                            // Other materials - moderate reflection
                                             child.material.envMapIntensity = 0.8;
                                         }
 
@@ -290,6 +467,7 @@
                             this.scene.add(model);
                             this.model = model;
                             this.fitModelToScreen();
+                            this.updateModelInfo(gltf);
                             this.loading.style.display = 'none';
                             resolve(model);
                         },
@@ -378,6 +556,7 @@
                 viewer.vrm = null;
             }
 
+            viewer.modelInfo.classList.remove('visible');
             viewer.loading.style.display = 'block';
             viewer.updateProgress(0);
             return viewer.loadModel(url);
