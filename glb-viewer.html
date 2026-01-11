@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GLB/VRM Viewer - Ultra Quality (Meshopt & Draco)</title>
+    <title>GLB/VRM Viewer - Ultra Quality (Meshopt & Draco & Anim)</title>
     <style>
         * {
             margin: 0;
@@ -118,6 +118,10 @@
                 this.container = document.getElementById('viewer-container');
                 this.loading = document.getElementById('loading');
                 this.devicePixelRatio = Math.min(window.devicePixelRatio, 2);
+                
+                // Animasyonlar için clock başlat
+                this.clock = new THREE.Clock();
+                this.mixer = null;
 
                 this.init();
                 this.setupLights();
@@ -244,7 +248,6 @@
                     loader.setDRACOLoader(dracoLoader);
 
                     // --- KTX2 SUPPORT (Basis Universal) ---
-                    // Sıkıştırılmış dokular için gereklidir (Meshopt ile genelde birlikte kullanılır)
                     const ktx2Loader = new KTX2Loader()
                         .setTranscoderPath('https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/libs/basis/')
                         .detectSupport(this.renderer);
@@ -272,29 +275,32 @@
                                 model = gltf.scene;
                             }
 
+                            // --- ANIMATION SUPPORT ---
+                            if (gltf.animations && gltf.animations.length > 0) {
+                                console.log(`Found ${gltf.animations.length} animations`);
+                                this.mixer = new THREE.AnimationMixer(model);
+                                
+                                // Tüm animasyonları loop modunda oynat
+                                gltf.animations.forEach((clip) => {
+                                    const action = this.mixer.clipAction(clip);
+                                    action.play();
+                                });
+                            }
+
                             // CRITICAL: DO NOT override material properties from GLB/VRM!
-                            // The model already has correct transmission/volume/ior values
                             model.traverse((child) => {
                                 if (child.isMesh) {
                                     child.castShadow = true;
                                     child.receiveShadow = true;
 
                                     if (child.material) {
-                                        // Only adjust envMapIntensity based on material type
-                                        // DO NOT change transmission, ior, thickness - model has correct values!
-
                                         if (child.material.transmission !== undefined && child.material.transmission > 0) {
-                                            // This is a transmission material (glass)
-                                            // Reduce env map reflection for subtle look
                                             child.material.envMapIntensity = 0.3;
                                         } else if (child.material.metalness !== undefined && child.material.metalness > 0.5) {
-                                            // Metallic materials - higher reflection
                                             child.material.envMapIntensity = 1.0;
                                         } else {
-                                            // Other materials - moderate reflection
                                             child.material.envMapIntensity = 0.8;
                                         }
-
                                         child.material.needsUpdate = true;
                                     }
                                 }
@@ -368,11 +374,17 @@
             animate() {
                 requestAnimationFrame(() => this.animate());
 
+                // Delta time hesapla
+                const deltaTime = this.clock.getDelta();
+
                 // Update VRM if exists
                 if (this.vrm) {
-                    const deltaTime = this.clock ? this.clock.getDelta() : 0.016;
-                    if (!this.clock) this.clock = new THREE.Clock();
                     this.vrm.update(deltaTime);
+                }
+
+                // Update Animations if exists
+                if (this.mixer) {
+                    this.mixer.update(deltaTime);
                 }
 
                 this.controls.update();
@@ -389,6 +401,12 @@
                 viewer.scene.remove(viewer.model);
                 viewer.model = null;
                 viewer.vrm = null;
+                
+                // Eski mixer varsa durdur ve temizle
+                if (viewer.mixer) {
+                    viewer.mixer.stopAllAction();
+                    viewer.mixer = null;
+                }
             }
 
             viewer.loading.style.display = 'block';
