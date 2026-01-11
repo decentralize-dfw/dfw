@@ -824,6 +824,7 @@
         }
 
         /* Circular navigation behind desktop icons */
+        /* Mevcut #circular-navigation kuralını bul ve background özelliklerini kaldırıp bunu yapıştır */
         #circular-navigation {
             display: none;
             position: fixed;
@@ -833,10 +834,33 @@
             height: 100vh;
             overflow: hidden;
             z-index: 1;
+            /* background-image BURADAN SİLİNDİ, ::before içine taşındı */
+            background: transparent !important; 
         }
 
-        /* Left Sidebar for Title & Description */
-        //buraya kopyala 
+        /* YENİ: Arka plan resmi bu sanal katmanda olacak */
+        #circular-navigation::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1; /* İçeriklerin arkasında kalsın */
+            
+            /* JS ile buraya --desktop-bg değişkeni atayacağız */
+            background-image: var(--desktop-bg); 
+            
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            
+            /* Animasyon Ayarı: 1 saniye git, 1 saniye gel */
+            opacity: 1;
+            transition: opacity 1s ease-in-out; 
+        }
+
+        /* YENİ: Bu sınıf eklendiğinde arka plan kararacak */
+        #circular-navigation.changing-bg::before {
+            opacity: 0;
+        }
 
        
 
@@ -1493,10 +1517,15 @@
         <div id="parametric-plan-container"></div>
     </div>
 
-    <div id="circular-sidebar-title">DFW website ui</div>
+    <div id="circular-sidebar-title">DFW Home</div>
 
     <div id="sidebar-scroll-wrapper">
-        <div id="circular-sidebar-description">Decentralized Fashion Week - Navigate through files and folders</div>
+        <div id="circular-sidebar-description">
+            Digital Forgery Workshop<br><br>
+            CREATIVE DESIGN STUDIO FOR SPATIAL WEB<br>
+            LET'S FORGE THE FUTURE TOGETHER.<br><br>
+            MILAN 2021-2026
+        </div>
         <div id="circular-sidebar-links"></div>
     </div>
 </div>
@@ -7682,13 +7711,16 @@ function getIcon(item) {
             // Update parametric plan
             updateParametricPlan('root');
 
-            document.getElementById('circular-sidebar-title').textContent = 'DFW website ui';
-            document.getElementById('circular-sidebar-description').textContent = 'Decentralized Fashion Week - Navigate through files and folders';
+            // --- BURASI GÜNCELLENDİ ---
+            document.getElementById('circular-sidebar-title').textContent = 'DFW Home';
+            document.getElementById('circular-sidebar-description').innerHTML = "Digital Forgery Workshop<br><br>CREATIVE DESIGN STUDIO FOR SPATIAL WEB<br>LET'S FORGE THE FUTURE TOGETHER.<br><br>MILAN 2021-2026";
+            
             document.getElementById('circular-breadcrumb').textContent = 'DFW/';
             document.getElementById('circular-back-button').classList.remove('visible');
 
             // Root'a dönerken de 'out' efekti (eğer başlangıç açılışı değilse)
             const transitionType = isNavigatingBack ? 'out' : 'normal';
+            // mainCategories değişkeni global scope'da tanımlı olduğu için direkt kullanıyoruz
             renderCircularScene('root', mainCategories, true, null, null, transitionType);
         }
 
@@ -7736,14 +7768,13 @@ function getIcon(item) {
             document.getElementById('circular-sidebar-links').innerHTML = '';
 
             if (circularNav.currentFolderData) {
+                // Eğer bir klasörün içindeysek o klasörün başlığını göster
                 document.getElementById('circular-sidebar-title').textContent = circularNav.currentFolderData.name;
                 document.getElementById('circular-sidebar-description').textContent = circularNav.currentFolderData.description;
-            } else if (circularNav.currentFolder === 'root') {
-                document.getElementById('circular-sidebar-title').textContent = 'DFW website ui';
-                document.getElementById('circular-sidebar-description').textContent = 'Decentralized Fashion Week - Navigate through files and folders';
             } else {
-                document.getElementById('circular-sidebar-title').textContent = 'DFW website ui';
-                document.getElementById('circular-sidebar-description').textContent = 'Decentralized Fashion Week - Navigate through files and folders';
+                // Eğer Ana Sayfadaysak (Root) senin istediğin özel metni göster
+                document.getElementById('circular-sidebar-title').textContent = 'DFW Home';
+                document.getElementById('circular-sidebar-description').innerHTML = "Digital Forgery Workshop<br><br>CREATIVE DESIGN STUDIO FOR SPATIAL WEB<br>LET'S FORGE THE FUTURE TOGETHER.<br><br>MILAN 2021-2026";
             }
         }
 
@@ -8060,46 +8091,51 @@ function getIcon(item) {
 
             // ======== BACKGROUND SELECTOR ======== //
              const backgrounds = [
-
-              
-                'https://static.wixstatic.com/media/54a996_3d4cccedaf914f7cba9e480ed49a7650~mv2.jpg', // 1 - Digital Topographies
-                'https://static.wixstatic.com/media/54a996_e33e3701a1b04ddaa00b15280249efd1~mv2.jpg', // 2 - DFW?
-                'https://static.wixstatic.com/media/54a996_8b3a92002e9d4dbb99bf9247e7885944~mv2.jpg', // 3 - DFW Design Market
-                'https://static.wixstatic.com/media/54a996_f30b1a66dd614f218faf61af3545c208~mv2.jpg', //4 - Digital Topographies
-                'https://static.wixstatic.com/media/54a996_28419c1654b14235bb2c695ab3a437e2~mv2.jpg', // 5 - DFW?
-                'https://static.wixstatic.com/media/54a996_0619c73049ca43f8aba1702365c15b5d~mv2.jpg', // 6 - DFW Design Market
-                
-                
-                'https://static.wixstatic.com/media/54a996_ba80e31fd25540a5b648f40640b7eaae~mv2.jpg', // 9 - WHY WE EXIST?
-               
+                'https://static.wixstatic.com/media/54a996_f30b1a66dd614f218faf61af3545c208~mv2.jpg',
+                'https://static.wixstatic.com/media/54a996_3d4cccedaf914f7cba9e480ed49a7650~mv2.jpg',
+                'https://static.wixstatic.com/media/54a996_e33e3701a1b04ddaa00b15280249efd1~mv2.jpg',
+                'https://static.wixstatic.com/media/54a996_8b3a92002e9d4dbb99bf9247e7885944~mv2.jpg',
+                'https://static.wixstatic.com/media/54a996_28419c1654b14235bb2c695ab3a437e2~mv2.jpg',
+                'https://static.wixstatic.com/media/54a996_0619c73049ca43f8aba1702365c15b5d~mv2.jpg',
+                'https://static.wixstatic.com/media/54a996_ba80e31fd25540a5b648f40640b7eaae~mv2.jpg'
             ];
 
-            // Set initial background
+            // 2. Başlangıç Resmini Ayarla (CSS Variable Olarak)
             const circularNav3D = document.getElementById('circular-navigation');
-            circularNav3D.style.backgroundImage = `url('${backgrounds[0]}')`;
-            circularNav3D.style.backgroundSize = 'cover';
-            circularNav3D.style.backgroundPosition = 'center';
-            circularNav3D.style.backgroundRepeat = 'no-repeat';
-
-            // Mobile: Always use first background
-            const isMobile = window.innerWidth <= 768;
-            if (isMobile) {
-                circularNav3D.style.backgroundImage = `url('${backgrounds[0]}')`;
+            if (circularNav3D) {
+                // background-image yerine setProperty kullanıyoruz
+                circularNav3D.style.setProperty('--desktop-bg', `url('${backgrounds[0]}')`);
             }
 
-            // Desktop: Add click handlers for background buttons
+            // 3. Tıklama Mantığı (Desktop Kontrolü)
+            const isMobile = window.innerWidth <= 768;
             if (!isMobile) {
                 const bgButtons = document.querySelectorAll('.bg-selector-btn');
+                
                 bgButtons.forEach((btn) => {
                     btn.addEventListener('click', () => {
+                        // Eğer zaten bir geçiş animasyonu varsa tıklamayı engelle (üst üste binmemesi için)
+                        if (circularNav3D.classList.contains('changing-bg')) return;
+
                         const bgIndex = parseInt(btn.getAttribute('data-bg')) - 1;
+                        if (backgrounds[bgIndex]) {
+                            
+                            // A) Butonların aktiflik durumunu hemen güncelle
+                            bgButtons.forEach(b => b.classList.remove('active'));
+                            btn.classList.add('active');
 
-                        // Update background
-                        circularNav3D.style.backgroundImage = `url('${backgrounds[bgIndex]}')`;
+                            // B) Fade Out Başlat (Karart)
+                            circularNav3D.classList.add('changing-bg');
 
-                        // Update active state
-                        bgButtons.forEach(b => b.classList.remove('active'));
-                        btn.classList.add('active');
+                            // C) 1 Saniye Bekle (CSS transition süresi kadar)
+                            setTimeout(() => {
+                                // Resmi değiştir (Karanlıkta olduğu için kullanıcı değişimi görmez)
+                                circularNav3D.style.setProperty('--desktop-bg', `url('${backgrounds[bgIndex]}')`);
+                                
+                                // D) Fade In Başlat (Aydınlat)
+                                circularNav3D.classList.remove('changing-bg');
+                            }, 1000); // 1000ms = 1 saniye
+                        }
                     });
                 });
             }
