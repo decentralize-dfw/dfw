@@ -903,8 +903,87 @@
             backdrop-filter: none;
              pointer-events: auto !important; /* Tıklamaların algılanması için şart */
             flex-shrink: 0;
-           
+
     z-index: 20; /* Üstte durması için */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        #parametric-plan-container.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        #parametric-plan-container.fullscreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw !important;
+            height: 100vh !important;
+            margin: 0 !important;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #parametric-plan-container.fullscreen svg {
+            max-width: 90vw;
+            max-height: 90vh;
+        }
+
+        /* Plan Controls */
+        #plan-controls {
+            position: fixed;
+            bottom: 62px;
+            left: 30px;
+            display: flex;
+            gap: 6px;
+            z-index: 10;
+            align-items: center;
+        }
+
+        .plan-control-btn {
+            height: 28px;
+            padding: 0 10px;
+            border-radius: 6px;
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 10px;
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .plan-control-btn:hover {
+            background: rgba(255,255,255,0.25);
+        }
+
+        .plan-control-btn.active {
+            background: rgba(255,255,255,0.35);
+            border-color: rgba(255,255,255,0.5);
+        }
+
+        #observe-btn {
+            display: none;
+        }
+
+        #observe-btn.visible {
+            display: flex;
+        }
+
+        /* Fullscreen backdrop blur */
+        #circular-navigation.blurred {
+            filter: blur(8px);
+            pointer-events: none;
         }
 .plan-room-shape:hover {
     fill-opacity: 0.6 !important;
@@ -1465,6 +1544,12 @@
         <div id="circular-sidebar-links"></div>
     </div>
 </div>
+
+        <!-- Plan Control Buttons -->
+        <div id="plan-controls">
+            <div class="plan-control-btn" id="show-plan-btn">SHOW PLAN</div>
+            <div class="plan-control-btn" id="observe-btn" style="display: none;">OBSERVE</div>
+        </div>
 
         <!-- Layout Toggle Buttons -->
         <div id="layout-toggle-container">
@@ -6642,6 +6727,7 @@ links: [
             // ROOMS (Tıklanabilir ve Klasör Açan Versiyon)
 const roomGroups = roomLayer.selectAll("g")
     .data(nodes).enter().append("g")
+    .attr("class", "node")
     .attr("transform", d => `translate(${d.x}, ${d.y})`)
     .attr("data-folder", d => d.folderMatch)
     // TIKLAMA ÖZELLİĞİ:
@@ -8039,6 +8125,142 @@ function getIcon(item) {
                         btn.classList.add('active');
                     });
                 });
+            }
+
+            // ======== PLAN VISIBILITY CONTROLS ======== //
+            const planContainer = document.getElementById('parametric-plan-container');
+            const showPlanBtn = document.getElementById('show-plan-btn');
+            const observeBtn = document.getElementById('observe-btn');
+            let isPlanVisible = false;
+            let isObserveMode = false;
+
+            // Show/Hide Plan Toggle
+            showPlanBtn.addEventListener('click', () => {
+                isPlanVisible = !isPlanVisible;
+
+                if (isPlanVisible) {
+                    planContainer.classList.add('visible');
+                    showPlanBtn.textContent = 'HIDE PLAN';
+                    observeBtn.style.display = 'block';
+                } else {
+                    planContainer.classList.remove('visible');
+                    showPlanBtn.textContent = 'SHOW PLAN';
+                    observeBtn.style.display = 'none';
+
+                    // If in observe mode, exit it
+                    if (isObserveMode) {
+                        exitObserveMode();
+                    }
+                }
+            });
+
+            // Observe/Unobserve Toggle
+            observeBtn.addEventListener('click', () => {
+                if (isObserveMode) {
+                    exitObserveMode();
+                } else {
+                    enterObserveMode();
+                }
+            });
+
+            function enterObserveMode() {
+                isObserveMode = true;
+                planContainer.classList.add('fullscreen');
+                circularNav3D.classList.add('blurred');
+                observeBtn.textContent = 'UNOBSERVE';
+
+                // Add hover handlers for plan rooms
+                addPlanHoverHandlers();
+            }
+
+            function exitObserveMode() {
+                isObserveMode = false;
+                planContainer.classList.remove('fullscreen');
+                circularNav3D.classList.remove('blurred');
+                observeBtn.textContent = 'OBSERVE';
+
+                // Remove hover handlers
+                removePlanHoverHandlers();
+
+                // Clear sidebar info
+                clearSidebarInfo();
+            }
+
+            // ESC key handler
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && isObserveMode) {
+                    exitObserveMode();
+                }
+            });
+
+            // Outside click handler
+            planContainer.addEventListener('click', (e) => {
+                if (isObserveMode && e.target === planContainer) {
+                    exitObserveMode();
+                }
+            });
+
+            // Plan hover handlers
+            function addPlanHoverHandlers() {
+                const planNodes = document.querySelectorAll('#parametric-plan-container .node');
+                planNodes.forEach(node => {
+                    node.addEventListener('mouseenter', handlePlanHover);
+                    node.addEventListener('mouseleave', clearSidebarInfo);
+                    node.addEventListener('click', handlePlanClick);
+                });
+            }
+
+            function removePlanHoverHandlers() {
+                const planNodes = document.querySelectorAll('#parametric-plan-container .node');
+                planNodes.forEach(node => {
+                    node.removeEventListener('mouseenter', handlePlanHover);
+                    node.removeEventListener('mouseleave', clearSidebarInfo);
+                    node.removeEventListener('click', handlePlanClick);
+                });
+            }
+
+            function handlePlanHover(e) {
+                const node = e.currentTarget;
+                const folderKey = node.getAttribute('data-folder');
+
+                if (folderKey && folderHierarchy[folderKey]) {
+                    const info = folderHierarchy[folderKey];
+                    displaySidebarInfo(info.name, info.description);
+                }
+            }
+
+            function handlePlanClick(e) {
+                if (!isObserveMode) return;
+
+                const node = e.currentTarget;
+                const folderKey = node.getAttribute('data-folder');
+
+                if (folderKey && folderHierarchy[folderKey]) {
+                    // Exit observe mode
+                    exitObserveMode();
+
+                    // Navigate to the room
+                    const info = folderHierarchy[folderKey];
+                    const items = fileSystemDB[folderKey] || [];
+                    navigateToCircularFolder(folderKey, info.name, info.description || '', null, null);
+                }
+            }
+
+            function displaySidebarInfo(name, description) {
+                const sidebar = document.getElementById('circular-sidebar-content');
+                if (sidebar) {
+                    sidebar.innerHTML = `
+                        <h2 style="color: white; margin-bottom: 10px;">${name}</h2>
+                        <p style="color: rgba(255,255,255,0.7); font-size: 14px;">${description}</p>
+                    `;
+                }
+            }
+
+            function clearSidebarInfo() {
+                const sidebar = document.getElementById('circular-sidebar-content');
+                if (sidebar) {
+                    sidebar.innerHTML = '';
+                }
             }
         }  // <--- BU PARANTEZ EKSİK! BUNU EKLE.
 
