@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DFW | Digital Forgery Workshop</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #000000;
+            --text-primary: #e5e5e5;
+            --text-secondary: #737373;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            margin: 0;
+            overflow: hidden; /* Scroll-snap wrapper handles scrolling */
+        }
+
+        .font-grotesk { font-family: 'Space Grotesk', sans-serif; }
+
+        /* SCROLL SNAP CONTAINER */
+        .snap-container {
+            height: 100vh;
+            width: 100vw;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+            scroll-behavior: smooth;
+        }
+
+        /* SLIDE COMMON STYLES */
+        .section-slide {
+            height: 100vh;
+            width: 100%;
+            scroll-snap-align: start;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 2rem;
+            overflow: hidden;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .slide-content {
+            position: relative;
+            z-index: 10;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 0 1rem;
+        }
+
+        /* BACKGROUNDS */
+        .bg-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 1;
+        }
+
+        .bg-image {
+            position: absolute;
+            inset: 0;
+            background-size: cover;
+            background-position: center;
+            opacity: 0.4;
+            filter: grayscale(100%) contrast(1.2);
+            transition: transform 10s ease;
+        }
+        
+        .section-slide:hover .bg-image {
+            transform: scale(1.02);
+        }
+
+        /* Unique Backgrounds per Slide */
+        .bg-1 { background-image: url('https://raw.githubusercontent.com/decentralize-dfw/c2w2art/main/c2w2artcover.jpg'); }
+        .bg-2 { background-image: url('https://static.wixstatic.com/media/54a996_456c0c5326d64fce8dc04b0abc005c9d~mv2.jpg'); }
+        .bg-3 { background-image: url('https://static.wixstatic.com/media/54a996_ba80e31fd25540a5b648f40640b7eaae~mv2.jpg'); }
+        .bg-4 { background-image: url('https://static.wixstatic.com/media/54a996_f6adc1252e084f9898321217b86cbd4d~mv2.jpg'); }
+        .bg-5 { background-color: #0a0a0a; background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px); background-size: 40px 40px; }
+        .bg-6 { background-image: url('https://static.wixstatic.com/media/54a996_2598bd0a3bab4c419b1939d8cee8b485~mv2.png'); }
+        .bg-7 { background-image: url('https://static.wixstatic.com/media/54a996_d7c0f7edddad4724bf78fa801b49da3a~mv2.jpg'); }
+        .bg-8 { background-color: #050505; } /* Text/List Slide */
+        .bg-9 { background-color: #000; } /* Works Grid */
+
+        /* TYPOGRAPHY */
+        .mega-title {
+            font-size: clamp(3rem, 8vw, 7rem);
+            font-weight: 700;
+            line-height: 0.9;
+            letter-spacing: -0.04em;
+            margin-bottom: 2rem;
+            color: #fff;
+        }
+
+        .slide-label {
+            font-family: 'Space Grotesk', monospace;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: #555;
+            margin-bottom: 1.5rem;
+            display: block;
+            border-left: 2px solid #333;
+            padding-left: 1rem;
+        }
+
+        .body-text {
+            font-size: clamp(1rem, 1.5vw, 1.5rem);
+            line-height: 1.5;
+            font-weight: 300;
+            color: #ccc;
+            max-width: 800px;
+        }
+
+        .list-item {
+            display: flex;
+            align-items: baseline;
+            gap: 1rem;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .list-item span:first-child { color: #555; font-family: monospace; min-width: 20px; }
+
+        /* NAV */
+        .nav-fixed {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            mix-blend-mode: difference;
+        }
+
+        /* PROJECT CARD */
+        .work-card {
+            position: relative;
+            background: #111;
+            aspect-ratio: 16/9;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: border-color 0.3s ease;
+            cursor: pointer;
+        }
+        .work-card:hover { border-color: #fff; }
+        .work-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: grayscale(100%);
+            transition: all 0.5s ease;
+            opacity: 0.6;
+        }
+        .work-card:hover img {
+            filter: grayscale(0%);
+            opacity: 1;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="nav-fixed">
+        <div class="font-grotesk font-bold text-2xl tracking-tighter">DFW.</div>
+        <div class="hidden md:flex gap-8 text-[10px] font-mono uppercase tracking-widest text-gray-400">
+            <span>Milan / Metaverse</span>
+            <span>Est. 2021</span>
+        </div>
+        <a href="#contact" class="hidden md:block border border-white px-6 py-2 rounded-full text-[10px] font-bold uppercase hover:bg-white hover:text-black transition-colors">Start Project</a>
+    </div>
+
+    <div class="snap-container">
+
+        <!-- SLIDE 1: HERO -->
+        <section class="section-slide">
+            <div class="bg-image bg-1"></div>
+            <div class="bg-overlay"></div>
+            <div class="slide-content">
+                <span class="font-mono text-gray-500 text-xs mb-4 block">DIGITAL FORGERY WORKSHOP</span>
+                <h1 class="mega-title">CREATIVE DESIGN STUDIO<br>FOR SPATIAL WEB.</h1>
+                <p class="body-text text-white">
+                    We are not just building 3D websites. We are liberating digital experiences from the tyranny of the flat screen. Breaking down the wall between the digital and the physical.
+                </p>
+                <div class="mt-8 text-sm font-mono text-gray-500">SCROLL TO EXPLORE</div>
+            </div>
+        </section>
+
+        <!-- ============================================= -->
+        <!-- PART 1: PHILOSOPHY (WHY) -->
+        <!-- ============================================= -->
+
+        <!-- SLIDE 2: TRUTH -->
+        <section class="section-slide">
+            <div class="bg-image bg-2"></div>
+            <div class="bg-overlay"></div>
+            <div class="slide-content">
+                <span class="slide-label">01 / TRUTH</span>
+                <h2 class="mega-title text-5xl md:text-7xl">SPACE IS THE SILENT<br>FRAMEWORK.</h2>
+                <p class="body-text">
+                    From ancient stone to intangible pixels, space shapes how humanity connects to itself. The future isn’t about mimicking the familiar—it’s about unearthing the unseen potential within the virtual.
+                </p>
+            </div>
+        </section>
+
+        <!-- SLIDE 3: POWER -->
+        <section class="section-slide">
+            <div class="bg-image bg-3"></div>
+            <div class="bg-overlay"></div>
+            <div class="slide-content">
+                <span class="slide-label">02 / POWER</span>
+                <h2 class="mega-title text-5xl md:text-7xl">TRANSCEND THE<br>PHYSICAL.</h2>
+                <p class="body-text">
+                    Virtual spaces create environments that respond, adapt, and transform. In these realms, structure is no longer bound by gravity, and experience extends beyond the tangible. This is where digital matter becomes meaningful.
+                </p>
+            </div>
+        </section>
+
+        <!-- SLIDE 4: DEFINITION -->
+        <section class="section-slide">
+            <div class="bg-image bg-4"></div>
+            <div class="bg-overlay"></div>
+            <div class="slide-content">
+                <span class="slide-label">03 / DEFINITION</span>
+                <h2 class="mega-title text-5xl md:text-7xl">REDEFINING SPATIAL<br>NARRATIVES.</h2>
+                <p class="body-text">
+                    Theater-like performance arenas, boundless galleries, adaptive retail spaces. Accessible to all without downloads or delay. These spaces provide the foundation for cultural evolution.
+                </p>
+            </div>
+        </section>
+
+        <!-- ============================================= -->
+        <!-- PART 2: METHODOLOGY (HOW) -->
+        <!-- ============================================= -->
+
+        <!-- SLIDE 5: APPROACH -->
+        <section class="section-slide bg-5">
+            <div class="slide-content">
+                <span class="slide-label">04 / APPROACH</span>
+                <h2 class="mega-title text-5xl md:text-7xl">THREE PRINCIPLES.</h2>
+                <div class="space-y-8 mt-12 max-w-2xl">
+                    <div>
+                        <h3 class="text-xl font-bold text-white mb-2">1. Spatial Innovation</h3>
+                        <p class="text-gray-400">Rethinking how digital spaces can be experienced. Not a page, a place.</p>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-white mb-2">2. Technical Efficiency</h3>
+                        <p class="text-gray-400">Optimizing performance without compromising quality. Under 15MB. Instant load.</p>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-white mb-2">3. Interactive Narrative</h3>
+                        <p class="text-gray-400">Creating engaging stories through spatial design. The user is the protagonist.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 6: SERVICES -->
+        <section class="section-slide">
+            <div class="bg-image bg-6"></div>
+            <div class="bg-overlay"></div>
+            <div class="slide-content">
+                <span class="slide-label">05 / SERVICES</span>
+                <h2 class="mega-title text-5xl md:text-7xl">WHAT WE BUILD.</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6 text-lg font-light text-gray-300">
+                    <div class="border-b border-white/20 pb-4">3D Design Browser</div>
+                    <div class="border-b border-white/20 pb-4">Virtual Theater Productions</div>
+                    <div class="border-b border-white/20 pb-4">Museum & Gallery Spaces</div>
+                    <div class="border-b border-white/20 pb-4">On-Chain Experiences</div>
+                    <div class="border-b border-white/20 pb-4">Digital Architecture Consulting</div>
+                    <div class="border-b border-white/20 pb-4">Spatial Retail Systems</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 7: COLLECTORS -->
+        <section class="section-slide">
+            <div class="bg-image bg-7"></div>
+            <div class="bg-overlay"></div>
+            <div class="slide-content">
+                <span class="slide-label">06 / OWNERSHIP</span>
+                <h2 class="mega-title text-5xl md:text-7xl">YOU OWN THE SPACE.</h2>
+                <p class="body-text mb-8">
+                    When acquiring a DFW world, you're not just renting a server. You obtain a complete, editable virtual environment.
+                </p>
+                <ul class="text-sm font-mono text-gray-400 space-y-2">
+                    <li>> Full world NFT rights on Ethereum</li>
+                    <li>> Complete editing capabilities</li>
+                    <li>> Original asset files included</li>
+                    <li>> Collaboration opportunities</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- ============================================= -->
+        <!-- PART 3: OUTPUT (WHAT) -->
+        <!-- ============================================= -->
+
+        <!-- SLIDE 8: DATA / LISTS -->
+        <section class="section-slide bg-8">
+            <div class="slide-content h-full flex flex-col justify-center">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-16">
+                    <div>
+                        <span class="text-xs font-mono text-gray-600 mb-6 block">RECOGNITION</span>
+                        <div class="space-y-4 text-sm text-gray-300">
+                            <div class="list-item"><span>01</span> VCA x Draup Virtual Fashion Residency 1st Prize</div>
+                            <div class="list-item"><span>02</span> Top 50 Creators of Metaverse by Metamundo</div>
+                            <div class="list-item"><span>03</span> Creatorverse Buildathon Winner</div>
+                            <div class="list-item"><span>04</span> EnterDAO Landworks Grant Winner</div>
+                            <div class="list-item"><span>05</span> MONA 3D Objects Honorable Mention</div>
+                        </div>
+                    </div>
+                    <div>
+                        <span class="text-xs font-mono text-gray-600 mb-6 block">EXHIBITIONS</span>
+                        <div class="space-y-4 text-sm text-gray-300">
+                            <div class="list-item"><span>IT</span> Fabbrica Del Vapore, Milan</div>
+                            <div class="list-item"><span>UK</span> Royal Institution, London</div>
+                            <div class="list-item"><span>US</span> Art Basel Miami</div>
+                            <div class="list-item"><span>CH</span> Kunsthaus Steffisburg</div>
+                            <div class="list-item"><span>DE</span> Factory Berlin</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 9: SELECTED WORKS (Visual) -->
+        <section id="experience" class="section-slide bg-9">
+            <div class="slide-content">
+                <div class="flex justify-between items-end mb-12 border-b border-white/10 pb-6">
+                    <h2 class="text-4xl font-bold text-white">SELECTED WORKS</h2>
+                    <span class="font-mono text-xs text-gray-500 hidden md:block">ARCHIVE 2021-2026</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Work 1 -->
+                    <div class="work-card group" onclick="openModal(fileSystemDB.Experience[0])">
+                        <img src="https://static.wixstatic.com/media/54a996_ba80e31fd25540a5b648f40640b7eaae~mv2.jpg">
+                        <div class="absolute bottom-4 left-4">
+                            <span class="text-[10px] font-mono bg-white text-black px-1">THEATER</span>
+                            <p class="text-white font-bold mt-1">Why We Exist?</p>
+                        </div>
+                    </div>
+                    <!-- Work 2 -->
+                    <div class="work-card group" onclick="openModal(fileSystemDB.Experience[3])">
+                        <img src="https://static.wixstatic.com/media/54a996_47b0c01fb7404427ade7405c73862623~mv2.jpg">
+                        <div class="absolute bottom-4 left-4">
+                            <span class="text-[10px] font-mono bg-white text-black px-1">EVENT</span>
+                            <p class="text-white font-bold mt-1">C2W Runway</p>
+                        </div>
+                    </div>
+                    <!-- Work 3 -->
+                    <div class="work-card group" onclick="openModal(fileSystemDB.Gallery[1])">
+                        <img src="https://static.wixstatic.com/media/54a996_2598bd0a3bab4c419b1939d8cee8b485~mv2.png">
+                        <div class="absolute bottom-4 left-4">
+                            <span class="text-[10px] font-mono bg-white text-black px-1">RETAIL</span>
+                            <p class="text-white font-bold mt-1">Concept Store</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                     <!-- Work 4 -->
+                     <div class="work-card group h-48" onclick="openModal(fileSystemDB.Gallery[0])">
+                        <img src="https://static.wixstatic.com/media/54a996_a4275b8206ae43d3ae134f283411acf2~mv2.jpg">
+                        <div class="absolute bottom-4 left-4">
+                            <span class="text-[10px] font-mono bg-white text-black px-1">MUSEUM</span>
+                            <p class="text-white font-bold mt-1">Scaffold</p>
+                        </div>
+                    </div>
+                    <!-- Work 5 -->
+                    <div class="work-card group h-48" onclick="openModal(fileSystemDB.Experience[2])">
+                        <img src="https://static.wixstatic.com/media/54a996_26886a672f784198b9f8af4c4c93a5b9~mv2.jpg">
+                        <div class="absolute bottom-4 left-4">
+                            <span class="text-[10px] font-mono bg-white text-black px-1">THEATER</span>
+                            <p class="text-white font-bold mt-1">Hatch</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 10: FOOTER -->
+        <section id="contact" class="section-slide bg-white text-black">
+            <div class="slide-content text-center">
+                <h2 class="mega-title text-black mb-6">FORGE<br>REALITY.</h2>
+                <p class="text-xl text-gray-600 mb-12 font-light">
+                    The internet is still flat. We are here to change that.
+                </p>
+                <div class="flex flex-col md:flex-row justify-center gap-6 mb-24">
+                    <a href="mailto:main@d--f--w.com" class="px-10 py-4 bg-black text-white font-bold rounded-full hover:scale-105 transition-transform">Contact Studio</a>
+                    <a href="https://calendly.com/d--f--w/meeting" class="px-10 py-4 border border-black text-black font-bold rounded-full hover:bg-black hover:text-white transition-colors">Book Demo</a>
+                </div>
+                <div class="text-[10px] font-mono text-gray-400">
+                    © 2026 DIGITAL FORGERY WORKSHOP
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- MODAL (Standard) -->
+    <div id="quick-view-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/95 backdrop-blur-md" onclick="closeModal()"></div>
+        <div class="relative bg-[#050505] w-full max-w-5xl max-h-[90vh] border border-white/20 flex flex-col md:flex-row overflow-hidden shadow-2xl">
+            <button onclick="closeModal()" class="absolute top-4 right-4 z-20 p-2 bg-black/50 text-white rounded-full">✕</button>
+            <div class="w-full md:w-2/3 bg-black flex items-center justify-center border-r border-white/10" id="modal-media-container"></div>
+            <div class="w-full md:w-1/3 p-10 overflow-y-auto bg-[#111]">
+                <span id="modal-type" class="text-gray-500 text-[10px] font-mono mb-4 block tracking-widest uppercase">TYPE</span>
+                <h3 id="modal-title" class="text-3xl font-bold text-white mb-6">Title</h3>
+                <p id="modal-desc" class="text-gray-400 text-sm leading-relaxed mb-8">Description.</p>
+                <div id="modal-actions" class="mt-auto"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simplified Data for Modal
+        const fileSystemDB = {
+            "Experience": [
+                { id: 'wwe', name: 'Why We Exist?', type: 'Virtual Theater', desc: 'Virtual Theater No:1. A pioneering venture into digital performance art.', img: 'https://static.wixstatic.com/media/54a996_ba80e31fd25540a5b648f40640b7eaae~mv2.jpg', link: 'https://hyperfy.io/pill' },
+                { id: 'balloon', name: 'Balloon', type: 'Virtual Theater', desc: 'Virtual Theater No:2. A 10-minute WebXR piece exploring digital identity.', img: 'https://static.wixstatic.com/media/54a996_c9415cfa41d943a7ae7ec18cc8a81a63~mv2.png', link: 'https://hyperfy.io/balloon' },
+                { id: 'hatch', name: 'Hatch', type: 'Virtual Theater', desc: 'Virtual Theater No:3. Exploring existence and freedom in WebXR.', img: 'https://static.wixstatic.com/media/54a996_26886a672f784198b9f8af4c4c93a5b9~mv2.jpg', link: 'https://hyperfy.io/hatch' },
+                { id: 'c2w', name: 'C2W Runway', type: 'Event Space', desc: 'First Metaverse Runway event held in Nov 2023.', img: 'https://static.wixstatic.com/media/54a996_47b0c01fb7404427ade7405c73862623~mv2.jpg', link: 'https://hyperfy.io/c2w' }
+            ],
+            "Gallery": [
+                { id: 'scaffold', name: 'Scaffold', type: 'Museum', desc: '3D Architectural Browser showcasing 50 digital topographies.', img: 'https://static.wixstatic.com/media/54a996_a4275b8206ae43d3ae134f283411acf2~mv2.jpg', link: 'https://hyperfy.io/scaffold' },
+                { id: 'retail', name: 'Retail', type: 'Commercial', desc: 'A hybrid retail model for the metaverse.', img: 'https://static.wixstatic.com/media/54a996_2598bd0a3bab4c419b1939d8cee8b485~mv2.png', link: 'https://hyperfy.io/retail' }
+            ]
+        };
+
+        const modal = document.getElementById('quick-view-modal');
+        function openModal(item) {
+            document.getElementById('modal-title').textContent = item.name || "Project";
+            document.getElementById('modal-desc').textContent = item.desc || "Details unavailable.";
+            document.getElementById('modal-type').textContent = (item.type || "Architecture").toUpperCase();
+            
+            const mediaContainer = document.getElementById('modal-media-container');
+            const imgUrl = item.img || 'https://placehold.co/800x600/111/333?text=Preview';
+            mediaContainer.innerHTML = `<img src="${imgUrl}" class="w-full h-full object-cover">`;
+            
+            const actions = document.getElementById('modal-actions');
+            actions.innerHTML = '';
+            if (item.link) {
+                actions.innerHTML = `<a href="${item.link}" target="_blank" class="block w-full border border-white text-white font-bold text-center py-4 hover:bg-white hover:text-black transition-colors uppercase tracking-widest text-xs">Enter Space ↗</a>`;
+            }
+            
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.body.style.overflow = 'auto';
+        }
+    </script>
+</body>
+</html>
