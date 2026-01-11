@@ -97,7 +97,8 @@
     {
         "imports": {
             "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/",
+            "@pixiv/three-vrm": "https://cdn.jsdelivr.net/npm/@pixiv/three-vrm@2.1.0/lib/three-vrm.module.js"
         }
     }
     </script>
@@ -110,7 +111,7 @@
         import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
         import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
         import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
-        import { VRMLoaderPlugin } from 'three/addons/loaders/VRMLoaderPlugin.js';
+        import { VRMLoaderPlugin } from '@pixiv/three-vrm';
 
         class GLBViewer {
             constructor() {
