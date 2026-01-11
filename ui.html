@@ -596,9 +596,9 @@
 
             --icon-size: min(18vw, calc((100dvh - 20%) / 8));
 
-            width: var(--icon-size);
+            width: calc(var(--icon-size) * 0.9);
 
-            height: var(--icon-size);
+            height: calc(var(--icon-size) * 0.9);
 
             aspect-ratio: 1 / 1;
 
@@ -640,7 +640,7 @@
 
             height: 100%;
 
-            object-fit: cover;
+            object-fit: contain;
 
         }
 
@@ -779,7 +779,8 @@
             max-width: 380px;
 
             box-shadow: 0 4px 30px rgba(0,0,0,0.1);
-
+font-size: 0 !important; /* Aradaki virgül/boşluk karakterlerini yutar */
+    line-height: 0 !important;
             gap: 4px;
 
         }
@@ -787,7 +788,7 @@
 
 
         .mobile-dock-icon {
-
+font-size: 0 !important; /* İkon yanındaki hayalet karakterleri gizler */
             display: flex;
 
             flex-direction: column;
@@ -811,12 +812,12 @@
         .mobile-dock-icon-image {
 
             /* Square dock icon */
-
+font-size: 0 !important;
             --dock-icon-size: min(14vw, 52px);
 
-            width: var(--dock-icon-size);
+            width: calc(var(--dock-icon-size) * 0.9);
 
-            height: var(--dock-icon-size);
+            height: calc(var(--dock-icon-size) * 0.9);
 
             aspect-ratio: 1 / 1;
 
@@ -868,6 +869,29 @@
 
 
 
+        .mobile-dock-icon-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    
+    /* --- BU KISIMLARI EKLEYİN --- */
+    border-style: none !important;  /* Resim çerçevesini kaldırır */
+    outline: none !important;       /* Dış çizgiyi kaldırır */
+    color: transparent !important;  /* Alt metni (o tire gibi görünen yazıyı) gizler */
+    background: transparent !important;
+    
+    /* Kırık resim ikonunu gizlemek için ek hileler */
+    display: block;
+    font-size: 0;
+}
+
+/* Sadece Chrome/Safari (WebKit) için ekstra önlem */
+.mobile-dock-icon-image img::-webkit-alt-text {
+    display: none;
+}
+
+
+
         .mobile-dock-icon-image svg {
 
             width: 55%;
@@ -881,7 +905,8 @@
 
 
         .mobile-dock-icon-name {
-
+font-size: clamp(7px, 1.8vw, 9px) !important; 
+    line-height: 1.4 !important;
             margin-top: 3px;
 
             font-size: clamp(7px, 1.8vw, 9px);
@@ -1158,9 +1183,9 @@
 
             --folder-icon-size: min(18vw, 56px);
 
-            width: var(--folder-icon-size);
+            width: calc(var(--folder-icon-size) * 0.9);
 
-            height: var(--folder-icon-size);
+            height: calc(var(--folder-icon-size) * 0.9);
 
             aspect-ratio: 1 / 1;
 
@@ -1198,7 +1223,7 @@
 
             height: 100%;
 
-            object-fit: cover;
+            object-fit: contain;
 
         }
 
@@ -2802,7 +2827,7 @@
 
             height: 100%;
 
-            object-fit: cover;
+            object-fit: contain;
 
         }
 
@@ -3682,7 +3707,7 @@
 
         url: 'https://raw.githubusercontent.com/decentralize-dfw/dfw/main/virtualtheater.html',
 
-        iconUrl: 'https://static.wixstatic.com/media/54a996_60a31e3753fb451a846ba35976e39372~mv2.png',
+        iconUrl: 'https://static.wixstatic.com/media/54a996_50e45f2b074242c294a846c351417cdc~mv2.png',
 
         description: 'C2W2 Runway 2025.',
 
@@ -3712,7 +3737,7 @@
 
         url: 'https://raw.githubusercontent.com/decentralize-dfw/dfw/main/virtualrunway.html',
 
-        iconUrl: 'https://static.wixstatic.com/media/54a996_4ce9c2d7738b4783a671018b01eb88a8~mv2.png',
+        iconUrl: 'https://static.wixstatic.com/media/54a996_d8844bc2a9cf439b9b517b8aaedd87ce~mv2.png',
 
         description: 'C2W2 Runway 2025.',
 
@@ -3738,17 +3763,17 @@
 
         "Gallery": [
 
-            { id: 'gal-1', type: 'folder', name: 'Scaffold', folderKey: 'Scaffold', description: '3D Architectural Browser.', created: '2025' },
+            { id: 'gal-1', type: 'folder', name: 'Scaffold',iconUrl: 'https://static.wixstatic.com/media/54a996_5599070ed1a2499ebbeab5f936e5628e~mv2.png', folderKey: 'Scaffold', description: '3D Architectural Browser.', created: '2025' },
 
-            { id: 'gal-2', type: 'folder', name: 'Retail', folderKey: 'Retail', description: '3D beings shop.', created: '2025' },
+            { id: 'gal-2', type: 'folder', name: 'Retail', iconUrl: 'https://static.wixstatic.com/media/54a996_f72b38581bbd4ea495d4e0e75ea610ac~mv2.png',folderKey: 'Retail', description: '3D beings shop.', created: '2025' },
 
-            { id: 'gal-3', type: 'folder', name: 'Neue² Dojo', folderKey: 'Neue² Dojo', description: 'Virtual Art Space.', created: '2023' },
+            { id: 'gal-3', type: 'folder', name: 'Neue² Dojo',iconUrl: 'https://static.wixstatic.com/media/54a996_0daeaf7be2ce4ba88173c00f5fbabc42~mv2.png', folderKey: 'Neue² Dojo', description: 'Virtual Art Space.', created: '2023' },
 
-            { id: 'gal-4', type: 'folder', name: 'Elements Store', folderKey: 'Elements Store', description: 'Furniture Gallery.', created: '2025' },
+            { id: 'gal-4', type: 'folder', name: 'Elements Store', iconUrl: 'https://static.wixstatic.com/media/54a996_62c72564c8db44729a8f1621c18d7fd5~mv2.png',folderKey: 'Elements Store', description: 'Furniture Gallery.', created: '2025' },
 
-            { id: 'gal-5', type: 'folder', name: 'Black City', folderKey: 'Black City', description: 'Decentralized Roomscape.', created: '2023' },
+            { id: 'gal-5', type: 'folder', name: 'Black City',iconUrl: 'https://static.wixstatic.com/media/54a996_339f3971d71d4de6973bdcbe00ffd1c4~mv2.png', folderKey: 'Black City', description: 'Decentralized Roomscape.', created: '2023' },
 
-            { id: 'gal-6', type: 'folder', name: 'Forge', folderKey: 'Forge', description: 'NoiseDAO World.', created: '2025' }
+            { id: 'gal-6', type: 'folder', name: 'Forge',iconUrl: 'https://static.wixstatic.com/media/54a996_405cfc236c82413689117aceddd0249c~mv2.png', folderKey: 'Forge', description: 'NoiseDAO World.', created: '2025' }
 
         ],
 
@@ -3760,15 +3785,17 @@
 
     id: 'link-1',
 
-    type: 'link', // YENİ TİP: 'link'
+    type: 'html', // YENİ TİP: 'link'
 
-    name: 'DFW - Website',
+    name: 'DFW-explain.html',
 
-    url: 'https://digitalforgerywork.shop/', // Yeni sekmede açılacak link
+    url: 'https://raw.githubusercontent.com/decentralize-dfw/dfw/main/dfw-explain.html', // Yeni sekmede açılacak link
 
-    description: 'Digital Forgery Workshop\'un ana web sitesi.',
+iconUrl:'https://static.wixstatic.com/media/54a996_1e2a80ec55494b58b9d675cf9cd0b485~mv2.png',
 
-    created: '2025',
+    description: 'Practice ai resume.html',
+
+    created: '2026',
 
     minted: 'N/A',
 
@@ -3780,11 +3807,7 @@
 
     tags: ['web', 'site', 'dfw'],
 
-    links: [ // Bu alandaki linkler bilgi panelinde gösterilir
-
-        { url: 'https://digitalforgerywork.shop/', name: 'Ana Sayfa' }
-
-    ]
+    links: [ ]
 
 },
 
@@ -3872,7 +3895,7 @@
 
                     links: [ 
 
-                        { url: 'digitalforgerywork.shop', name: 'dfwebsite' }
+                        
 
                     ]
 
@@ -3887,7 +3910,7 @@
                     name: 'DFW Blog',
 
                     url: 'https://decentralize-dfw.github.io/dfw-blog/',
-
+iconUrl:'https://static.wixstatic.com/media/54a996_0464f0d205824f9ea0638fb3ea1ecd6c~mv2.png',
                     description: 'blog about virtual design, digital identities and more.',
 
                     created: '2023',
@@ -18752,15 +18775,15 @@ if (thumbnailsEl) {
 
             const mobileDockFolders = [
 
-                { key: 'RealDesktop', name: 'Phone', icon: 'drive' },
+                { key: 'RealDesktop', name: 'HOME', icon: 'drive', iconUrl: 'https://static.wixstatic.com/media/54a996_4ae5c8c9b4f9434e822f5a180daac513~mv2.png' },
 
-                { key: 'DFW', name: 'DFW', icon: 'bolt' },
+                { key: 'DFW', name: 'DFW', icon: 'bolt', iconUrl: 'https://static.wixstatic.com/media/54a996_64bf67985c1f490aa39904908cd47b09~mv2.png' },
 
-                { key: 'Experience', name: 'Experience', icon: 'app' },
+                { key: 'Experience', name: 'Experience', icon: 'app', iconUrl: 'https://static.wixstatic.com/media/54a996_737fd77ba60246a092e841165a379da2~mv2.png' },
 
-                { key: 'Gallery', name: 'Gallery', icon: 'document' },
+                { key: 'Gallery', name: 'Gallery', icon: 'document', iconUrl: 'https://static.wixstatic.com/media/54a996_67f15dfac881405f84631e798bc6cbf5~mv2.png' },
 
-                { key: 'Item', name: 'Item', icon: 'clock' }
+                { key: 'Item', name: 'Item', icon: 'clock', iconUrl: 'https://static.wixstatic.com/media/54a996_1201b6cebfa04334b98c96c59e9eac1c~mv2.png' }
 
             ];
 
@@ -18816,6 +18839,22 @@ if (thumbnailsEl) {
 
             function getMobileIconHTML(item) {
 
+                // Check for iconUrl or thumbnailUrl first (priority for all types on mobile)
+
+                if (item.iconUrl) {
+
+                    return `<img src="${item.iconUrl}" alt="${item.name}" onerror="this.parentElement.innerHTML='<svg fill=\\'none\\' stroke=\\'currentColor\\' viewBox=\\'0 0 24 24\\' class=\\'text-gray-400\\'><path stroke-linecap=\\'round\\' stroke-linejoin=\\'round\\' stroke-width=\\'2\\' d=\\'M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z\\'></path></svg>';">`;
+
+                }
+
+                if (item.thumbnailUrl) {
+
+                    return `<img src="${item.thumbnailUrl}" alt="${item.name}" onerror="this.parentElement.innerHTML='<svg fill=\\'none\\' stroke=\\'currentColor\\' viewBox=\\'0 0 24 24\\' class=\\'text-gray-400\\'><path stroke-linecap=\\'round\\' stroke-linejoin=\\'round\\' stroke-width=\\'2\\' d=\\'M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z\\'></path></svg>';">`;
+
+                }
+
+                // Fallback to type-based defaults
+
                 if (item.type === 'folder') {
 
                     return '<svg fill="currentColor" viewBox="0 0 20 20" class="text-blue-400"><path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"></path></svg>';
@@ -18825,12 +18864,6 @@ if (thumbnailsEl) {
                 if (item.type === 'image') {
 
                     return `<img src="${item.url}" alt="${item.name}" onerror="this.parentElement.innerHTML='<svg fill=\\'none\\' stroke=\\'currentColor\\' viewBox=\\'0 0 24 24\\' class=\\'text-gray-400\\'><path stroke-linecap=\\'round\\' stroke-linejoin=\\'round\\' stroke-width=\\'2\\' d=\\'M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l-1.586-1.586a2 2 0 00-2.828 0L6 18m6-6l.01.01\\'></path></svg>';">`;
-
-                }
-
-                if ((item.type === 'html' || item.type === 'link') && item.iconUrl) {
-
-                    return `<img src="${item.iconUrl}" alt="${item.name}" onerror="this.parentElement.innerHTML='<svg fill=\\'none\\' stroke=\\'currentColor\\' viewBox=\\'0 0 24 24\\' class=\\'text-gray-500\\'><path stroke-linecap=\\'round\\' stroke-linejoin=\\'round\\' stroke-width=\\'2\\' d=\\'M10 20l4-16m-8 4l-4 4 4 4m16-8l-4 4 4 4\\'></path></svg>';">`;
 
                 }
 
@@ -18944,9 +18977,28 @@ if (thumbnailsEl) {
 
                     dockIcon.dataset.sectionIndex = index;
 
+
+
+                    // Use iconUrl if available, otherwise use SVG icon
+
+                    let iconHTML;
+
+                    if (folder.iconUrl) {
+
+                        // alt="" yaparak metnin görünmesini engelliyoruz
+iconHTML = `<img src="${folder.iconUrl}" alt="" style="border:none;" onerror="this.parentElement.innerHTML='${getMobileDockIconSVG(folder.icon)}';">`;
+
+                    } else {
+
+                        iconHTML = getMobileDockIconSVG(folder.icon);
+
+                    }
+
+
+
                     dockIcon.innerHTML = `
 
-                        <div class="mobile-dock-icon-image">${getMobileDockIconSVG(folder.icon)}</div>
+                        <div class="mobile-dock-icon-image">${iconHTML}</div>
 
                         <div class="mobile-dock-icon-name">${folder.name}</div>
 
@@ -20509,6 +20561,5 @@ if (thumbnailsEl) {
 </body>
 
 </html>
-
 
 
