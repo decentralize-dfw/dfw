@@ -110,10 +110,6 @@
         import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
         import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
         import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
-        import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-        import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-        import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
-        import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
         class GLBViewer {
             constructor() {
@@ -123,7 +119,6 @@
 
                 this.init();
                 this.setupLights();
-                this.setupPostProcessing();
                 this.animate();
 
                 window.addEventListener('resize', () => this.onWindowResize());
@@ -135,7 +130,7 @@
                 this.scene = new THREE.Scene();
                 this.scene.background = null;
 
-                // Camera - positioned further back for zoom out
+                // Camera
                 this.camera = new THREE.PerspectiveCamera(
                     45,
                     window.innerWidth / window.innerHeight,
@@ -154,13 +149,13 @@
                 this.renderer.setPixelRatio(this.devicePixelRatio);
                 this.renderer.setSize(window.innerWidth, window.innerHeight);
 
-                // Advanced shadow settings
+                // Shadow settings
                 this.renderer.shadowMap.enabled = true;
                 this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-                // Modern color management (r160+)
+                // Color management
                 this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-                this.renderer.toneMappingExposure = 1.2;
+                this.renderer.toneMappingExposure = 1.0; // Reduced from 1.2
                 this.renderer.outputColorSpace = THREE.SRGBColorSpace;
 
                 this.container.appendChild(this.renderer.domElement);
@@ -178,15 +173,15 @@
 
             setupLights() {
                 // Ambient Light
-                this.ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+                this.ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
                 this.scene.add(this.ambientLight);
 
-                // Main Directional Light with ultra-quality shadows
-                this.directionalLight = new THREE.DirectionalLight(0xffffff, 2.0);
+                // Main Directional Light
+                this.directionalLight = new THREE.DirectionalLight(0xffffff, 1.5);
                 this.directionalLight.position.set(10, 50, 20);
                 this.directionalLight.castShadow = true;
 
-                // 4K shadow map for ultra quality
+                // 4K shadow map
                 this.directionalLight.shadow.mapSize.width = 4096;
                 this.directionalLight.shadow.mapSize.height = 4096;
                 this.directionalLight.shadow.camera.near = 0.5;
@@ -199,20 +194,20 @@
 
                 this.scene.add(this.directionalLight);
 
-                // Fill lights for better illumination
-                const fillLight1 = new THREE.DirectionalLight(0xffffff, 0.5);
+                // Fill lights
+                const fillLight1 = new THREE.DirectionalLight(0xffffff, 0.4);
                 fillLight1.position.set(-10, 20, -20);
                 this.scene.add(fillLight1);
 
-                const fillLight2 = new THREE.DirectionalLight(0xffffff, 0.3);
+                const fillLight2 = new THREE.DirectionalLight(0xffffff, 0.2);
                 fillLight2.position.set(0, -10, 0);
                 this.scene.add(fillLight2);
 
                 // Hemisphere Light
-                this.hemisphereLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.6);
+                this.hemisphereLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.5);
                 this.scene.add(this.hemisphereLight);
 
-                // Load HDRI for realistic reflections and glass materials
+                // Load HDRI for environment
                 const pmremGenerator = new THREE.PMREMGenerator(this.renderer);
                 pmremGenerator.compileEquirectangularShader();
 
@@ -226,28 +221,6 @@
                         pmremGenerator.dispose();
                     }
                 );
-            }
-
-            setupPostProcessing() {
-                // Effect Composer for post-processing
-                this.composer = new EffectComposer(this.renderer);
-
-                // Render Pass
-                const renderPass = new RenderPass(this.scene, this.camera);
-                this.composer.addPass(renderPass);
-
-                // Unreal Bloom Pass for realistic bloom
-                const bloomPass = new UnrealBloomPass(
-                    new THREE.Vector2(window.innerWidth, window.innerHeight),
-                    0.5,  // strength
-                    0.4,  // radius
-                    0.85  // threshold
-                );
-                this.composer.addPass(bloomPass);
-
-                // Output Pass for proper color space
-                const outputPass = new OutputPass();
-                this.composer.addPass(outputPass);
             }
 
             updateProgress(percent) {
@@ -274,47 +247,31 @@
                         (gltf) => {
                             const model = gltf.scene;
 
-                            // Enhanced material processing for ULTRA quality
+                            // CRITICAL: DO NOT override material properties from GLB!
+                            // The model already has correct transmission/volume/ior values
                             model.traverse((child) => {
                                 if (child.isMesh) {
                                     child.castShadow = true;
                                     child.receiveShadow = true;
 
                                     if (child.material) {
-                                        // Enable environment map with high intensity
-                                        child.material.envMapIntensity = 1.5;
+                                        // Only adjust envMapIntensity based on material type
+                                        // DO NOT change transmission, ior, thickness - model has correct values!
 
-                                        // Glass materials (Transmission/Volume)
-                                        if (child.material.name && child.material.name.toLowerCase().includes('glass')) {
-                                            child.material.transmission = 1.0;
-                                            child.material.thickness = 0.5;
-                                            child.material.roughness = 0.0;
-                                            child.material.metalness = 0.0;
-                                            child.material.ior = 1.5; // Glass IOR
-                                            child.material.transparent = true;
-                                            child.material.opacity = 0.95;
-                                            child.material.side = THREE.DoubleSide;
-                                        }
-
-                                        // Transparent materials
-                                        if (child.material.transparent || child.material.opacity < 1) {
-                                            child.material.transparent = true;
-                                            child.material.side = THREE.DoubleSide;
-                                            child.material.depthWrite = false;
+                                        if (child.material.transmission !== undefined && child.material.transmission > 0) {
+                                            // This is a transmission material (glass)
+                                            // Reduce env map reflection for subtle look
+                                            child.material.envMapIntensity = 0.3;
+                                        } else if (child.material.metalness !== undefined && child.material.metalness > 0.5) {
+                                            // Metallic materials - higher reflection
+                                            child.material.envMapIntensity = 1.0;
+                                        } else {
+                                            // Other materials - moderate reflection
+                                            child.material.envMapIntensity = 0.8;
                                         }
 
-                                        // Metallic/Rough materials
-                                        if (child.material.metalness !== undefined) {
-                                            child.material.metalness = Math.max(child.material.metalness, 0.1);
-                                        }
-                                        if (child.material.roughness !== undefined) {
-                                            child.material.roughness = Math.max(child.material.roughness, 0.1);
-                                        }
-
-                                        // Emissive materials
-                                        if (child.material.emissive) {
-                                            child.material.emissiveIntensity = 1.0;
-                                        }
+                                        // Ensure side rendering is preserved from model
+                                        // Don't force DoubleSide unless needed
 
                                         child.material.needsUpdate = true;
                                     }
@@ -374,7 +331,6 @@
                 this.camera.updateProjectionMatrix();
 
                 this.renderer.setSize(width, height);
-                this.composer.setSize(width, height);
 
                 if (this.model) {
                     this.fitModelToScreen();
@@ -390,7 +346,7 @@
             animate() {
                 requestAnimationFrame(() => this.animate());
                 this.controls.update();
-                this.composer.render();
+                this.renderer.render(this.scene, this.camera);
             }
         }
 
