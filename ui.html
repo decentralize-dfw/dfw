@@ -874,8 +874,8 @@
             height: 100vh;
             padding: 40px;
             /* Sol üstteki back button ile çakışmaması için padding ayarı */
-            padding-top: 0; 
-            z-index: 10;
+            padding-top: 0;
+            z-index: 10000;
             pointer-events: none;
             display: flex;
             flex-direction: column;
@@ -901,13 +901,12 @@
             border-radius: 0;
             padding: 0;
             backdrop-filter: none;
-             pointer-events: auto !important; /* Tıklamaların algılanması için şart */
+            pointer-events: auto !important; /* Tıklamaların algılanması için şart */
             flex-shrink: 0;
-
-    z-index: 20; /* Üstte durması için */
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s ease, visibility 0.3s ease;
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
         }
 
         #parametric-plan-container.visible {
@@ -917,20 +916,49 @@
 
         #parametric-plan-container.fullscreen {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw !important;
-            height: 100vh !important;
+            top: 50%;
+            left: 50%;
+            width: 90vw !important;
+            height: 90vh !important;
             margin: 0 !important;
             z-index: 9999;
             display: flex;
             align-items: center;
             justify-content: center;
+            transform: translate(-50%, -50%) scale(1);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #parametric-plan-container.fullscreen.entering {
+            transform: translate(-50%, -50%) scale(0.3);
+            transform-origin: left center;
         }
 
         #parametric-plan-container.fullscreen svg {
-            max-width: 90vw;
-            max-height: 90vh;
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        /* Blur Overlay */
+        #blur-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.4s ease, visibility 0.4s ease;
+            z-index: 100;
+            pointer-events: none;
+        }
+
+        #blur-overlay.active {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
         }
 
         /* Plan Controls */
@@ -940,7 +968,7 @@
             left: 30px;
             display: flex;
             gap: 6px;
-            z-index: 10;
+            z-index: 200;
             align-items: center;
         }
 
@@ -974,16 +1002,6 @@
 
         #observe-btn {
             display: none;
-        }
-
-        #observe-btn.visible {
-            display: flex;
-        }
-
-        /* Fullscreen backdrop blur */
-        #circular-navigation.blurred {
-            filter: blur(8px);
-            pointer-events: none;
         }
 .plan-room-shape:hover {
     fill-opacity: 0.6 !important;
@@ -1167,7 +1185,7 @@
             font-size: 12px;
             color: rgba(255,255,255,0.7);
             text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-            z-index: 10;
+            z-index: 200;
             pointer-events: none;
             font-family: monospace;
         }
@@ -1180,7 +1198,7 @@
             transform: translateX(-50%);
             display: flex;
             gap: 6px;
-            z-index: 10;
+            z-index: 200;
         }
 
         @media (max-width: 768px) {
@@ -1222,7 +1240,7 @@
             left: 30px;
             display: flex;
             gap: 6px;
-            z-index: 10;
+            z-index: 200;
         }
 
         .layout-toggle-btn {
@@ -1544,6 +1562,9 @@
         <div id="circular-sidebar-links"></div>
     </div>
 </div>
+
+        <!-- Blur Overlay (For Observe Mode) -->
+        <div id="blur-overlay"></div>
 
         <!-- Plan Control Buttons -->
         <div id="plan-controls">
@@ -8131,6 +8152,7 @@ function getIcon(item) {
             const planContainer = document.getElementById('parametric-plan-container');
             const showPlanBtn = document.getElementById('show-plan-btn');
             const observeBtn = document.getElementById('observe-btn');
+            const blurOverlay = document.getElementById('blur-overlay');
             let isPlanVisible = false;
             let isObserveMode = false;
 
@@ -8157,7 +8179,7 @@ function getIcon(item) {
             // Observe/Unobserve Toggle
             observeBtn.addEventListener('click', () => {
                 if (isObserveMode) {
-                    exitObserveMode();
+                    exitObserveMode(false);
                 } else {
                     enterObserveMode();
                 }
@@ -8165,18 +8187,43 @@ function getIcon(item) {
 
             function enterObserveMode() {
                 isObserveMode = true;
-                planContainer.classList.add('fullscreen');
-                circularNav3D.classList.add('blurred');
+
+                // Show blur overlay
+                blurOverlay.classList.add('active');
+
+                // Add fullscreen class and entering state for animation
+                planContainer.classList.add('fullscreen', 'entering');
+
+                // Remove entering class after a frame to trigger animation
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        planContainer.classList.remove('entering');
+                    });
+                });
+
                 observeBtn.textContent = 'UNOBSERVE';
 
                 // Add hover handlers for plan rooms
                 addPlanHoverHandlers();
             }
 
-            function exitObserveMode() {
+            function exitObserveMode(instant = false) {
                 isObserveMode = false;
-                planContainer.classList.remove('fullscreen');
-                circularNav3D.classList.remove('blurred');
+
+                if (instant) {
+                    // Instant close (for room clicks)
+                    planContainer.classList.remove('fullscreen', 'entering');
+                    blurOverlay.classList.remove('active');
+                } else {
+                    // Smooth close (for unobserve, ESC, outside click)
+                    planContainer.classList.add('entering');
+
+                    setTimeout(() => {
+                        planContainer.classList.remove('fullscreen', 'entering');
+                        blurOverlay.classList.remove('active');
+                    }, 500);
+                }
+
                 observeBtn.textContent = 'OBSERVE';
 
                 // Remove hover handlers
@@ -8189,14 +8236,14 @@ function getIcon(item) {
             // ESC key handler
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape' && isObserveMode) {
-                    exitObserveMode();
+                    exitObserveMode(false);
                 }
             });
 
-            // Outside click handler
-            planContainer.addEventListener('click', (e) => {
-                if (isObserveMode && e.target === planContainer) {
-                    exitObserveMode();
+            // Blur overlay click handler (outside click)
+            blurOverlay.addEventListener('click', () => {
+                if (isObserveMode) {
+                    exitObserveMode(false);
                 }
             });
 
@@ -8232,12 +8279,14 @@ function getIcon(item) {
             function handlePlanClick(e) {
                 if (!isObserveMode) return;
 
+                e.stopPropagation(); // Prevent blur overlay click
+
                 const node = e.currentTarget;
                 const folderKey = node.getAttribute('data-folder');
 
                 if (folderKey && folderHierarchy[folderKey]) {
-                    // Exit observe mode
-                    exitObserveMode();
+                    // Exit observe mode instantly (no animation)
+                    exitObserveMode(true);
 
                     // Navigate to the room
                     const info = folderHierarchy[folderKey];
@@ -8247,19 +8296,22 @@ function getIcon(item) {
             }
 
             function displaySidebarInfo(name, description) {
-                const sidebar = document.getElementById('circular-sidebar-content');
-                if (sidebar) {
-                    sidebar.innerHTML = `
-                        <h2 style="color: white; margin-bottom: 10px;">${name}</h2>
-                        <p style="color: rgba(255,255,255,0.7); font-size: 14px;">${description}</p>
-                    `;
+                const sidebarTitle = document.getElementById('circular-sidebar-title');
+                const sidebarDesc = document.getElementById('circular-sidebar-description');
+
+                if (sidebarTitle && sidebarDesc) {
+                    sidebarTitle.textContent = name;
+                    sidebarDesc.textContent = description;
                 }
             }
 
             function clearSidebarInfo() {
-                const sidebar = document.getElementById('circular-sidebar-content');
-                if (sidebar) {
-                    sidebar.innerHTML = '';
+                const sidebarTitle = document.getElementById('circular-sidebar-title');
+                const sidebarDesc = document.getElementById('circular-sidebar-description');
+
+                if (sidebarTitle && sidebarDesc) {
+                    sidebarTitle.textContent = 'DFW website ui';
+                    sidebarDesc.textContent = 'Decentralized Fashion Week - Navigate through files and folders';
                 }
             }
         }  // <--- BU PARANTEZ EKSİK! BUNU EKLE.
