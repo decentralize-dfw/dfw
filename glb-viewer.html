@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GLB Viewer - Ultra Quality</title>
+    <title>GLB/VRM Viewer - Ultra Quality</title>
     <style>
         * {
             margin: 0;
@@ -15,9 +15,7 @@
             height: 100vh;
             overflow: hidden;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: rgba(255, 255, 255, 0.4);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
+            background: #000;
         }
         #viewer-container {
             width: 100%;
@@ -40,7 +38,7 @@
         }
         .loading-text {
             font-size: 12px;
-            color: #666;
+            color: #fff;
             margin-top: 15px;
             font-weight: 500;
         }
@@ -60,7 +58,7 @@
             stroke-width: 3;
         }
         .circle-bg {
-            stroke: rgba(0, 0, 0, 0.1);
+            stroke: rgba(255, 255, 255, 0.2);
         }
         .circle-progress {
             stroke: #3b82f6;
@@ -94,7 +92,7 @@
         </div>
     </div>
 
-    <!-- Three.js r160 - Modern version with Transmission/Volume support -->
+    <!-- Three.js r160 - Modern version with Transmission/Volume/VRM support -->
     <script type="importmap">
     {
         "imports": {
@@ -110,6 +108,7 @@
         import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
         import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
         import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+        import { VRMLoaderPlugin } from 'three/addons/loaders/VRMLoaderPlugin.js';
 
         class GLBViewer {
             constructor() {
@@ -126,9 +125,9 @@
             }
 
             init() {
-                // Scene
+                // Scene with BLACK background
                 this.scene = new THREE.Scene();
-                this.scene.background = null;
+                this.scene.background = new THREE.Color(0x000000);
 
                 // Camera
                 this.camera = new THREE.PerspectiveCamera(
@@ -144,7 +143,7 @@
                     antialias: true,
                     powerPreference: 'high-performance',
                     preserveDrawingBuffer: true,
-                    alpha: true
+                    alpha: false
                 });
                 this.renderer.setPixelRatio(this.devicePixelRatio);
                 this.renderer.setSize(window.innerWidth, window.innerHeight);
@@ -155,7 +154,7 @@
 
                 // Color management
                 this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-                this.renderer.toneMappingExposure = 1.0; // Reduced from 1.2
+                this.renderer.toneMappingExposure = 1.0;
                 this.renderer.outputColorSpace = THREE.SRGBColorSpace;
 
                 this.container.appendChild(this.renderer.domElement);
@@ -216,7 +215,6 @@
                     (texture) => {
                         const envMap = pmremGenerator.fromEquirectangular(texture).texture;
                         this.scene.environment = envMap;
-                        this.scene.background = null;
                         texture.dispose();
                         pmremGenerator.dispose();
                     }
@@ -233,7 +231,7 @@
                 percentText.textContent = Math.round(percent) + '%';
             }
 
-            async loadGLB(url) {
+            async loadModel(url) {
                 return new Promise((resolve, reject) => {
                     const loader = new GLTFLoader();
 
@@ -242,12 +240,26 @@
                     dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
                     loader.setDRACOLoader(dracoLoader);
 
+                    // VRM support
+                    loader.register((parser) => {
+                        return new VRMLoaderPlugin(parser);
+                    });
+
                     loader.load(
                         url,
                         (gltf) => {
-                            const model = gltf.scene;
+                            let model;
 
-                            // CRITICAL: DO NOT override material properties from GLB!
+                            // Check if this is a VRM model
+                            if (gltf.userData.vrm) {
+                                model = gltf.userData.vrm.scene;
+                                this.vrm = gltf.userData.vrm;
+                                console.log('VRM model loaded:', this.vrm);
+                            } else {
+                                model = gltf.scene;
+                            }
+
+                            // CRITICAL: DO NOT override material properties from GLB/VRM!
                             // The model already has correct transmission/volume/ior values
                             model.traverse((child) => {
                                 if (child.isMesh) {
@@ -270,9 +282,6 @@
                                             child.material.envMapIntensity = 0.8;
                                         }
 
-                                        // Ensure side rendering is preserved from model
-                                        // Don't force DoubleSide unless needed
-
                                         child.material.needsUpdate = true;
                                     }
                                 }
@@ -291,7 +300,7 @@
                             }
                         },
                         (error) => {
-                            console.error('Error loading GLB:', error);
+                            console.error('Error loading model:', error);
                             document.querySelector('.loading-text').textContent = 'Error loading model';
                             reject(error);
                         }
@@ -345,6 +354,14 @@
 
             animate() {
                 requestAnimationFrame(() => this.animate());
+
+                // Update VRM if exists
+                if (this.vrm) {
+                    const deltaTime = this.clock ? this.clock.getDelta() : 0.016;
+                    if (!this.clock) this.clock = new THREE.Clock();
+                    this.vrm.update(deltaTime);
+                }
+
                 this.controls.update();
                 this.renderer.render(this.scene, this.camera);
             }
@@ -353,16 +370,17 @@
         // Initialize viewer
         const viewer = new GLBViewer();
 
-        // Load GLB from URL
+        // Load model from URL (GLB or VRM)
         window.loadGLBModel = function(url) {
             if (viewer.model) {
                 viewer.scene.remove(viewer.model);
                 viewer.model = null;
+                viewer.vrm = null;
             }
 
             viewer.loading.style.display = 'block';
             viewer.updateProgress(0);
-            return viewer.loadGLB(url);
+            return viewer.loadModel(url);
         };
 
         // Auto-load from URL parameter
