@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GLB Viewer - High Quality</title>
+    <title>GLB Viewer - Ultra Quality</title>
     <style>
         * {
             margin: 0;
@@ -94,27 +94,38 @@
         </div>
     </div>
 
-    <!-- Three.js ve gerekli kütüphaneler - ui.html ile aynı (r128) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/DRACOLoader.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/RGBELoader.js"></script>
-    <script src="https://unpkg.com/meshoptimizer@0.18.1/meshopt_decoder.js"></script>
+    <!-- Three.js r160 - Modern version with Transmission/Volume support -->
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
 
-    <script>
+    <script type="module">
+        import * as THREE from 'three';
+        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+        import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+        import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+        import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+        import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+        import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+
         class GLBViewer {
             constructor() {
                 this.container = document.getElementById('viewer-container');
                 this.loading = document.getElementById('loading');
-                this.quality = 'high'; // HIGH quality mode
-                this.devicePixelRatio = Math.min(window.devicePixelRatio, 2); // Better quality
+                this.devicePixelRatio = Math.min(window.devicePixelRatio, 2);
 
                 this.init();
                 this.setupLights();
+                this.setupPostProcessing();
                 this.animate();
 
-                // Handle window resize and fullscreen
                 window.addEventListener('resize', () => this.onWindowResize());
                 document.addEventListener('fullscreenchange', () => this.onFullscreenChange());
             }
@@ -122,58 +133,60 @@
             init() {
                 // Scene
                 this.scene = new THREE.Scene();
-                this.scene.background = null; // Transparent to show blurred background
+                this.scene.background = null;
 
-                // Camera - FOV 45 for orbit mode, positioned further back for zoom out
+                // Camera - positioned further back for zoom out
                 this.camera = new THREE.PerspectiveCamera(
                     45,
                     window.innerWidth / window.innerHeight,
                     0.1,
                     2000
                 );
-                this.camera.position.set(0, 3, 8); // Further back for zoom out capability
+                this.camera.position.set(0, 3, 8);
 
-                // Renderer with HIGHEST quality settings for materials
+                // Renderer with ULTRA quality settings
                 this.renderer = new THREE.WebGLRenderer({
                     antialias: true,
                     powerPreference: 'high-performance',
                     preserveDrawingBuffer: true,
-                    alpha: true // Enable transparency
+                    alpha: true
                 });
                 this.renderer.setPixelRatio(this.devicePixelRatio);
                 this.renderer.setSize(window.innerWidth, window.innerHeight);
+
+                // Advanced shadow settings
                 this.renderer.shadowMap.enabled = true;
                 this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+                // Modern color management (r160+)
                 this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-                this.renderer.toneMappingExposure = 1.0;
-                this.renderer.outputEncoding = THREE.sRGBEncoding;
-                this.renderer.physicallyCorrectLights = true; // Better material rendering
+                this.renderer.toneMappingExposure = 1.2;
+                this.renderer.outputColorSpace = THREE.SRGBColorSpace;
 
                 this.container.appendChild(this.renderer.domElement);
 
-                // Controls - AUTO-ROTATE DISABLED, zoom enabled
-                this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
+                // Controls
+                this.controls = new OrbitControls(this.camera, this.renderer.domElement);
                 this.controls.enableDamping = true;
                 this.controls.dampingFactor = 0.05;
-                this.controls.autoRotate = false; // DISABLED as requested
-                this.controls.autoRotateSpeed = 0;
-                this.controls.minDistance = 0.1; // Allow very close zoom
-                this.controls.maxDistance = 200; // Allow very far zoom out
+                this.controls.autoRotate = false;
+                this.controls.minDistance = 0.1;
+                this.controls.maxDistance = 200;
                 this.controls.enablePan = true;
                 this.controls.enableZoom = true;
             }
 
             setupLights() {
-                // Ambient Light - for overall illumination
-                this.ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+                // Ambient Light
+                this.ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
                 this.scene.add(this.ambientLight);
 
-                // Main Directional Light with shadows
-                this.directionalLight = new THREE.DirectionalLight(0xffffff, 1.5);
+                // Main Directional Light with ultra-quality shadows
+                this.directionalLight = new THREE.DirectionalLight(0xffffff, 2.0);
                 this.directionalLight.position.set(10, 50, 20);
                 this.directionalLight.castShadow = true;
 
-                // High quality shadow map
+                // 4K shadow map for ultra quality
                 this.directionalLight.shadow.mapSize.width = 4096;
                 this.directionalLight.shadow.mapSize.height = 4096;
                 this.directionalLight.shadow.camera.near = 0.5;
@@ -182,40 +195,65 @@
                 this.directionalLight.shadow.camera.right = 50;
                 this.directionalLight.shadow.camera.top = 50;
                 this.directionalLight.shadow.camera.bottom = -50;
-                this.directionalLight.shadow.bias = -0.0001;
+                this.directionalLight.shadow.bias = -0.0005;
 
                 this.scene.add(this.directionalLight);
 
-                // Fill light from opposite side
-                const fillLight = new THREE.DirectionalLight(0xffffff, 0.3);
-                fillLight.position.set(-10, 20, -20);
-                this.scene.add(fillLight);
+                // Fill lights for better illumination
+                const fillLight1 = new THREE.DirectionalLight(0xffffff, 0.5);
+                fillLight1.position.set(-10, 20, -20);
+                this.scene.add(fillLight1);
 
-                // Hemisphere Light for better ambient
-                this.hemisphereLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.5);
+                const fillLight2 = new THREE.DirectionalLight(0xffffff, 0.3);
+                fillLight2.position.set(0, -10, 0);
+                this.scene.add(fillLight2);
+
+                // Hemisphere Light
+                this.hemisphereLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.6);
                 this.scene.add(this.hemisphereLight);
 
-                // Environment map for realistic reflections (frosted glass, etc.)
+                // Load HDRI for realistic reflections and glass materials
                 const pmremGenerator = new THREE.PMREMGenerator(this.renderer);
                 pmremGenerator.compileEquirectangularShader();
 
-                // Load HDRI environment for best material quality
-                new THREE.RGBELoader().load(
+                new RGBELoader().load(
                     'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/equirectangular/venice_sunset_1k.hdr',
                     (texture) => {
                         const envMap = pmremGenerator.fromEquirectangular(texture).texture;
                         this.scene.environment = envMap;
-                        this.scene.background = null; // Keep transparent
+                        this.scene.background = null;
                         texture.dispose();
                         pmremGenerator.dispose();
                     }
                 );
             }
 
+            setupPostProcessing() {
+                // Effect Composer for post-processing
+                this.composer = new EffectComposer(this.renderer);
+
+                // Render Pass
+                const renderPass = new RenderPass(this.scene, this.camera);
+                this.composer.addPass(renderPass);
+
+                // Unreal Bloom Pass for realistic bloom
+                const bloomPass = new UnrealBloomPass(
+                    new THREE.Vector2(window.innerWidth, window.innerHeight),
+                    0.5,  // strength
+                    0.4,  // radius
+                    0.85  // threshold
+                );
+                this.composer.addPass(bloomPass);
+
+                // Output Pass for proper color space
+                const outputPass = new OutputPass();
+                this.composer.addPass(outputPass);
+            }
+
             updateProgress(percent) {
                 const circle = document.querySelector('.circle-progress');
                 const percentText = document.querySelector('.progress-percent');
-                const circumference = 2 * Math.PI * 36; // radius = 36
+                const circumference = 2 * Math.PI * 36;
                 const offset = circumference - (percent / 100) * circumference;
 
                 circle.style.strokeDashoffset = offset;
@@ -224,46 +262,58 @@
 
             async loadGLB(url) {
                 return new Promise((resolve, reject) => {
-                    const loader = new THREE.GLTFLoader();
+                    const loader = new GLTFLoader();
 
-                    // Setup Draco decoder
-                    const dracoLoader = new THREE.DRACOLoader();
-                    dracoLoader.setDecoderPath('https://www.gstatic.com/draco/v1/decoders/');
+                    // Draco decoder
+                    const dracoLoader = new DRACOLoader();
+                    dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
                     loader.setDRACOLoader(dracoLoader);
-
-                    // Setup Meshopt decoder
-                    if (typeof MeshoptDecoder !== 'undefined') {
-                        loader.setMeshoptDecoder(MeshoptDecoder);
-                    }
 
                     loader.load(
                         url,
                         (gltf) => {
                             const model = gltf.scene;
 
-                            // Setup shadows and materials for all meshes
+                            // Enhanced material processing for ULTRA quality
                             model.traverse((child) => {
                                 if (child.isMesh) {
                                     child.castShadow = true;
                                     child.receiveShadow = true;
 
-                                    // Ensure materials render at highest quality
                                     if (child.material) {
-                                        // Enable environment map for reflections
-                                        child.material.envMapIntensity = 1.0;
+                                        // Enable environment map with high intensity
+                                        child.material.envMapIntensity = 1.5;
 
-                                        // For transparent/glass materials
-                                        if (child.material.transparent || child.material.opacity < 1) {
+                                        // Glass materials (Transmission/Volume)
+                                        if (child.material.name && child.material.name.toLowerCase().includes('glass')) {
+                                            child.material.transmission = 1.0;
+                                            child.material.thickness = 0.5;
+                                            child.material.roughness = 0.0;
+                                            child.material.metalness = 0.0;
+                                            child.material.ior = 1.5; // Glass IOR
                                             child.material.transparent = true;
+                                            child.material.opacity = 0.95;
                                             child.material.side = THREE.DoubleSide;
                                         }
 
-                                        // For rough/metallic materials
-                                        if (child.material.roughness !== undefined) {
-                                            child.material.roughness = child.material.roughness;
+                                        // Transparent materials
+                                        if (child.material.transparent || child.material.opacity < 1) {
+                                            child.material.transparent = true;
+                                            child.material.side = THREE.DoubleSide;
+                                            child.material.depthWrite = false;
                                         }
+
+                                        // Metallic/Rough materials
                                         if (child.material.metalness !== undefined) {
-                                            child.material.metalness = child.material.metalness;
+                                            child.material.metalness = Math.max(child.material.metalness, 0.1);
+                                        }
+                                        if (child.material.roughness !== undefined) {
+                                            child.material.roughness = Math.max(child.material.roughness, 0.1);
+                                        }
+
+                                        // Emissive materials
+                                        if (child.material.emissive) {
+                                            child.material.emissiveIntensity = 1.0;
                                         }
 
                                         child.material.needsUpdate = true;
@@ -271,13 +321,9 @@
                                 }
                             });
 
-                            // Add model to scene
                             this.scene.add(model);
                             this.model = model;
-
-                            // Auto-fit model to screen with zoom out capability
                             this.fitModelToScreen();
-
                             this.loading.style.display = 'none';
                             resolve(model);
                         },
@@ -299,30 +345,22 @@
             fitModelToScreen() {
                 if (!this.model) return;
 
-                // Calculate bounding box
                 const box = new THREE.Box3().setFromObject(this.model);
                 const size = box.getSize(new THREE.Vector3());
                 const center = box.getCenter(new THREE.Vector3());
 
-                // Calculate max dimension
                 const maxDim = Math.max(size.x, size.y, size.z);
                 const fov = this.camera.fov * (Math.PI / 180);
                 let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
 
-                // More padding for better zoom out capability
                 cameraZ *= 2.5;
 
-                // Position camera further for zoom out
                 this.camera.position.set(center.x, center.y + cameraZ * 0.3, center.z + cameraZ);
-
-                // Point camera at center
                 this.camera.lookAt(center);
 
-                // Update controls target
                 this.controls.target.copy(center);
                 this.controls.update();
 
-                // Adjust near/far planes
                 this.camera.near = cameraZ / 100;
                 this.camera.far = cameraZ * 100;
                 this.camera.updateProjectionMatrix();
@@ -336,15 +374,14 @@
                 this.camera.updateProjectionMatrix();
 
                 this.renderer.setSize(width, height);
+                this.composer.setSize(width, height);
 
-                // Re-fit model when window resizes
                 if (this.model) {
                     this.fitModelToScreen();
                 }
             }
 
             onFullscreenChange() {
-                // Wait a bit for the fullscreen transition to complete
                 setTimeout(() => {
                     this.onWindowResize();
                 }, 100);
@@ -352,39 +389,34 @@
 
             animate() {
                 requestAnimationFrame(() => this.animate());
-
                 this.controls.update();
-                this.renderer.render(this.scene, this.camera);
+                this.composer.render();
             }
         }
 
         // Initialize viewer
         const viewer = new GLBViewer();
 
-        // Function to load GLB from URL (can be called from parent)
+        // Load GLB from URL
         window.loadGLBModel = function(url) {
-            // Remove existing model if any
             if (viewer.model) {
                 viewer.scene.remove(viewer.model);
                 viewer.model = null;
             }
 
-            // Show loading
             viewer.loading.style.display = 'block';
             viewer.updateProgress(0);
-
-            // Load new model
             return viewer.loadGLB(url);
         };
 
-        // Auto-load if URL parameter is present
+        // Auto-load from URL parameter
         const urlParams = new URLSearchParams(window.location.search);
         const modelUrl = urlParams.get('model');
         if (modelUrl) {
             window.loadGLBModel(decodeURIComponent(modelUrl));
         }
 
-        // Listen for messages from parent window
+        // Listen for messages from parent
         window.addEventListener('message', (event) => {
             if (event.data && event.data.type === 'loadGLB' && event.data.url) {
                 window.loadGLBModel(event.data.url);
