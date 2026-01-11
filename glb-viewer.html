@@ -15,7 +15,9 @@
             height: 100vh;
             overflow: hidden;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: #000;
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
         }
         #viewer-container {
             width: 100%;
@@ -33,31 +35,62 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            color: white;
-            font-size: 18px;
             z-index: 10;
             text-align: center;
         }
-        .spinner {
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-top: 3px solid white;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 10px;
+        .loading-text {
+            font-size: 12px;
+            color: #666;
+            margin-top: 15px;
+            font-weight: 500;
         }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        .circular-progress {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            margin: 0 auto;
+        }
+        .circular-progress svg {
+            transform: rotate(-90deg);
+            width: 100%;
+            height: 100%;
+        }
+        .circular-progress circle {
+            fill: none;
+            stroke-width: 3;
+        }
+        .circle-bg {
+            stroke: rgba(0, 0, 0, 0.1);
+        }
+        .circle-progress {
+            stroke: #3b82f6;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 0.3s ease;
+        }
+        .progress-percent {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 18px;
+            font-weight: 600;
+            color: #3b82f6;
         }
     </style>
 </head>
 <body>
     <div id="viewer-container">
         <div id="loading">
-            <div class="spinner"></div>
-            <div>Loading 3D Model...</div>
+            <div class="circular-progress">
+                <svg viewBox="0 0 80 80">
+                    <circle class="circle-bg" cx="40" cy="40" r="36"></circle>
+                    <circle class="circle-progress" cx="40" cy="40" r="36"
+                            stroke-dasharray="226.19"
+                            stroke-dashoffset="226.19"></circle>
+                </svg>
+                <div class="progress-percent">0%</div>
+            </div>
+            <div class="loading-text">Loading</div>
         </div>
     </div>
 
@@ -75,7 +108,7 @@
                 this.container = document.getElementById('viewer-container');
                 this.loading = document.getElementById('loading');
                 this.quality = 'high'; // HIGH quality mode
-                this.devicePixelRatio = 1.0; // HIGH mode: 1.0
+                this.devicePixelRatio = Math.min(window.devicePixelRatio, 2); // Better quality
 
                 this.init();
                 this.setupLights();
@@ -89,23 +122,23 @@
             init() {
                 // Scene
                 this.scene = new THREE.Scene();
-                this.scene.background = new THREE.Color(0x000000);
+                this.scene.background = null; // Transparent to show blurred background
 
-                // Camera - FOV 45 for orbit mode
+                // Camera - FOV 45 for orbit mode, positioned further back for zoom out
                 this.camera = new THREE.PerspectiveCamera(
                     45,
                     window.innerWidth / window.innerHeight,
                     0.1,
                     2000
                 );
-                this.camera.position.set(0, 2, 5);
+                this.camera.position.set(0, 3, 8); // Further back for zoom out capability
 
-                // Renderer with HIGH quality settings
+                // Renderer with HIGHEST quality settings for materials
                 this.renderer = new THREE.WebGLRenderer({
                     antialias: true,
                     powerPreference: 'high-performance',
                     preserveDrawingBuffer: true,
-                    alpha: false
+                    alpha: true // Enable transparency
                 });
                 this.renderer.setPixelRatio(this.devicePixelRatio);
                 this.renderer.setSize(window.innerWidth, window.innerHeight);
@@ -114,34 +147,35 @@
                 this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
                 this.renderer.toneMappingExposure = 1.0;
                 this.renderer.outputEncoding = THREE.sRGBEncoding;
+                this.renderer.physicallyCorrectLights = true; // Better material rendering
 
                 this.container.appendChild(this.renderer.domElement);
 
-                // Controls - AUTO-ROTATE DISABLED
+                // Controls - AUTO-ROTATE DISABLED, zoom enabled
                 this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
                 this.controls.enableDamping = true;
                 this.controls.dampingFactor = 0.05;
                 this.controls.autoRotate = false; // DISABLED as requested
                 this.controls.autoRotateSpeed = 0;
-                this.controls.minDistance = 0.5;
-                this.controls.maxDistance = 100;
+                this.controls.minDistance = 0.1; // Allow very close zoom
+                this.controls.maxDistance = 200; // Allow very far zoom out
                 this.controls.enablePan = true;
                 this.controls.enableZoom = true;
             }
 
             setupLights() {
-                // Ambient Light - HIGH quality: 0.5-0.8 intensity
-                this.ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+                // Ambient Light - for overall illumination
+                this.ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
                 this.scene.add(this.ambientLight);
 
-                // Directional Light with shadows
-                this.directionalLight = new THREE.DirectionalLight(0xfff9f0, 2.8);
+                // Main Directional Light with shadows
+                this.directionalLight = new THREE.DirectionalLight(0xffffff, 1.5);
                 this.directionalLight.position.set(10, 50, 20);
                 this.directionalLight.castShadow = true;
 
-                // Shadow map: 2048x2048 for HIGH mode
-                this.directionalLight.shadow.mapSize.width = 2048;
-                this.directionalLight.shadow.mapSize.height = 2048;
+                // High quality shadow map
+                this.directionalLight.shadow.mapSize.width = 4096;
+                this.directionalLight.shadow.mapSize.height = 4096;
                 this.directionalLight.shadow.camera.near = 0.5;
                 this.directionalLight.shadow.camera.far = 500;
                 this.directionalLight.shadow.camera.left = -50;
@@ -152,24 +186,40 @@
 
                 this.scene.add(this.directionalLight);
 
+                // Fill light from opposite side
+                const fillLight = new THREE.DirectionalLight(0xffffff, 0.3);
+                fillLight.position.set(-10, 20, -20);
+                this.scene.add(fillLight);
+
                 // Hemisphere Light for better ambient
-                this.hemisphereLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.4);
+                this.hemisphereLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.5);
                 this.scene.add(this.hemisphereLight);
 
-                // Environment map (simple version for r128)
+                // Environment map for realistic reflections (frosted glass, etc.)
                 const pmremGenerator = new THREE.PMREMGenerator(this.renderer);
                 pmremGenerator.compileEquirectangularShader();
 
-                // Load HDRI environment
+                // Load HDRI environment for best material quality
                 new THREE.RGBELoader().load(
                     'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/equirectangular/venice_sunset_1k.hdr',
                     (texture) => {
                         const envMap = pmremGenerator.fromEquirectangular(texture).texture;
                         this.scene.environment = envMap;
+                        this.scene.background = null; // Keep transparent
                         texture.dispose();
                         pmremGenerator.dispose();
                     }
                 );
+            }
+
+            updateProgress(percent) {
+                const circle = document.querySelector('.circle-progress');
+                const percentText = document.querySelector('.progress-percent');
+                const circumference = 2 * Math.PI * 36; // radius = 36
+                const offset = circumference - (percent / 100) * circumference;
+
+                circle.style.strokeDashoffset = offset;
+                percentText.textContent = Math.round(percent) + '%';
             }
 
             async loadGLB(url) {
@@ -191,15 +241,31 @@
                         (gltf) => {
                             const model = gltf.scene;
 
-                            // Setup shadows for all meshes
+                            // Setup shadows and materials for all meshes
                             model.traverse((child) => {
                                 if (child.isMesh) {
                                     child.castShadow = true;
                                     child.receiveShadow = true;
 
-                                    // Ensure materials are properly configured
+                                    // Ensure materials render at highest quality
                                     if (child.material) {
-                                        child.material.envMapIntensity = 0.8;
+                                        // Enable environment map for reflections
+                                        child.material.envMapIntensity = 1.0;
+
+                                        // For transparent/glass materials
+                                        if (child.material.transparent || child.material.opacity < 1) {
+                                            child.material.transparent = true;
+                                            child.material.side = THREE.DoubleSide;
+                                        }
+
+                                        // For rough/metallic materials
+                                        if (child.material.roughness !== undefined) {
+                                            child.material.roughness = child.material.roughness;
+                                        }
+                                        if (child.material.metalness !== undefined) {
+                                            child.material.metalness = child.material.metalness;
+                                        }
+
                                         child.material.needsUpdate = true;
                                     }
                                 }
@@ -209,7 +275,7 @@
                             this.scene.add(model);
                             this.model = model;
 
-                            // Auto-fit model to screen
+                            // Auto-fit model to screen with zoom out capability
                             this.fitModelToScreen();
 
                             this.loading.style.display = 'none';
@@ -217,13 +283,13 @@
                         },
                         (progress) => {
                             if (progress.total > 0) {
-                                const percent = (progress.loaded / progress.total * 100).toFixed(0);
-                                this.loading.querySelector('div:last-child').textContent = `Loading 3D Model... ${percent}%`;
+                                const percent = (progress.loaded / progress.total * 100);
+                                this.updateProgress(percent);
                             }
                         },
                         (error) => {
                             console.error('Error loading GLB:', error);
-                            this.loading.querySelector('div:last-child').textContent = 'Error loading model';
+                            document.querySelector('.loading-text').textContent = 'Error loading model';
                             reject(error);
                         }
                     );
@@ -243,11 +309,11 @@
                 const fov = this.camera.fov * (Math.PI / 180);
                 let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
 
-                // Add some padding
-                cameraZ *= 1.5;
+                // More padding for better zoom out capability
+                cameraZ *= 2.5;
 
-                // Position camera
-                this.camera.position.set(center.x, center.y, center.z + cameraZ);
+                // Position camera further for zoom out
+                this.camera.position.set(center.x, center.y + cameraZ * 0.3, center.z + cameraZ);
 
                 // Point camera at center
                 this.camera.lookAt(center);
@@ -305,7 +371,7 @@
 
             // Show loading
             viewer.loading.style.display = 'block';
-            viewer.loading.querySelector('div:last-child').textContent = 'Loading 3D Model...';
+            viewer.updateProgress(0);
 
             // Load new model
             return viewer.loadGLB(url);
