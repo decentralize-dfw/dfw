@@ -1093,6 +1093,49 @@
             font-family: monospace;
         }
 
+        /* Background Selector */
+        #background-selector {
+            position: fixed;
+            bottom: 26px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 6px;
+            z-index: 10;
+        }
+
+        @media (max-width: 768px) {
+            #background-selector {
+                display: none;
+            }
+        }
+
+        .bg-selector-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 11px;
+            color: white;
+            font-weight: 600;
+        }
+
+        .bg-selector-btn:hover {
+            background: rgba(255,255,255,0.25);
+        }
+
+        .bg-selector-btn.active {
+            background: rgba(255,255,255,0.35);
+            border-color: rgba(255,255,255,0.5);
+        }
+
         /* Layout Toggle Buttons */
         #layout-toggle-container {
             position: fixed;
@@ -1446,6 +1489,22 @@
 
         <!-- Breadcrumb Path -->
         <div id="circular-breadcrumb">DFW/</div>
+
+        <!-- Background Selector (Desktop Only) -->
+        <div id="background-selector">
+            <div class="bg-selector-btn active" data-bg="1">1</div>
+            <div class="bg-selector-btn" data-bg="2">2</div>
+            <div class="bg-selector-btn" data-bg="3">3</div>
+            <div class="bg-selector-btn" data-bg="4">4</div>
+            <div class="bg-selector-btn" data-bg="5">5</div>
+            <div class="bg-selector-btn" data-bg="6">6</div>
+            <div class="bg-selector-btn" data-bg="7">7</div>
+            <div class="bg-selector-btn" data-bg="8">8</div>
+            <div class="bg-selector-btn" data-bg="9">9</div>
+            <div class="bg-selector-btn" data-bg="10">10</div>
+            <div class="bg-selector-btn" data-bg="11">11</div>
+            <div class="bg-selector-btn" data-bg="12">12</div>
+        </div>
 
         <!-- Back Button -->
         <div id="circular-back-button">
@@ -7935,6 +7994,52 @@ function getIcon(item) {
            window.addEventListener('touchend', () => {
                 handleDragEnd();
             });
+
+            // ======== BACKGROUND SELECTOR ======== //
+            const backgrounds = [
+                'https://static.wixstatic.com/media/54a996_3243206499e746e99f403f1865458700~mv2.jpg', // 1 - Digital Topographies
+                'https://static.wixstatic.com/media/54a996_c4c2d6de38af47b099a5042ebeb14dbd~mv2.png', // 2 - DFW?
+                'https://static.wixstatic.com/media/54a996_2598bd0a3bab4c419b1939d8cee8b485~mv2.png', // 3 - DFW Design Market
+                'https://static.wixstatic.com/media/54a996_6af9880c704747ee91e6760a6c6443ad~mv2.jpg', // 4 - NEUE² DOJO GALLERY
+                'https://static.wixstatic.com/media/54a996_1bb979e7beeb40caa7e8b9455e1688bb~mv2.jpg', // 5 - MERMAID CHAIR
+                'https://static.wixstatic.com/media/54a996_d84a54e9f05e454a92cc8df1c0d72209~mv2.jpg', // 6 - ZEN BUBBLE RIDER
+                'https://static.wixstatic.com/media/54a996_26886a672f784198b9f8af4c4c93a5b9~mv2.jpg', // 7 - HATCH
+                'https://static.wixstatic.com/media/54a996_c9415cfa41d943a7ae7ec18cc8a81a63~mv2.png', // 8 - BALLOON
+                'https://static.wixstatic.com/media/54a996_ba80e31fd25540a5b648f40640b7eaae~mv2.jpg', // 9 - WHY WE EXIST?
+                'https://static.wixstatic.com/media/54a996_8ea705af2b04470db99ed4122b5bbb5a~mv2.jpg', // 10 - C2W2 (Avatars)
+                'https://static.wixstatic.com/media/54a996_a4275b8206ae43d3ae134f283411acf2~mv2.jpg', // 11 - SCAFFOLD
+                'https://static.wixstatic.com/media/54a996_d7c0f7edddad4724bf78fa801b49da3a~mv2.jpg'  // 12 - BLACK CITY
+            ];
+
+            // Set initial background
+            const circularNav3D = document.getElementById('circular-navigation');
+            circularNav3D.style.backgroundImage = `url('${backgrounds[0]}')`;
+            circularNav3D.style.backgroundSize = 'cover';
+            circularNav3D.style.backgroundPosition = 'center';
+            circularNav3D.style.backgroundRepeat = 'no-repeat';
+
+            // Mobile: Always use first background
+            const isMobile = window.innerWidth <= 768;
+            if (isMobile) {
+                circularNav3D.style.backgroundImage = `url('${backgrounds[0]}')`;
+            }
+
+            // Desktop: Add click handlers for background buttons
+            if (!isMobile) {
+                const bgButtons = document.querySelectorAll('.bg-selector-btn');
+                bgButtons.forEach((btn) => {
+                    btn.addEventListener('click', () => {
+                        const bgIndex = parseInt(btn.getAttribute('data-bg')) - 1;
+
+                        // Update background
+                        circularNav3D.style.backgroundImage = `url('${backgrounds[bgIndex]}')`;
+
+                        // Update active state
+                        bgButtons.forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                    });
+                });
+            }
         }  // <--- BU PARANTEZ EKSİK! BUNU EKLE.
 
         // ============================================= //
