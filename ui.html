@@ -814,9 +814,9 @@
 
             --dock-icon-size: min(14vw, 52px);
 
-            width: var(--dock-icon-size);
+            width: calc(var(--dock-icon-size) * 0.9);
 
-            height: var(--dock-icon-size);
+            height: calc(var(--dock-icon-size) * 0.9);
 
             aspect-ratio: 1 / 1;
 
@@ -863,6 +863,18 @@
         .mobile-dock-icon-image:active {
 
             transform: scale(0.9);
+
+        }
+
+
+
+        .mobile-dock-icon-image img {
+
+            width: 100%;
+
+            height: 100%;
+
+            object-fit: contain;
 
         }
 
@@ -18752,15 +18764,15 @@ if (thumbnailsEl) {
 
             const mobileDockFolders = [
 
-                { key: 'RealDesktop', name: 'Phone', icon: 'drive' },
+                { key: 'RealDesktop', name: 'Phone', icon: 'drive', iconUrl: null },
 
-                { key: 'DFW', name: 'DFW', icon: 'bolt' },
+                { key: 'DFW', name: 'DFW', icon: 'bolt', iconUrl: 'https://raw.githubusercontent.com/decentralize-dfw/c2w2runway/main/dfwlogo.png' },
 
-                { key: 'Experience', name: 'Experience', icon: 'app' },
+                { key: 'Experience', name: 'Experience', icon: 'app', iconUrl: 'https://static.wixstatic.com/media/54a996_f568fd01ce7f4ae19a815dc46b0891a4~mv2.png' },
 
-                { key: 'Gallery', name: 'Gallery', icon: 'document' },
+                { key: 'Gallery', name: 'Gallery', icon: 'document', iconUrl: null },
 
-                { key: 'Item', name: 'Item', icon: 'clock' }
+                { key: 'Item', name: 'Item', icon: 'clock', iconUrl: 'https://static.wixstatic.com/media/54a996_35d0435be1394003981f568ab7749ebe~mv2.png' }
 
             ];
 
@@ -18954,9 +18966,27 @@ if (thumbnailsEl) {
 
                     dockIcon.dataset.sectionIndex = index;
 
+
+
+                    // Use iconUrl if available, otherwise use SVG icon
+
+                    let iconHTML;
+
+                    if (folder.iconUrl) {
+
+                        iconHTML = `<img src="${folder.iconUrl}" alt="${folder.name}" onerror="this.parentElement.innerHTML='${getMobileDockIconSVG(folder.icon)}';">`;
+
+                    } else {
+
+                        iconHTML = getMobileDockIconSVG(folder.icon);
+
+                    }
+
+
+
                     dockIcon.innerHTML = `
 
-                        <div class="mobile-dock-icon-image">${getMobileDockIconSVG(folder.icon)}</div>
+                        <div class="mobile-dock-icon-image">${iconHTML}</div>
 
                         <div class="mobile-dock-icon-name">${folder.name}</div>
 
