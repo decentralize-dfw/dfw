@@ -901,9 +901,9 @@
             border-radius: 0;
             padding: 0;
             backdrop-filter: none;
-            pointer-events: auto !important; /* Tıklamaların algılanması için şart */
+            pointer-events: none; /* Default: no interaction */
             flex-shrink: 0;
-            z-index: 9999;
+            z-index: 50;
             opacity: 0;
             visibility: hidden;
             transition: opacity 0.3s ease, visibility 0.3s ease;
@@ -912,6 +912,7 @@
         #parametric-plan-container.visible {
             opacity: 1;
             visibility: visible;
+            pointer-events: auto; /* Enable interaction when visible */
         }
 
         #parametric-plan-container.fullscreen {
@@ -927,6 +928,7 @@
             justify-content: center;
             transform: translate(-50%, -50%) scale(1);
             transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: auto;
         }
 
         #parametric-plan-container.fullscreen.entering {
@@ -968,8 +970,9 @@
             left: 30px;
             display: flex;
             gap: 6px;
-            z-index: 200;
+            z-index: 15000;
             align-items: center;
+            pointer-events: auto;
         }
 
         .plan-control-btn {
@@ -989,6 +992,7 @@
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            pointer-events: auto;
         }
 
         .plan-control-btn:hover {
@@ -1185,7 +1189,7 @@
             font-size: 12px;
             color: rgba(255,255,255,0.7);
             text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-            z-index: 200;
+            z-index: 15000;
             pointer-events: none;
             font-family: monospace;
         }
@@ -1198,7 +1202,8 @@
             transform: translateX(-50%);
             display: flex;
             gap: 6px;
-            z-index: 200;
+            z-index: 15000;
+            pointer-events: auto;
         }
 
         @media (max-width: 768px) {
@@ -1240,7 +1245,8 @@
             left: 30px;
             display: flex;
             gap: 6px;
-            z-index: 200;
+            z-index: 15000;
+            pointer-events: auto;
         }
 
         .layout-toggle-btn {
@@ -1287,7 +1293,7 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            z-index: 100;
+            z-index: 15000;
             transition: all 0.3s ease;
             opacity: 0;
             pointer-events: none;
