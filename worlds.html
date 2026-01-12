@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DFW | Metaverse Portal</title>
+    <meta name="description" content="Direct access to DFW Metaverse Worlds.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #000000;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+        
+        /* Klasör hover efekti için özel gölge */
+        .world-card:hover .world-icon {
+            filter: drop-shadow(0 0 15px rgba(59, 130, 246, 0.5));
+            transform: scale(1.1);
+        }
+        
+        /* Yüklenirken animasyon */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="min-h-screen text-white p-8 sm:p-12">
+
+    <!-- Ana Konteyner: Responsive Grid Yapısı -->
+    <!-- Ekran genişledikçe sütun sayısı artar, daraldıkça azalır (otomatik sığar) -->
+    <div id="world-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-x-6 gap-y-12 fade-in">
+        <!-- Javascript ile burası doldurulacak -->
+    </div>
+
+    <script>
+        // Orijinal DFW veritabanından süzülmüş Dünya Listesi (Hyperfy & OnCyber)
+        // type: "GALLERY" veya "EXPERIENCE" olarak eklendi.
+        const worlds = [
+            {
+                name: "Scaffold",
+                type: "GALLERY",
+                desc: "Architecture Browser",
+                url: "https://hyperfy.io/scaffold",
+                img: "https://static.wixstatic.com/media/54a996_5599070ed1a2499ebbeab5f936e5628e~mv2.png"
+            },
+            {
+                name: "Neue² Dojo",
+                type: "GALLERY",
+                desc: "Virtual Art Gallery",
+                url: "https://hyperfy.io/neue2dojo",
+                img: "https://static.wixstatic.com/media/54a996_0daeaf7be2ce4ba88173c00f5fbabc42~mv2.png"
+            },
+            {
+                name: "Elements Store",
+                type: "GALLERY",
+                desc: "Furniture Gallery",
+                url: "https://hyperfy.io/dfw",
+                img: "https://static.wixstatic.com/media/54a996_62c72564c8db44729a8f1621c18d7fd5~mv2.png"
+            },
+            {
+                name: "Black City",
+                type: "GALLERY",
+                desc: "MOCA Rooms City",
+                url: "https://hyperfy.io/blackcity",
+                img: "https://static.wixstatic.com/media/54a996_339f3971d71d4de6973bdcbe00ffd1c4~mv2.png"
+            },
+            {
+                name: "Forge",
+                type: "GALLERY",
+                desc: "NoiseDAO World",
+                url: "https://hyperfy.io/noise",
+                img: "https://static.wixstatic.com/media/54a996_405cfc236c82413689117aceddd0249c~mv2.png"
+            },
+            {
+                name: "Retail",
+                type: "GALLERY",
+                desc: "Virtual Fashion Store",
+                url: "https://hyperfy.io/retail",
+                img: "https://static.wixstatic.com/media/54a996_f72b38581bbd4ea495d4e0e75ea610ac~mv2.png"
+            },
+            {
+                name: "Why We Exist?",
+                type: "EXPERIENCE",
+                desc: "Virtual Theater No.1",
+                url: "https://hyperfy.io/pill",
+                img: "https://static.wixstatic.com/media/54a996_f568fd01ce7f4ae19a815dc46b0891a4~mv2.png"
+            },
+            {
+                name: "Balloon",
+                type: "EXPERIENCE",
+                desc: "Virtual Theater No.2",
+                url: "https://hyperfy.io/balloon",
+                img: "https://static.wixstatic.com/media/54a996_8832881734f4461ca5c4faab416b3e11~mv2.png"
+            },
+            {
+                name: "Hatch",
+                type: "EXPERIENCE",
+                desc: "Virtual Theater No.3",
+                url: "https://hyperfy.io/hatch",
+                img: "https://static.wixstatic.com/media/54a996_c379db983a8d4747afb75ebd91cbfcf8~mv2.png"
+            },
+            {
+                name: "C2W Runway",
+                type: "EXPERIENCE",
+                desc: "Season 1 Show",
+                url: "https://hyperfy.io/c2w",
+                img: "https://static.wixstatic.com/media/54a996_15e12552054a4998910043bb192d498c~mv2.png"
+            },
+            {
+                name: "C2W2 Runway v1 (Hyperfy)",
+                type: "EXPERIENCE",
+                desc: "Season 2 Show",
+                url: "https://hyperfy.io/c2w2",
+                img: "https://static.wixstatic.com/media/54a996_507f0476eb114a3bb49f87a89e4748a4~mv2.png"
+            },
+            {
+                name: "C2W2 Runway",
+                type: "EXPERIENCE",
+                desc: "Season 2 Show (Web)",
+                url: "https://c2w2.world",
+                img: "https://static.wixstatic.com/media/54a996_507f0476eb114a3bb49f87a89e4748a4~mv2.png"
+            },
+            {
+                name: "Isometric Exhibition",
+                type: "GALLERY",
+                desc: "OnCyber Gallery",
+                url: "https://v2.oncyber.io/digitaltopographies",
+                img: "https://static.wixstatic.com/media/54a996_145e862db9034dd9b0249c171eb5a3fa~mv2.png" 
+            }
+        ];
+
+        const grid = document.getElementById('world-grid');
+
+        worlds.forEach(world => {
+            // Link Elementi (Kutu)
+            const link = document.createElement('a');
+            link.href = world.url;
+            link.target = "_blank"; // Yeni sekmede açar
+            link.className = "world-card group flex flex-col items-center justify-start p-4 rounded-2xl hover:bg-white/5 transition-all duration-300 cursor-pointer";
+
+            // İkon Konteyner
+            const iconContainer = document.createElement('div');
+            iconContainer.className = "w-32 h-32 mb-4 flex items-center justify-center relative";
+            
+            // Resim (Folder Logosu)
+            const img = document.createElement('img');
+            img.src = world.img;
+            img.alt = world.name;
+            img.className = "world-icon w-full h-full object-contain transition-transform duration-300";
+            
+            // İsim
+            const title = document.createElement('h3');
+            title.className = "text-sm font-bold text-center text-gray-200 group-hover:text-blue-400 transition-colors uppercase tracking-wider";
+            title.textContent = world.name;
+
+            // Açıklama
+            const subtitle = document.createElement('span');
+            subtitle.className = "text-[10px] text-gray-500 mt-1 text-center group-hover:text-gray-400";
+            subtitle.textContent = world.desc;
+
+            // Kategori Etiketi (Type)
+            const typeLabel = document.createElement('span');
+            typeLabel.className = "text-[9px] font-mono mt-2 px-2 py-0.5 rounded bg-white/10 text-gray-400 group-hover:bg-blue-900/30 group-hover:text-blue-300 transition-colors";
+            typeLabel.textContent = world.type;
+
+            // Birleştirme
+            iconContainer.appendChild(img);
+            link.appendChild(iconContainer);
+            link.appendChild(title);
+            link.appendChild(subtitle);
+            link.appendChild(typeLabel); // Etiket eklendi
+            grid.appendChild(link);
+        });
+    </script>
+</body>
+</html>
