@@ -4962,166 +4962,323 @@ links: [
  function renderFileIndex() {
  const svg = d3.select('#file-index-svg');
  svg.selectAll('*').remove();
- const width = window.innerWidth;
- const height = window.innerHeight;
- const centerX = width / 2 + 100;
- const centerY = height / 2;
- const allNodes = [];
- const allLinks = [];
- const rootNode = {
- id: 'root',
+ const nodes = [];
+ const links = [];
+ // LOBBY - Center
+ const lobbyNode = {
+ id: 'LOBBY',
  name: 'decentralize',
  type: 'root',
- x: centerX,
- y: centerY,
- r: 45,
+ r: 70,
+ fx: 0, fy: 0,
+ pathData: generateOrganicPath(70),
  folderKey: 'root',
  iconUrl: 'https://static.wixstatic.com/media/54a996_8f7253663c574ecdb4e2468004959096~mv2.png'
  };
- allNodes.push(rootNode);
- const mainCategories = [
- { key: 'decentralize', name: 'decentralize', iconUrl: 'https://static.wixstatic.com/media/54a996_64bf67985c1f490aa39904908cd47b09~mv2.png' },
- { key: 'Experience', name: 'EXPERIENCE', iconUrl: 'https://static.wixstatic.com/media/54a996_737fd77ba60246a092e841165a379da2~mv2.png' },
- { key: 'Gallery', name: 'GALLERY', iconUrl: 'https://static.wixstatic.com/media/54a996_67f15dfac881405f84631e798bc6cbf5~mv2.png' },
- { key: 'Item', name: 'ITEM', iconUrl: 'https://static.wixstatic.com/media/54a996_1201b6cebfa04334b98c96c59e9eac1c~mv2.png' }
- ];
- const baseRadius = Math.min(width, height) * 0.28;
- mainCategories.forEach((cat, i) => {
- const angle = (i / mainCategories.length) * Math.PI * 2 - Math.PI / 2;
- const catNode = {
- id: cat.key,
- name: cat.name,
- type: 'category',
- x: centerX + Math.cos(angle) * baseRadius,
- y: centerY + Math.sin(angle) * baseRadius,
- r: 38,
- folderKey: cat.key,
- iconUrl: cat.iconUrl
+ nodes.push(lobbyNode);
+ // ITEM HALL - Left hub
+ const itemHallNode = {
+ id: 'ITEM',
+ name: 'ITEM',
+ type: 'hub',
+ r: 60,
+ targetX: -140, targetY: 0,
+ pathData: generateOrganicPath(60),
+ folderKey: 'Item',
+ iconUrl: 'https://static.wixstatic.com/media/54a996_1201b6cebfa04334b98c96c59e9eac1c~mv2.png'
  };
- allNodes.push(catNode);
- allLinks.push({ source: rootNode, target: catNode });
- const items = fileSystemDB[cat.key] || [];
- const itemCount = items.length;
- const subRadius = 110 + itemCount * 5;
- const angleSpread = Math.min(Math.PI * 0.7, Math.PI * 0.15 * itemCount);
- const startAngle = angle - angleSpread / 2;
- items.forEach((item, j) => {
- const subAngle = itemCount > 1 ? startAngle + (j / (itemCount - 1)) * angleSpread : angle;
+ nodes.push(itemHallNode);
+ links.push({ source: lobbyNode, target: itemHallNode, width: 50, distance: 120 });
+ // Zone positions - Cross layout
+ const zoneConfig = {
+ "Gallery": { x: 0, y: -200, hub: lobbyNode, r: 55, isMainHub: true },
+ "Experience": { x: 0, y: 200, hub: lobbyNode, r: 55, isMainHub: true },
+ "decentralize": { x: 220, y: 0, hub: lobbyNode, r: 55, isMainHub: true }
+ };
+ // Item sub-zones
+ const itemSubZones = {
+ "Design": { x: -280, y: 0, r: 45 },
+ "Avatar": { x: -200, y: -140, r: 40 },
+ "Space": { x: -200, y: 140, r: 40 }
+ };
+ // Create main hub nodes
+ Object.keys(zoneConfig).forEach(zone => {
+ const config = zoneConfig[zone];
+ const items = fileSystemDB[zone] || [];
+ const hubNode = {
+ id: zone.toUpperCase(),
+ name: zone,
+ type: 'hub',
+ r: config.r,
+ targetX: config.x,
+ targetY: config.y,
+ pathData: generateOrganicPath(config.r),
+ folderKey: zone,
+ iconUrl: getZoneIcon(zone)
+ };
+ nodes.push(hubNode);
+ links.push({ source: config.hub, target: hubNode, width: 40, distance: 130 });
+ // Add items for this zone
+ items.forEach(item => {
  const itemNode = {
  id: item.id,
- name: item.name.length > 15 ? item.name.substring(0, 14) + '…' : item.name,
+ name: item.name.length > 12 ? item.name.substring(0, 11) + '…' : item.name,
  fullName: item.name,
- type: item.type,
- x: catNode.x + Math.cos(subAngle) * subRadius,
- y: catNode.y + Math.sin(subAngle) * subRadius,
- r: 28,
+ type: 'room',
+ r: 32,
+ targetX: config.x * 1.4,
+ targetY: config.y * 1.4,
+ pathData: generateOrganicPath(32),
  folderKey: item.folderKey || null,
  iconUrl: getFileIndexIcon(item),
  itemData: item
  };
- allNodes.push(itemNode);
- allLinks.push({ source: catNode, target: itemNode });
+ nodes.push(itemNode);
+ links.push({ source: hubNode, target: itemNode, width: 22, distance: 50 });
+ // Sub-items for folders
  if (item.type === 'folder' && item.folderKey && fileSystemDB[item.folderKey]) {
  const subItems = fileSystemDB[item.folderKey] || [];
- const thirdRadius = 65;
- const thirdCount = Math.min(subItems.length, 5);
- const thirdSpread = Math.PI * 0.4;
- const thirdStart = subAngle - thirdSpread / 2;
- subItems.slice(0, thirdCount).forEach((subItem, k) => {
- const thirdAngle = thirdCount > 1 ? thirdStart + (k / (thirdCount - 1)) * thirdSpread : subAngle;
+ subItems.slice(0, 4).forEach(subItem => {
  const subNode = {
  id: subItem.id,
  name: '',
  fullName: subItem.name,
- type: subItem.type,
- x: itemNode.x + Math.cos(thirdAngle) * thirdRadius,
- y: itemNode.y + Math.sin(thirdAngle) * thirdRadius,
- r: 18,
+ type: 'sub-room',
+ r: 20,
+ targetX: config.x * 1.6,
+ targetY: config.y * 1.6,
+ pathData: generateOrganicPath(20),
  folderKey: subItem.folderKey || null,
  iconUrl: getFileIndexIcon(subItem),
  itemData: subItem
  };
- allNodes.push(subNode);
- allLinks.push({ source: itemNode, target: subNode });
+ nodes.push(subNode);
+ links.push({ source: itemNode, target: subNode, width: 14, distance: 35 });
  });
  }
  });
  });
- svg.selectAll('.file-index-link')
- .data(allLinks)
- .enter()
- .append('line')
- .attr('class', 'file-index-link')
- .attr('x1', d => d.source.x)
- .attr('y1', d => d.source.y)
- .attr('x2', d => d.target.x)
- .attr('y2', d => d.target.y);
- const defs = svg.append('defs');
- allNodes.forEach((d, i) => {
- if (d.iconUrl) {
- defs.append('pattern')
- .attr('id', `icon-pattern-${i}`)
- .attr('width', 1)
- .attr('height', 1)
- .attr('patternContentUnits', 'objectBoundingBox')
- .append('image')
- .attr('href', d.iconUrl)
- .attr('width', 1)
- .attr('height', 1)
- .attr('preserveAspectRatio', 'xMidYMid slice');
+ // Create Item sub-zones
+ Object.keys(itemSubZones).forEach(zone => {
+ const config = itemSubZones[zone];
+ const items = fileSystemDB[zone] || [];
+ const subHubNode = {
+ id: zone.toUpperCase(),
+ name: zone,
+ type: 'sub-hub',
+ r: config.r,
+ targetX: config.x,
+ targetY: config.y,
+ pathData: generateOrganicPath(config.r),
+ folderKey: zone,
+ iconUrl: getZoneIcon(zone)
+ };
+ nodes.push(subHubNode);
+ links.push({ source: itemHallNode, target: subHubNode, width: 35, distance: 90 });
+ items.forEach(item => {
+ const itemNode = {
+ id: item.id,
+ name: item.name.length > 10 ? item.name.substring(0, 9) + '…' : item.name,
+ fullName: item.name,
+ type: 'room',
+ r: 28,
+ targetX: config.x * 1.3,
+ targetY: config.y * 1.3,
+ pathData: generateOrganicPath(28),
+ folderKey: item.folderKey || null,
+ iconUrl: getFileIndexIcon(item),
+ itemData: item
+ };
+ nodes.push(itemNode);
+ links.push({ source: subHubNode, target: itemNode, width: 18, distance: 40 });
+ if (item.type === 'folder' && item.folderKey && fileSystemDB[item.folderKey]) {
+ const subItems = fileSystemDB[item.folderKey] || [];
+ subItems.slice(0, 3).forEach(subItem => {
+ const subNode = {
+ id: subItem.id,
+ name: '',
+ fullName: subItem.name,
+ type: 'sub-room',
+ r: 16,
+ targetX: config.x * 1.5,
+ targetY: config.y * 1.5,
+ pathData: generateOrganicPath(16),
+ folderKey: subItem.folderKey || null,
+ iconUrl: getFileIndexIcon(subItem),
+ itemData: subItem
+ };
+ nodes.push(subNode);
+ links.push({ source: itemNode, target: subNode, width: 10, distance: 28 });
+ });
  }
  });
- const nodeGroups = svg.selectAll('.file-index-node')
- .data(allNodes)
- .enter()
- .append('g')
- .attr('class', 'file-index-node')
- .attr('transform', d => `translate(${d.x}, ${d.y})`)
- .style('cursor', 'pointer')
- .on('click', function(event, d) {
+ });
+ // D3 Force Simulation
+ const simulation = d3.forceSimulation(nodes)
+ .force("link", d3.forceLink(links).id(d => d.id).distance(d => d.distance).strength(1.2))
+ .force("collide", d3.forceCollide().radius(d => d.r + 4).iterations(6))
+ .force("x", d3.forceX(d => d.targetX || 0).strength(d => d.type === 'room' || d.type === 'sub-room' ? 0.4 : 0.15))
+ .force("y", d3.forceY(d => d.targetY || 0).strength(d => d.type === 'room' || d.type === 'sub-room' ? 0.4 : 0.15))
+ .force("charge", d3.forceManyBody().strength(-200))
+ .stop();
+ for (let i = 0; i < 350; ++i) simulation.tick();
+ // Calculate viewBox to fit 100% screen
+ let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+ nodes.forEach(d => {
+ const r = d.r + 25;
+ if (d.x - r < minX) minX = d.x - r;
+ if (d.x + r > maxX) maxX = d.x + r;
+ if (d.y - r < minY) minY = d.y - r;
+ if (d.y + r > maxY) maxY = d.y + r;
+ });
+ const contentWidth = maxX - minX;
+ const contentHeight = maxY - minY;
+ const screenRatio = window.innerWidth / window.innerHeight;
+ const contentRatio = contentWidth / contentHeight;
+ let viewWidth, viewHeight;
+ if (screenRatio > contentRatio) {
+ viewHeight = contentHeight;
+ viewWidth = viewHeight * screenRatio;
+ } else {
+ viewWidth = contentWidth;
+ viewHeight = viewWidth / screenRatio;
+ }
+ const padding = 30;
+ const centerX = (minX + maxX) / 2;
+ const centerY = (minY + maxY) / 2;
+ const finalViewX = centerX - viewWidth / 2 - padding;
+ const finalViewY = centerY - viewHeight / 2 - padding;
+ const finalViewW = viewWidth + padding * 2;
+ const finalViewH = viewHeight + padding * 2;
+ svg.attr("viewBox", `${finalViewX} ${finalViewY} ${finalViewW} ${finalViewH}`)
+ .attr("preserveAspectRatio", "xMidYMid slice");
+ // Create layers
+ const linkLayer = svg.append("g");
+ const membraneLayer = svg.append("g");
+ const roomLayer = svg.append("g");
+ const iconLayer = svg.append("g");
+ const labelLayer = svg.append("g");
+ // Draw corridors (links)
+ linkLayer.selectAll("line")
+ .data(links).enter().append("line")
+ .attr("stroke", "rgba(255,255,255,0.08)")
+ .attr("stroke-width", d => d.width)
+ .attr("stroke-linecap", "round")
+ .attr("x1", d => d.source.x)
+ .attr("y1", d => d.source.y)
+ .attr("x2", d => d.target.x)
+ .attr("y2", d => d.target.y);
+ // Draw membrane outline
+ let membranePoints = [];
+ nodes.forEach(d => {
+ const numPts = 10;
+ for (let i = 0; i < numPts; i++) {
+ const angle = (i / numPts) * Math.PI * 2;
+ const r = d.r + 15;
+ membranePoints.push([d.x + Math.cos(angle) * r, d.y + Math.sin(angle) * r]);
+ }
+ });
+ const hull = d3.polygonHull(membranePoints);
+ if (hull) {
+ membraneLayer.append("path")
+ .attr("fill", "none")
+ .attr("stroke", "rgba(255,255,255,0.06)")
+ .attr("stroke-width", 2)
+ .attr("d", d3.line().curve(d3.curveBasisClosed)(hull));
+ }
+ // Draw room shapes
+ const roomGroups = roomLayer.selectAll("g")
+ .data(nodes).enter().append("g")
+ .attr("transform", d => `translate(${d.x}, ${d.y})`)
+ .attr("data-folder", d => d.folderKey)
+ .style("cursor", "pointer")
+ .on("click", function(event, d) {
  event.stopPropagation();
- if (d.type === 'root') {
+ if (d.folderKey === 'root') {
  exitFileIndexZoom('root');
- } else if (d.type === 'category' || (d.type === 'folder' && d.folderKey)) {
- exitFileIndexZoom(d.folderKey || d.id);
+ } else if (d.type === 'hub' || d.type === 'sub-hub' || (d.type === 'room' && d.folderKey)) {
+ exitFileIndexZoom(d.folderKey);
  } else if (d.itemData) {
  exitFileIndexZoom(null, d.itemData);
  }
  });
- nodeGroups.each(function(d, i) {
- const g = d3.select(this);
- g.append('circle')
- .attr('r', d.r + 2)
- .attr('fill', 'rgba(0,0,0,0.3)')
- .attr('filter', 'blur(4px)');
+ // Room path shapes
+ roomGroups.append("path")
+ .attr("d", d => d.pathData)
+ .attr("fill", "rgba(255,255,255,0.04)")
+ .attr("stroke", "rgba(255,255,255,0.12)")
+ .attr("stroke-width", 1);
+ // Create defs for icon patterns
+ const defs = svg.append("defs");
+ nodes.forEach((d, i) => {
  if (d.iconUrl) {
- g.append('circle')
- .attr('r', d.r)
- .attr('fill', `url(#icon-pattern-${i})`)
- .attr('stroke', 'rgba(255,255,255,0.2)')
- .attr('stroke-width', 1);
- } else {
- g.append('circle')
- .attr('r', d.r)
- .attr('fill', 'rgba(40,40,40,0.8)')
- .attr('stroke', 'rgba(255,255,255,0.2)')
- .attr('stroke-width', 1);
- const iconSize = d.r * 1.2;
- g.append('svg')
- .attr('x', -iconSize/2)
- .attr('y', -iconSize/2)
- .attr('width', iconSize)
- .attr('height', iconSize)
- .attr('viewBox', '0 0 24 24')
- .html(getDefaultIconSVG(d.type));
+ const clipId = `file-index-clip-${i}`;
+ defs.append("clipPath")
+ .attr("id", clipId)
+ .append("circle")
+ .attr("r", d.r * 0.7);
  }
  });
- nodeGroups.filter(d => d.name && d.name.length > 0)
- .append('text')
- .attr('class', 'file-index-label')
- .attr('y', d => d.r + 14)
+ // Draw icons inside rooms
+ iconLayer.selectAll("g")
+ .data(nodes).enter().append("g")
+ .attr("transform", d => `translate(${d.x}, ${d.y})`)
+ .each(function(d, i) {
+ const g = d3.select(this);
+ const iconR = d.r * 0.7;
+ if (d.iconUrl) {
+ g.append("clipPath")
+ .attr("id", `icon-clip-${i}`)
+ .append("circle")
+ .attr("r", iconR);
+ g.append("image")
+ .attr("href", d.iconUrl)
+ .attr("x", -iconR)
+ .attr("y", -iconR)
+ .attr("width", iconR * 2)
+ .attr("height", iconR * 2)
+ .attr("clip-path", `url(#icon-clip-${i})`)
+ .attr("preserveAspectRatio", "xMidYMid slice")
+ .style("opacity", 0.85);
+ } else {
+ g.append("circle")
+ .attr("r", iconR * 0.6)
+ .attr("fill", "rgba(255,255,255,0.15)");
+ const svgIcon = g.append("svg")
+ .attr("x", -iconR * 0.5)
+ .attr("y", -iconR * 0.5)
+ .attr("width", iconR)
+ .attr("height", iconR)
+ .attr("viewBox", "0 0 24 24");
+ svgIcon.html(getDefaultIconSVG(d.type || 'default'));
+ }
+ });
+ // Draw labels
+ labelLayer.selectAll("text")
+ .data(nodes.filter(d => d.name && d.name.length > 0))
+ .enter().append("text")
+ .attr("x", d => d.x)
+ .attr("y", d => d.y + d.r + 12)
+ .attr("text-anchor", "middle")
+ .attr("fill", "rgba(255,255,255,0.7)")
+ .attr("font-size", d => d.type === 'root' ? 11 : (d.type === 'hub' || d.type === 'sub-hub' ? 9 : 7))
+ .attr("font-weight", d => d.type === 'root' || d.type === 'hub' ? 600 : 400)
+ .attr("pointer-events", "none")
+ .style("text-shadow", "0 1px 3px rgba(0,0,0,0.8)")
  .text(d => d.name);
  fileIndexSVG = svg;
+ }
+ function getZoneIcon(zone) {
+ const icons = {
+ 'decentralize': 'https://static.wixstatic.com/media/54a996_64bf67985c1f490aa39904908cd47b09~mv2.png',
+ 'Experience': 'https://static.wixstatic.com/media/54a996_737fd77ba60246a092e841165a379da2~mv2.png',
+ 'Gallery': 'https://static.wixstatic.com/media/54a996_67f15dfac881405f84631e798bc6cbf5~mv2.png',
+ 'Item': 'https://static.wixstatic.com/media/54a996_1201b6cebfa04334b98c96c59e9eac1c~mv2.png',
+ 'Design': 'https://static.wixstatic.com/media/54a996_1201b6cebfa04334b98c96c59e9eac1c~mv2.png',
+ 'Avatar': 'https://static.wixstatic.com/media/54a996_1201b6cebfa04334b98c96c59e9eac1c~mv2.png',
+ 'Space': 'https://static.wixstatic.com/media/54a996_1201b6cebfa04334b98c96c59e9eac1c~mv2.png'
+ };
+ return icons[zone] || null;
  }
  function initParametricPlan() {
  const rawData = {
